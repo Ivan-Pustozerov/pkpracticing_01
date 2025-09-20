@@ -1,0 +1,5 @@
+#input,result
+#this is comment line/ it is always ignored by tester
+3,6
+5,10
+3,5
