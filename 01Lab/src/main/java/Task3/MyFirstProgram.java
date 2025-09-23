@@ -1,3 +1,5 @@
+package Task3;
+
 class MyFirstClass {
     public static void main(String[] s){
         MySecondClass o = new MySecondClass(0,1);

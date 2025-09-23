@@ -1,3 +1,5 @@
+package Task4;
+
 import myfirstpackage.*;
 class MyFirstClass {
     public static void main(String[] s){

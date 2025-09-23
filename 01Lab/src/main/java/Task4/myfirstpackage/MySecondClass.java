@@ -1,4 +1,4 @@
-package myfirstpackage;
+package Task4.myfirstpackage;
 public class MySecondClass{
     private int a;
     private int b;
