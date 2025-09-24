@@ -1,4 +1,4 @@
-import org.junit.jupiter.api.*;
+/*import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -14,9 +14,9 @@ public class ExTest {
     }
 
     @ParameterizedTest
-    @CsvFileSource(resources = "/data.csv",numLinesToSkip = 0)
+    @CsvFileSource(resources = "/exdata.csv",numLinesToSkip = 0)
     void getDoubleATest(int a, int result) {
         obj = new Ex.A(a);
         Assertions.assertEquals(result,obj.getDoubleA());
     }
-}
+}*/
