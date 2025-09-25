@@ -8,6 +8,7 @@
 0.123123213,0.015159325579443368
 -4.0,16.0
 -0.1,0.01
+-9,81
 1e3,1e6
 1e16,1e32
 1e-11,1e-22
@@ -19,6 +20,8 @@ Infinity,Infinity
 -3,9
 "LOG Other type check","FLOAT"
 4.0f,16.0
+-0.1f,0.01
 "LOG Other type check","STR"
 "string",NaN
+
 
