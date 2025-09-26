@@ -31,6 +31,7 @@ public class LazyTester {
         public void clear(){mem_in=null;}
     }
     protected double delta=1e-6;
+    protected static String NAME= new String("Default");
     protected static StringBuffer log=new StringBuffer("Default");//temp nonstatic - in case of parallel tests
     protected static String type=new String("Default");//temp nonstatic - in case of parallel tests
     protected static final String[] TYPES ={
@@ -46,6 +47,10 @@ public class LazyTester {
 
     protected static boolean STOP(){
         return (log.toString().indexOf("STOP")!=-1)? true:false;
+    }
+
+    protected static boolean isName(String msg) {
+        return(msg.charAt(0)=='N' && msg.charAt(1)=='A' && msg.charAt(2)=='M'&& msg.charAt(3)=='E');
     }
     protected static boolean isLog(String msg) {
         return(msg.charAt(0)=='L' && msg.charAt(1)=='O' && msg.charAt(2)=='G');
@@ -63,12 +68,26 @@ public class LazyTester {
         int i=0;
         int size=msg.length;
         while(!res && type_res && i<size){
-            res=isLog(msg[i++]);
+            res=isLog(msg[i]);
+            ++i;
         }
         if(res){
             log=new StringBuffer(msg[i-1]);
         }
         return res && type_res;
+    }
+    protected static boolean getName(String[] msg,String Name) {
+        boolean res=false;
+        int i=0;
+        int size=msg.length;
+        while(!res && i<size){
+            res=isName(msg[i]);
+            ++i;
+        }
+        if(res){
+            NAME=new String(Name);
+        }
+        return res;
     }
     protected boolean getLog(String msg) {
         boolean res=isLog(msg);
@@ -126,7 +145,7 @@ public class LazyTester {
         }
     }
 
-    protected LazyHolder LazyTest(ArgumentsAccessor args, String type_out){
+    protected LazyHolder LazyTest(ArgumentsAccessor args, String type_out,String func_name){
         LazyHolder holder=new LazyHolder();
         if(STOP()){return holder;}
         String[] input=new String[args.size()-1];
@@ -134,8 +153,7 @@ public class LazyTester {
         for(int i=0;i<input.length;++i) {
             input[i]=args.getString(i);
         }
-        if(!getLog(input,ans)){
-
+        if(!getLog(input,ans) && !getName(input,ans) && NAME.equals(func_name)){
             Object[] in=new Object[input.length];
             Object out=new Object();
 
