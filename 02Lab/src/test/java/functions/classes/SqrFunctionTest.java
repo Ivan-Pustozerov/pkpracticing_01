@@ -17,15 +17,6 @@ class SqrFunctionTest extends LazyTester{
     @CsvFileSource(resources = File,numLinesToSkip = 0)
     public void testApply(ArgumentsAccessor args) {
         h=this.LazyTest(args,type_out);
-        if(h!=null)
-        {
-            if(type_out.equals("DOUBLE") ||type_out.equals("FLOAT"))
-            {
-                Assertions.assertEquals((double)h.out(),(double)func.apply(h.nextIn()),delta,String.valueOf(log));
-            }
-            else{
-                Assertions.assertEquals(h.out(),func.apply(h.nextIn()),String.valueOf(log));
-            }
-        }
+        assertionTest(h,func.apply(h.nextIn()),type_out);
     }
 }

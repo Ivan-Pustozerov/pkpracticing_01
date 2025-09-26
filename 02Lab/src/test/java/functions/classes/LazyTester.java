@@ -1,14 +1,20 @@
 package functions.classes;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 
 
 public class LazyTester {
     protected class LazyHolder {//nested class//make static?????!
-        private Object[] mem_in;//(решение - отключение параллельного тестирования)
-        private Object mem_out;//делать статическими - ошибка,
+        private Object[] mem_in=null;//(решение - отключение параллельного тестирования)
+        private Object mem_out=null;//делать статическими - ошибка,
         private int counter=0;//т.к несколько тестов будут вызывать данный холдер?
-        public LazyHolder(Object[] in, Object out){
+
+        public LazyHolder(Object[] in, Object out){fillData(in,out);}
+        public LazyHolder(){}
+
+        public void fillData(Object[] in, Object out)
+        {
             mem_in=new Object[in.length];
             for(int i=0;i<in.length;++i)
             {
@@ -17,8 +23,10 @@ public class LazyTester {
             mem_out=new Object();
             mem_out=out;
         }
+
         public Object out(){return mem_out;}
-        public Object nextIn(){return mem_in[counter++];}
+        public Object nextIn() {return (mem_in!=null)? mem_in[counter++] : null;}
+        public boolean isEmpty(){return mem_in==null;}
         public void reset(){counter=0;}
         public void clear(){mem_in=null;}
     }
@@ -69,7 +77,6 @@ public class LazyTester {
         }
         return res;
     }
-
     protected static Object convert(String input,String type){
         Object in=new Object();
         if(type==TYPES[0])
@@ -107,8 +114,19 @@ public class LazyTester {
         return in;
     }
 
+    protected void assertionTest(LazyHolder h,Object func_return,String type_out)
+    {
+        if(h.isEmpty()){return;}
+        if(type_out.equals("DOUBLE") ||type_out.equals("FLOAT")) {
+            Assertions.assertEquals((double) h.out(), (double) func_return, delta, String.valueOf(log));
+        }
+        else{
+            Assertions.assertEquals(h.out(),func_return,String.valueOf(log));
+        }
+    }
+
     protected LazyHolder LazyTest(ArgumentsAccessor args, String type_out){
-        LazyHolder holder=null;
+        LazyHolder holder=new LazyHolder();
         String[] input=new String[args.size()-1];
         String ans=new String(args.getString(args.size()-1));
         for(int i=0;i<input.length;++i) {
@@ -126,21 +144,8 @@ public class LazyTester {
                 }
                 out=convert(ans,type_out);
             }catch (NumberFormatException e) {System.out.println("ERRR!!!!");}
-
-
-            holder=new LazyHolder(in,out);
-
-
-            /*if(type_out.equals("DOUBLE") ||type_out.equals("FLOAT"))
-            {
-                Assertions.assertEquals((double)out,(double)func.apply(in[0]),delta,String.valueOf(log));
-            }
-            else{
-                Assertions.assertEquals(out,func.apply(in[0]), String.valueOf(log));
-            }*/
+            holder.fillData(in,out);
         }
         return holder;
     }
-
-
 }
