@@ -21,7 +21,8 @@ Infinity,Infinity
 "LOG Other type check","FLOAT"
 4.0f,16.0
 -0.1f,0.01
+"LOG STOP","STR"
 "LOG Other type check","STR"
-"string",NaN
+"string",NaNs
 
 

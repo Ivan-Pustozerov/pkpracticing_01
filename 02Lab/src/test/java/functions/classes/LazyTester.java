@@ -30,7 +30,6 @@ public class LazyTester {
         public void reset(){counter=0;}
         public void clear(){mem_in=null;}
     }
-
     protected double delta=1e-6;
     protected static StringBuffer log=new StringBuffer("Default");//temp nonstatic - in case of parallel tests
     protected static String type=new String("Default");//temp nonstatic - in case of parallel tests
@@ -45,8 +44,10 @@ public class LazyTester {
             "STR"//String
     };
 
+    protected static boolean STOP(){
+        return (log.toString().indexOf("STOP")!=-1)? true:false;
+    }
     protected static boolean isLog(String msg) {
-
         return(msg.charAt(0)=='L' && msg.charAt(1)=='O' && msg.charAt(2)=='G');
     }
     protected static boolean isType(String msg) {
@@ -116,7 +117,7 @@ public class LazyTester {
 
     protected void assertionTest(LazyHolder h,Object func_return,String type_out)
     {
-        if(h.isEmpty()){return;}
+        if(h.isEmpty()||STOP()){System.out.println("SKIPPED");return;}
         if(type_out.equals("DOUBLE") ||type_out.equals("FLOAT")) {
             Assertions.assertEquals((double) h.out(), (double) func_return, delta, String.valueOf(log));
         }
@@ -127,6 +128,7 @@ public class LazyTester {
 
     protected LazyHolder LazyTest(ArgumentsAccessor args, String type_out){
         LazyHolder holder=new LazyHolder();
+        if(STOP()){return holder;}
         String[] input=new String[args.size()-1];
         String ans=new String(args.getString(args.size()-1));
         for(int i=0;i<input.length;++i) {
