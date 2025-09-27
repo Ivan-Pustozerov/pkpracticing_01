@@ -1,5 +1,5 @@
 # input , output
-"NAME","Other"
+"NAME","SqrFuncTest"
 "LOG double type check","DOUBLE"
 0.0,0.0
 2.0,4.0
@@ -9,7 +9,6 @@
 -4.0,16.0
 -0.1,0.01
 -9,81
-"NAME","SqrFuncTest"
 1e3,1e6
 1e16,1e32
 1e-11,1e-22
@@ -22,8 +21,39 @@ Infinity,Infinity
 "LOG Other type check","FLOAT"
 4.0f,16.0
 -0.1f,0.01
-"LOG STOP","STR"
 "LOG Other type check","STR"
-"string",NaNs
-
+"string",NaN
+"NAME","ConstFunctionTest"
+"LOG double type check","DOUBLE"
+2.0,2.0
+-3.5,-3.5
+0.0001,0.0001
+Infinity,Infinity
+"LOG Other type check","FLOAT"
+4.0f,4.0
+-4.56f,-4.56
+"LOG Other type check","STR"
+"test",NaN
+"NAME","ConstZeroTest"
+"LOG double type check","DOUBLE"
+2.0,0.0
+-3.5,0.0
+0.0001,0.0
+Infinity,0.0
+"LOG Other type check","FLOAT"
+4.0f,0.0
+-4.56f,0.0
+"LOG Other type check","STR"
+"test",0.0
+"NAME","ConstUnitTest"
+"LOG double type check","DOUBLE"
+2.0,1.0
+-3.5,1.0
+0.0001,1.0
+Infinity,1.0
+"LOG Other type check","FLOAT"
+4.0f,1.0
+-4.56f,1.0
+"LOG Other type check","STR"
+"test",1.0
 

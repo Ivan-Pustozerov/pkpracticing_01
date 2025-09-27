@@ -4,18 +4,25 @@ import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import LazyTester.LazyTester;
 
-class SqrFunctionTest extends LazyTester {
-    protected static SqrFunction func=new SqrFunction();
+class ZeroFuncTest extends LazyTester {
+    protected static ConstantFunction func;
     protected static LazyHolder h;
     protected static final String TYPE_OUT="DOUBLE";
-    protected static final String Name="SqrFuncTest";
+    protected static final String Name="ConstZeroTest";
     protected static final String FILE="/data1-1.csv";
 
-    //в параметризированном тесте мы создаем НОВЫЙ объект sqrFuncTest НА КАЖДОЙ ИТЕРАЦИИ!!!
     @ParameterizedTest
     @CsvFileSource(resources = FILE,numLinesToSkip = 0)
     public void testApply(ArgumentsAccessor args) {
         h=this.LazyTest(args,TYPE_OUT,Name);
-        assertionTest(h,func.apply(h.nextIn()),TYPE_OUT);
+        func=new ZeroFunction();
+        assertionTest(h,func.apply(h.reset().nextIn()),TYPE_OUT);
+    }
+    @ParameterizedTest
+    @CsvFileSource(resources = FILE,numLinesToSkip = 0)
+    public void testGetConst(ArgumentsAccessor args) {
+        h=this.LazyTest(args,TYPE_OUT,Name);
+        func=new ZeroFunction();
+        assertionTest(h,func.getConst(),TYPE_OUT);
     }
 }

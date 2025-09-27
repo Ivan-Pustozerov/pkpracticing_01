@@ -1,4 +1,4 @@
-package functions.classes;
+package LazyTester;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
@@ -27,7 +27,7 @@ public class LazyTester {
         public Object out(){return mem_out;}
         public Object nextIn() {return (mem_in!=null)? mem_in[counter++] : null;}
         public boolean isEmpty(){return mem_in==null;}
-        public void reset(){counter=0;}
+        public LazyHolder reset(){counter=0;return this;}
         public void clear(){mem_in=null;}
     }
     protected double delta=1e-6;
