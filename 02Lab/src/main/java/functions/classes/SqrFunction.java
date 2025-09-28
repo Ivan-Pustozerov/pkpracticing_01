@@ -1,8 +1,6 @@
 package functions.classes;
 import functions.interfaces.MathFunction;
 
-import java.io.Serializable;
-
 import static java.lang.Math.pow;//for using without namespaces
 
 public class SqrFunction implements MathFunction {

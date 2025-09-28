@@ -30,10 +30,13 @@ public class LazyTester {
         public LazyHolder reset(){counter=0;return this;}
         public void clear(){mem_in=null;}
     }
+    /// //////////////////////////
+    /// static fields не наследуются!!!!!!!
+    /// //////////////////////////
     protected double delta=1e-6;
-    protected static String NAME= new String("Default");
+    protected static String NAME= "Default";
     protected static StringBuffer log=new StringBuffer("Default");//temp nonstatic - in case of parallel tests
-    protected static String type=new String("Default");//temp nonstatic - in case of parallel tests
+    protected static String type="Default";//temp nonstatic - in case of parallel tests
     protected static final String[] TYPES ={
             "DOUBLE",//Double
             "FLOAT",//Float
@@ -134,6 +137,16 @@ public class LazyTester {
         return in;
     }
 
+    protected void assertionTest(LazyHolder h,Object func_return,String type_out,double delta)
+    {
+        if(h.isEmpty()||STOP()){System.out.println("SKIPPED");return;}
+        if(type_out.equals("DOUBLE") ||type_out.equals("FLOAT")) {
+            Assertions.assertEquals((double) h.out(), (double) func_return, delta, String.valueOf(log));
+        }
+        else{
+            Assertions.assertEquals(h.out(),func_return,String.valueOf(log));
+        }
+    }
     protected void assertionTest(LazyHolder h,Object func_return,String type_out)
     {
         if(h.isEmpty()||STOP()){System.out.println("SKIPPED");return;}
