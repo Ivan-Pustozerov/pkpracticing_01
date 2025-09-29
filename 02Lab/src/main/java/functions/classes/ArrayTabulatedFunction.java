@@ -1,5 +1,6 @@
 package functions.classes;
 import functions.abstracts.AbstractTabulatedFunction;
+import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
 
 import java.util.Arrays;
@@ -7,7 +8,7 @@ import java.util.TreeMap;
 
 import static java.lang.Math.abs;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
 
     protected double[] xVals;
     protected double[] yVals;
@@ -60,6 +61,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
         double x=((Number)X).doubleValue();
         double y=((Number)Y).doubleValue();
 
+        if(indexOfX(X)!=-1){setX(indexOfX(X),X);return;}
+
         int index=floorIndexOfX(X);
         if(index==0){index=(x<xVals[0])? index=-1: index;}
 
@@ -97,12 +100,13 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
 
     @Override public void setX(int index, Object X) {
         double x;
-        if(X instanceof Number) {
+        if(X instanceof Number && index>0 && index<count) {
             x=((Number)X).doubleValue();
             xVals[index]=x;
+            this.sort();
         }
         /// else error
-        this.sort();
+
     }
 
     @Override public int indexOfX(Object X) {
