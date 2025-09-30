@@ -13,7 +13,14 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     protected double[] xVals;
     protected double[] yVals;
 
-    public ArrayTabulatedFunction(double[] xVals,double[] yVals){
+    public double[] getxVals() {
+        return xVals;
+    }
+    public double[] getyVals() {
+        return yVals;
+    }
+
+    public ArrayTabulatedFunction(double[] xVals, double[] yVals){
         if(xVals.length==yVals.length){
             this.count=xVals.length;
             this.xVals=new double[count];
@@ -23,12 +30,13 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
                 this.xVals[i]=xVals[i];
                 this.yVals[i]=yVals[i];
             }
-            //quick sort???
-            //insertion sort - for setX = o(n)
+            this.sort();
         }
         ///else error!
     }
     public ArrayTabulatedFunction(MathFunction source,double xFrom,double xTo,int count){
+        this.xVals=new double[count];
+        this.yVals=new double[count];
         if(abs(xFrom-xTo)<1e-32) {
             for (int i = 0; i < count; ++i) {
                 this.xVals[i] = xTo;
@@ -54,6 +62,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             this.yVals[count-1] = source.apply(xTo);
         }
     }
+
     public void insert(Object X,Object Y){
         if (!(X instanceof Number) || !(Y instanceof Number)) {
             return;
@@ -64,7 +73,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         if(indexOfX(X)!=-1){setX(indexOfX(X),X);return;}
 
         int index=floorIndexOfX(X);
-        if(index==0){index=(x<xVals[0])? index=-1: index;}
+        if(index==0){
+            index=(x<xVals[0])? index=-1: index;}
 
         double[] xTemp=Arrays.copyOf(xVals,count+1);
         double[] yTemp=Arrays.copyOf(yVals,count+1);
@@ -82,22 +92,21 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     @Override public double getX(int index) {
+        if(index>count || index <0)return Double.NaN;
         return xVals[index];
     }
-
     @Override public double getY(int index) {
+        if(index>count || index <0)return Double.NaN;
         return yVals[index];
     }
-
     @Override public void setY(int index, Object val) {
         double y;
-        if(val instanceof Number) {
+        if(val instanceof Number && index>0 && index<count) {
             y=((Number)val).doubleValue();
             yVals[index]=y;
         }
         ///else{error}
     }
-
     @Override public void setX(int index, Object X) {
         double x;
         if(X instanceof Number && index>0 && index<count) {
@@ -118,7 +127,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         }
         return (i!=-1 && i<count)? i:-1;
     }
-
     @Override public int indexOfY(Object Y) {
         double y;
         int i=-1;
@@ -131,11 +139,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override public double leftBound() {
         return xVals[0];
-    }
-
+    }//
     @Override public double rightBound() {
         return xVals[count-1];
-    }
+    }//
 
     @Override public int floorIndexOfX(Object X) {
         double x;
@@ -149,7 +156,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         return -1;
     }
 
-    /// ////////////////////////
     protected void sort(){
         TreeMap<Double,Double>dots =new TreeMap<>();
         for(int i=0;i<count;++i){
@@ -165,12 +171,10 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
 
     @Override protected double extrapolateLeft(double x) {
         return interpolate(x,0) ;
-    }
-
+    }//
     @Override protected double extrapolateRight(double x) {
         return interpolate(x,count-2);
-    }
-
+    }//
     @Override protected double interpolate(double x, int floorIndex) {
         if(floorIndex<0 || floorIndex>count-2){
             return Double.NaN;
@@ -183,6 +187,6 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             double yright=getX(floorIndex+1);
             return interpolate(x,xleft,xright,yleft,yright);
         }
-    }
+    }//
 
 }
