@@ -1,4 +1,5 @@
 package functions.classes;
+
 import functions.interfaces.MathFunction;
 public class SimpleIterationMethod implements MathFunction{
 
