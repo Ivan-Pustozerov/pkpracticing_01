@@ -114,7 +114,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         int i=-1;
         if(X instanceof Number) {
             x=((Number)X).doubleValue();
-            for(i=0;i<count && abs(x-xVals[i])<1e-32 ;++i);
+            for(i=0;i<count && abs(x-xVals[i])>1e-32 ;++i);
         }
         return (i!=-1 && i<count)? i:-1;
     }
@@ -124,7 +124,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         int i=-1;
         if(Y instanceof Number) {
             y=((Number)Y).doubleValue();
-            for(i=0;i<count && abs(y-yVals[i])<1e-32;++i){}
+            for(i=0;i<count && abs(y-yVals[i])>1e-32;++i){}
         }
         return (i!=-1 && i<count)? i:-1;
     }
@@ -142,7 +142,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         if(X instanceof Number) {
             int i=0;
             x=((Number)X).doubleValue();
-            for (; i < count && abs(x - xVals[i]) < 1e-32 && x < xVals[i]; ++i);
+            for (; i < count && abs(x - xVals[i]) > 1e-32 && x > xVals[i]; ++i);
             if(i==count){return count-1;}
             return (x < xVals[i]) ? i - 1 : i;
         }
