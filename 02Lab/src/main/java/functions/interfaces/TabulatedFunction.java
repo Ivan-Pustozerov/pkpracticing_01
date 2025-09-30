@@ -5,7 +5,7 @@ public interface TabulatedFunction extends MathFunction {
     double getY(int index);
     void setY(int index,Object val);
     /// /Unnecessary!
-    void setX(int index,Object val);
+    void setX(int index,Object x);
     /// /
     int indexOfX(Object x);
     int indexOfY(Object y);

@@ -8,7 +8,6 @@ public class CompositeFunction implements MathFunction{
         this.ff = ff;
         this.sf = sf;
     }
-
     @Override
     public double apply(Object x){
         double first = ff.apply(x);

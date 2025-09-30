@@ -4,16 +4,18 @@ import functions.interfaces.MathFunction;
 import functions.interfaces.TabulatedFunction;
 
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
-    private int count;
+    protected int count;
     protected abstract int floorIndexOfX(Object x);
-    protected abstract double extrapolateLeft(Object x);
-    protected abstract double extrapolateRight(Object x);
-    protected abstract double interpolate(Object x,int floorIndex);
+    protected abstract double extrapolateLeft(double x);
+    protected abstract double extrapolateRight(double x);
+    protected abstract double interpolate(double x,int floorIndex);
+
     protected double interpolate(double x,double leftX,double rightX,double leftY,double rightY){
         return leftY+(rightY-leftY)*(x-leftX)/(rightX-leftX);
     }
-    public int getCount(){return count;}
 
+
+    public int getCount(){return count;}
     public double apply(Object X){
         if(X instanceof Number)
         {
