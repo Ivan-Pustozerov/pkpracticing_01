@@ -1,142 +1,166 @@
 package functions.classes;
-
-import LazyTester.LazyTester;
+import functions.classes.ArrayTabulatedFunction;
 import functions.interfaces.MathFunction;
-import functions.interfaces.MathFunction2args;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.swing.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+class ArrayTabulatedFunctionTest {
 
-class ArrayTabulatedFunctionTest extends LazyTester {
-    protected static ArrayList<ArrayTabulatedFunction> funcs=new ArrayList<>();
-    protected static LazyHolder h;
-    protected static final String TYPE_OUT="DOUBLE";
-    protected static final String FILE="/data1-1.csv";
-    protected static final double delta=1e-3;
-    protected static final double x0=0.0;
-    protected static final double y0=0.0;
-    protected static final double step=0.00001;
+    private double[] xs = {1, 2, 3, 4, 5};
+    private double[] ys = {10, 20, 30, 40, 50};
+    private double delta =1e-32;
+    private ArrayTabulatedFunction func;
+
+    @BeforeEach
+    void setup() {
+        func = new ArrayTabulatedFunction(xs, ys);
+    }
 
     @Test
-    public void constructorTest(){
-        double[] xVals ={0,3,2,1.6,-1.8,4.4,7,5,9,6};
-        double[] yVals ={1,2,4,-4,23,0,11,-5,59,3.1};
-        int index =0;
-        funcs.add(new ArrayTabulatedFunction(xVals,yVals));
-        ArrayTabulatedFunction func=funcs.get(index++);
-        Assertions.assertNotNull(func,"Object not Created!");
-        Assertions.assertNotNull(func.getxVals());
-        Assertions.assertNotNull(func.getyVals());
-
-        MathFunction f = x->new IdentityFunction().apply(x);
-        funcs.add(new ArrayTabulatedFunction(f,-1.0,10.0,11));
-        func=funcs.get(index++);
-        Assertions.assertNotNull(func,"Object not Created!");
-        Assertions.assertNotNull(func.getxVals());
-        Assertions.assertNotNull(func.getyVals());
-
-        funcs.add(new ArrayTabulatedFunction(f,0.0,0.0,5));
-        func=funcs.get(index++);
-        Assertions.assertNotNull(func,"Object not Created!");
-        Assertions.assertNotNull(func.getxVals());
-        Assertions.assertNotNull(func.getyVals());
-
-        funcs.add(new ArrayTabulatedFunction(f,10,-0.4,5));
-        func=funcs.get(index++);
-        Assertions.assertNotNull(func,"Object not Created!");
-        Assertions.assertNotNull(func.getxVals());
-        Assertions.assertNotNull(func.getyVals());
-
+    void testConstructor() {
+        func = new ArrayTabulatedFunction(xs, ys);
+        for (int i = 1; i < xs.length; i++) {
+            assertEquals(xs[i],func.getxVals()[i],delta);
+            assertEquals(ys[i],func.getyVals()[i],delta);
+        }
     }
+
+    @Test
+    void testConstructorWithMismatchedArrays() {
+        double[] xsBad = {1, 2, 3};
+        double[] ysBad = {10, 20};
+        assertThrows(IllegalArgumentException.class, () -> new ArrayTabulatedFunction(xsBad, ysBad));
+    }
+
+    @Test
+    void testGetXandYValidIndexes() {
+        for (int i = 0; i < xs.length; i++) {
+            assertEquals(xs[i], func.getX(i),delta);
+            assertEquals(ys[i], func.getY(i),delta);
+        }
+    }
+
+    @Test
+    void testGetXandYInvalidIndexes() {
+        assertTrue(Double.isNaN(func.getX(-1)));
+        assertTrue(Double.isNaN(func.getX(xs.length)));
+        assertTrue(Double.isNaN(func.getY(-1)));
+        assertTrue(Double.isNaN(func.getY(ys.length)));
+    }
+
+    @Test
+    void testSetXValid() {
+        func.setX(1, 8.0);
+        assertEquals(8.0, func.rightBound(),delta);
+        //checks if sorted:
+        double[] sorted = func.getxVals();
+        for (int i = 1; i < sorted.length; i++) {
+            assertTrue(sorted[i] - sorted[i-1]>delta);
+        }
+    }
+
+    @Test
+    void testSetXInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> func.setX(1, "string"));
+        assertThrows(IllegalArgumentException.class, () -> func.setX(-1, 1.0));
+        assertThrows(IllegalArgumentException.class, () -> func.setX(xs.length, 1.0));
+    }
+
+    @Test
+    void testSetYValid() {
+        func.setY(2, 100.0);
+        assertEquals(100.0, func.getY(2),delta);
+    }
+
+    @Test
+    void testSetYInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> func.setY(2, "string"));
+        assertThrows(IllegalArgumentException.class, () -> func.setY(-1, 10.0));
+        assertThrows(IllegalArgumentException.class, () -> func.setY(ys.length, 10.0));
+    }
+
+    @Test
+    void testIndexOfXWithValidAndInvalid() {
+        assertEquals(0, func.indexOfX(1.0));
+        assertEquals(-1, func.indexOfX("string"));
+        assertEquals(xs.length - 1, func.indexOfX(5.0));
+    }
+    @Test
+    void testIndexOfYWithValidAndInvalid() {
+        assertEquals(0, func.indexOfY(10));
+        assertEquals(-1, func.indexOfY(5000));
+        assertEquals(-1, func.indexOfY("string"));
+        assertEquals(xs.length - 1, func.indexOfY(50));
+    }
+
+    @Test
+    void testSortMaintainsOrdering() {
+        func.setX(0, 10.0);
+        double[] vals = func.getxVals();
+        for (int i = 1; i < vals.length; i++) {
+            assertTrue(vals[i] >= vals[i - 1]);
+        }
+    }
+
+    @Test
+    void testInterpolationWithinRange() {
+        double xMid = 2.5;
+        double expectedY = 25.0;
+        double resultY = func.apply(xMid);
+        assertEquals(expectedY, resultY,delta);
+    }
+
+    @Test
+    void testfloorIndexOfXValidAndInvalid() {
+        assertEquals(-1, func.floorIndexOfX("string"));
+        assertEquals(func.getCount(), func.floorIndexOfX(10000.0));
+        assertEquals(func.getCount(), func.floorIndexOfX(10000.0));
+    }
+    @Test
+    void testInterpolationAtBounds() {
+        assertEquals(ys[0], func.apply(xs[0]),delta);
+        assertEquals(ys[ys.length - 1], func.apply(xs[xs.length - 1]),delta);
+    }
+
+    @Test
+    void testInterpolationOutOfRange() {
+
+        double leftOut = func.apply(xs[0] - 1);
+        double rightOut = func.apply(xs[xs.length - 1] + 1);
+        assertTrue(leftOut < ys[0] || leftOut > ys[0]);
+        assertTrue(rightOut < ys[ys.length - 1] || rightOut > ys[ys.length - 1]);
+    }
+
+    @Test
+    void testConstructorFromFunction() {
+        MathFunction mf = x -> 2 * ((Number)x).doubleValue() + 1;
+        ArrayTabulatedFunction genFunc = new ArrayTabulatedFunction(mf, 0.0, 5.0, 6);
+        assertEquals(6, genFunc.getCount());
+        for (int i = 0; i < genFunc.getCount(); i++) {
+            double x = genFunc.getX(i);
+            double y = genFunc.getY(i);
+            assertEquals(mf.apply(x), y,delta);
+        }
+        assertThrows(IllegalArgumentException.class,() ->new ArrayTabulatedFunction(mf, 0.0, 5.0, 0));
+        genFunc = new ArrayTabulatedFunction(mf, 0.0, 0.0, 6);
+        genFunc = new ArrayTabulatedFunction(mf, 5.0, 0.0, 6);
+    }
+
     @Disabled
-    void insert() {
-        for(ArrayTabulatedFunction func : funcs){
-            func.insert(2.0,1.0);
-            func.insert(2.0,0.1);
-            func.insert("2.1",0.1);
-            func.insert(2.1,"0.1");
-            func.insert(func.leftBound(),0.3);
-            func.insert(func.leftBound()-1.0,0.3);
-            /*System.out.println(Arrays.toString(func.getxVals()));
-            System.out.println(Arrays.toString(func.getyVals()));
-            System.out.println("dsfaas\n");*/
-            /*System.out.println(Arrays.toString(func.getxVals()));
-            System.out.println(Arrays.toString(func.getyVals()));
-            System.out.println("dsfaas\n");*/
-        }
-    }
-    @Test
-    void getX() {
-        for(ArrayTabulatedFunction func : funcs){
-            assertEquals(func.leftBound(),func.getX(0),delta);
-            assertEquals(func.rightBound(),func.getX(func.getCount()-1),delta);
-            assertEquals(Double.NaN,func.getX(func.getCount()+1),delta);
-            assertEquals(Double.NaN,func.getX(-23),delta);
-        }
+    void testRemoveAndInsert() {
+
     }
 
     @Test
-    void getY() {
-        for(ArrayTabulatedFunction func : funcs){
-            assertEquals(func.apply(func.leftBound()),func.getY(0),delta);
-            assertEquals(func.apply(func.leftBound()),func.getY(func.getCount()-1),delta);
-            assertEquals(Double.NaN,func.getY(func.getCount()+1),delta);
-            assertEquals(Double.NaN,func.getY(-23),delta);
-        }
-    }
-
-    @Test
-    void setY() {
-        for(ArrayTabulatedFunction func : funcs){
-            func.setY(2,2.3);
-            assertEquals(func.getY(2),func.getY(2),delta);
-            func.setY(2,"q.3");
-            assertEquals(func.getY(2),func.getY(2),delta);
-            func.setY(-2,2.3);
-            assertEquals(func.getY(2),func.getY(2),delta);
-        }
-    }
-
-    @Test
-    void setX() {
-        for(ArrayTabulatedFunction func : funcs){
-            func.setX(3,-1243);
-            assertEquals(-1243,func.getX(3),delta);
-            func.setX(3,"-1243");
-            assertEquals(-1243,func.getX(3),delta);
-            func.setX(-4,-1243);
-            double a=func.getX(4);
-            assertEquals(a,func.getX(4),delta);
-        }
-    }
-    @Disabled
-    @Test
-    void indexOfX() {
-        for(ArrayTabulatedFunction func : funcs){
-            assertEquals(0,func.indexOfX(func.leftBound()));
-            assertEquals(func.getCount()-1,func.indexOfX(func.rightBound()));
-            assertEquals(-1,func.indexOfX("-10000000.0"));
-        }
-    }
-    @Disabled
-    @Test
-    void indexOfY() {
-        for(ArrayTabulatedFunction func : funcs){
-            assertEquals(0,func.indexOfY(func.apply(func.leftBound())));
-            assertEquals(func.getCount()-1,func.indexOfY(func.apply(func.rightBound())));
-            assertEquals(-1,func.indexOfY("-10000000.0"));
-        }
-    }
-    @Disabled
-    @Test
-    void floorIndexOfX() {
+    void testEdgeCasesEmptyAndSingleElement() {
+        double[] singleX = {1.0};
+        double[] singleY = {10.0};
+        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
+        assertEquals(10.0, singleFunc.apply(1.0),delta);
+        assertEquals(10.0, singleFunc.apply(0.0),delta);
+        assertEquals(10.0, singleFunc.apply(2.0),delta);
     }
 }

@@ -5,6 +5,9 @@ import functions.interfaces.TabulatedFunction;
 
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
+    protected final double delta=1e-32;
+
+    protected abstract void sort();
     protected abstract int floorIndexOfX(Object x);
     protected abstract double extrapolateLeft(double x);
     protected abstract double extrapolateRight(double x);
@@ -14,9 +17,8 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         return leftY+(rightY-leftY)*(x-leftX)/(rightX-leftX);
     }
 
-
-    public int getCount(){return count;}
-    public double apply(Object X){
+    @Override public int getCount(){return count;}
+    @Override public double apply(Object X){
         if(X instanceof Number)
         {
             double x=((Number)X).doubleValue();
