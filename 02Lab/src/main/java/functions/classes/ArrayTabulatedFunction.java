@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import static java.lang.Math.abs;
 
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
 
     private double[] xVals;
     private double[] yVals;
@@ -116,6 +116,20 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction{
             return (i<count)? i-1: i;
         }
     }
+    @Override public void insert(Object x, Object y){
+        /// ДОПИСАТЬ!!!///
+    }
+    @Override public void remove(int index){
+        if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
+        for(int i=index;i<count-1;++i){
+            xVals[i]=xVals[i+1];
+            yVals[i]=yVals[i+1];
+        }
+        --count;
+        xVals=Arrays.copyOf(xVals,count);
+        yVals=Arrays.copyOf(yVals,count);
+    }
+
 
     @Override protected void sort(){
         TreeMap<Double,Double>dots =new TreeMap<>();

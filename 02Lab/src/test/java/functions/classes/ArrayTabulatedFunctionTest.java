@@ -149,9 +149,21 @@ class ArrayTabulatedFunctionTest {
         genFunc = new ArrayTabulatedFunction(mf, 5.0, 0.0, 6);
     }
 
-    @Disabled
-    void testRemoveAndInsert() {
-
+    @Test
+    void testRemoveCorrect() {
+        func.remove(2);
+        double[] xvalsnew= {1, 2, 4, 5};
+        double[] yvalsnew = {10, 20, 40, 50};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(xvalsnew[i],func.getX(i));
+            assertEquals(yvalsnew[i],func.getY(i));
+        }
+    }
+    @Test
+    void testRemoveIncorrect() {
+        assertThrows(IndexOutOfBoundsException.class,() ->func.remove(-1));//создание и вызов анонимной лямба -функции
+                                                                          //которая вернет тип Executable
+        assertThrows(IndexOutOfBoundsException.class,() ->func.remove(func.getCount()+1));
     }
 
     @Test

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import static java.lang.Math.round;
 
 public class RungeKuttaMethod implements MathFunction {
+
     protected MathFunction2args dfunc;
     protected final double step;
     protected double x0;
