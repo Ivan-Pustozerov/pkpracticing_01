@@ -1,9 +1,10 @@
 package functions.classes;
 import functions.abstracts.AbstractTabulatedFunction;
+import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
 
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
     private int count;
     private Node head;
 
@@ -94,6 +95,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         }
         double x = ((Number) X).doubleValue();
 
+        if (head == null) {
+            throw new IllegalArgumentException("Err");
+        }
         if (x < head.x) {
             return 0;
         }
@@ -327,6 +331,21 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
             res.prev = null;
         }
         return res;
+    }
+
+    public void insert(Object X,Object Y){
+        if(!(X instanceof Number) || !(Y instanceof Number)){throw new IllegalArgumentException();}
+        double x=((Number)X).doubleValue();
+        double y=((Number)Y).doubleValue();
+        Node where=floorNodeOfX(x);
+        if(where.next==this.head){addNode(x,y);}
+        else{
+            Node temp=new Node(x,y);
+            temp.prev=where;
+            temp.next=where.next;
+            where.next=temp;
+            ++count;
+        }
     }
 
 }
