@@ -11,12 +11,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         if(xVal.length != yVal.length){
             throw new IllegalArgumentException("Массивам необходимо быть одинаковой длины");
         }
-        /*
-        for(int i = 1; i < xVal.length; i++){
-            if(xVal[i] <= xVal[i-1]){
-                throw new IllegalArgumentException("Значеним необходимо строго возрастать в xVal");
-            }
-        }*/
         this.count = 0;
         this.head = null;
         for(int i = 0; i < xVal.length;i++){
@@ -100,9 +94,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         }
         double x = ((Number) X).doubleValue();
 
-        if (head == null) {
-            throw new IllegalArgumentException("Err");
-        }
         if (x < head.x) {
             return 0;
         }

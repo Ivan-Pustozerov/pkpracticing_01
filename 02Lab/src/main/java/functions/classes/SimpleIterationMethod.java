@@ -104,4 +104,5 @@ public class SimpleIterationMethod implements MathFunction{
         }
         return Approx[index];
     }
+
 }
