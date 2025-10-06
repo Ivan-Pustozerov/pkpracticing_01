@@ -1,8 +1,7 @@
 package functions.classes;
 import functions.abstracts.AbstractTabulatedFunction;
 import functions.interfaces.MathFunction;
-import java.util.Arrays;
-import java.util.TreeMap;
+
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
     private int count;
@@ -12,17 +11,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         if(xVal.length != yVal.length){
             throw new IllegalArgumentException("Массивам необходимо быть одинаковой длины");
         }
-
+        /*
         for(int i = 1; i < xVal.length; i++){
             if(xVal[i] <= xVal[i-1]){
                 throw new IllegalArgumentException("Значеним необходимо строго возрастать в xVal");
             }
-        }
+        }*/
         this.count = 0;
         this.head = null;
         for(int i = 0; i < xVal.length;i++){
             addNode(xVal[i], yVal[i]);
         }
+        this.sort();                    //дописал потом ХD
     }
     //конструктор с дискретизацией функции
     public LinkedListTabulatedFunction(MathFunction s, double xFrom, double xTo, int count){
@@ -74,7 +74,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
         return head;
     }
 
-    private Node getNode(int index){
+    public Node getNode(int index){
         if (index < 0 || index >= count){
             throw new IndexOutOfBoundsException("Индекс: " + index + ", размер: " + count);
         }
@@ -285,5 +285,57 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction {
     }else {return Double.NaN;}
     }
 
+    public void sort(){                             //Общая финкция сортировки
+        if(head.next==head||head==null){return;}    //проверяем на пустой список
+        head.prev.next=null;                        //разрываем список(делаем линейным, а не циклическим)
+        head.prev=null;
+
+        head=mergesort(head);
+        Node tails =head;
+        while (tails.next != null) {tails = tails.next;}
+        tails.next=head;                            //связываем обратно список
+        head.prev=tails;
+    }
+    private Node GetMiddle(Node x) {                //Поиск серединного
+        if (x == null) return x;
+
+        Node slow = x;
+        Node fast = x;
+
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;}
+        return slow;
+    }
+    private Node mergesort(Node x){                 //Разбитие на кусочки и слияние
+        if(x.next==null||x==null){return x;}
+
+        Node mid = GetMiddle(x);
+        Node mid_next = mid.next;
+        mid.next=null;                              //разрываем
+        if (mid_next != null) {mid_next.prev = null;}
+
+        Node left = mergesort(x);
+        Node right = mergesort(mid_next);
+        return Merge(left,right);
+    }
+    private Node Merge(Node first,Node second) {    //Слияние
+        if (first == null) return second;
+        if (second == null) return first;
+        Node res;
+
+        if(first.x<=second.x){
+            res=first;
+            res.next=Merge(first.next,second);      //значит первый нод меньше второго
+            if (res.next != null) {res.next.prev = res;}  //пересвязываем
+            res.prev = null;
+        }else{
+            res=second;
+            res.next=Merge(first,second.next);      //значит второго нод меньше первого
+            if (res.next != null) {res.next.prev = res;}
+            res.prev = null;
+        }
+        return res;
+    }
 
 }
