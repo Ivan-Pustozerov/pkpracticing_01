@@ -338,7 +338,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         double x=((Number)X).doubleValue();
         double y=((Number)Y).doubleValue();
         Node where=floorNodeOfX(x);
-        if(where.next==this.head){addNode(x,y);}
+        if(where.x==x){where.y=y;}
+        else if(where.next==this.head){addNode(x,y);}
         else{
             Node temp=new Node(x,y);
             temp.prev=where;
