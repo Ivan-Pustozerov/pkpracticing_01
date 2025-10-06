@@ -328,7 +328,34 @@ class LinkedListTabulatedFunctionTest {
         assertThrows(IllegalArgumentException.class,() -> func.insert("string","4.0"));
         assertThrows(IllegalArgumentException.class,() -> func.insert(2.3,"4.0"));
     }
+    @Test
+    void remove(){
+        double[] x ={0.0,1.0,2.0,9.0};
+        double[] y ={1.0,2.0,10.0,100.0};
+        func= new LinkedListTabulatedFunction(x,y);
+        func.remove(1);
+        double[] xnew =new double[]{0.0,2.0,9.0};
+        double[] ynew =new double[]{1.0,10.0,100.0};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(xnew[i],func.getX(i));
+            assertEquals(ynew[i],func.getY(i));
+        }
+    }
 
+    @Test
+    void setX1() {
+        double[] x ={2.0,4.0,5.0,9.0};
+        double[] y ={1.0,2.0,10.0,100.0};
+        func= new LinkedListTabulatedFunction(x,y);
+        func.setX(1,3.0);
+        double[] nx ={2.0,3.0,5.0,9.0};
+        double[] ny ={1.0,2.0,10.0,100.0};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(nx[i],func.getX(i));
+            assertEquals(ny[i],func.getY(i));
+        }
+
+    }
     @Disabled
     void sort() {
     }

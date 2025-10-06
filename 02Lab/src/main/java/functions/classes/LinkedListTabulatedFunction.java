@@ -1,10 +1,11 @@
 package functions.classes;
 import functions.abstracts.AbstractTabulatedFunction;
 import functions.interfaces.Insertable;
+import functions.interfaces.Removable;
 import functions.interfaces.MathFunction;
 
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable,Removable {
     private int count;
     private Node head;
 
@@ -170,7 +171,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             double s_x = ((Number) X).doubleValue();
             Node point = head;
             if(count==1){point.x=s_x;return;}
-            for(int i=0;i<count;i++){point=point.next;} //просто проходим до нужного индекса
+            for(int i=0;i<index;i++){point=point.next;} //просто проходим до нужного индекса
 
             if(point == head){  head = point.next;}     //если голова(решил заранее ,т.к. потом изменится point)
             point.next.prev=point.prev;                 //меняем указатели
@@ -348,5 +349,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             ++count;
         }
     }
+    public void remove(int index){
+        if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
+        Node point =head;
+        for(int i=0;i<index;++i){point=point.next;}
+        if(count==1){head=null;}else{
+                                                    //как обычно,перенаправляем указатели
+            point.prev.next = point.next;
+            point.next.prev = point.prev;
+                                                    // Если удаляем голову, сдвигаем head
+            if (point == head) {head = point.next;}
+        }
+        count--;
 
+    }
 }
