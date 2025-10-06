@@ -311,6 +311,14 @@ class LinkedListTabulatedFunctionTest {
             assertEquals(xnew[i],func.getX(i));
             assertEquals(ynew[i],func.getY(i));
         }
+        func= new LinkedListTabulatedFunction(x,y);
+        func.insert(0.0,0.0);
+        xnew =new double[]{0.0,12.0, 14.3, 50.9};
+        ynew =new double[]{0,11.2, -14.3, 5.9};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(xnew[i],func.getX(i));
+            assertEquals(ynew[i],func.getY(i));
+        }
     }
     @Test
     void insertIncorrect(){
