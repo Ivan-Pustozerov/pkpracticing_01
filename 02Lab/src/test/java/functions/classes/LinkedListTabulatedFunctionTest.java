@@ -1,5 +1,6 @@
 package functions.classes;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -291,6 +292,36 @@ class LinkedListTabulatedFunctionTest {
     }
 
     @Test
+    void insertCorrect(){
+        double[] x ={0.0,12.0, 14.3, 50.9};
+        double[] y ={0,11.2, -14.3, 5.9};
+        LinkedListTabulatedFunction func= new LinkedListTabulatedFunction(x,y);
+        func.insert(5.0,4.0);
+        double[] xnew ={0.0,5.0,12.0, 14.3, 50.9};
+        double[] ynew ={0,4.0,11.2, -14.3, 5.9};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(xnew[i],func.getX(i));
+            assertEquals(ynew[i],func.getY(i));
+        }
+        func= new LinkedListTabulatedFunction(x,y);
+        func.insert(100.0,4.0);
+        xnew =new double[]{0.0,12.0, 14.3, 50.9,100.0};
+        ynew =new double[]{0,11.2, -14.3, 5.9,4.0};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(xnew[i],func.getX(i));
+            assertEquals(ynew[i],func.getY(i));
+        }
+    }
+    @Test
+    void insertIncorrect(){
+        double[] x ={0.0,12.0, 14.3, 50.9};
+        double[] y ={0,11.2, -14.3, 5.9};
+        LinkedListTabulatedFunction func= new LinkedListTabulatedFunction(x,y);
+        assertThrows(IllegalArgumentException.class,() -> func.insert("string","4.0"));
+        assertThrows(IllegalArgumentException.class,() -> func.insert(2.3,"4.0"));
+    }
+
+    @Disabled
     void sort() {
     }
 }
