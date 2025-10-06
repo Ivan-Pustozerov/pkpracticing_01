@@ -116,8 +116,32 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             return (i<count)? i-1: i;
         }
     }
-    @Override public void insert(Object x, Object y){
-        /// ДОПИСАТЬ!!!///
+    @Override public void insert(Object X, Object Y){
+        if(!(X instanceof Number)) {throw new IllegalArgumentException();}
+        if(!(Y instanceof Number)) {throw new IllegalArgumentException();}
+        double x=((Number)X).doubleValue();
+        double y=((Number)Y).doubleValue();
+        int count = xVals.length;
+                                                    //1 случай
+        for(int i=0;i<count;++i){
+            if(xVals[i]==x){yVals[i]=y;return;}
+        }
+                                                    //2 случай
+        int pos=0;
+        while(pos<count && xVals[pos]<x)pos++;
+        double[] NxVals = new double[count + 1];
+        double[] NyVals = new double[count + 1];
+        //(откуда,начало,куда,куданачало,до чего)   - насколько разобрался
+        //да, кустарное решение, но как есть
+        System.arraycopy(xVals, 0, NxVals, 0, pos);
+        System.arraycopy(yVals, 0, NyVals, 0, pos);
+        NxVals[pos] = x;
+        NyVals[pos] = y;
+        System.arraycopy(xVals, pos, NxVals, pos+1,count-pos );
+        System.arraycopy(yVals, pos, NyVals, pos+1, count-pos);
+
+        xVals=NxVals;
+        yVals=NyVals;
     }
     @Override public void remove(int index){
         if(index<0 || index >=count){throw new IndexOutOfBoundsException();}

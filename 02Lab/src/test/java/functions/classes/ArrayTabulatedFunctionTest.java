@@ -165,7 +165,28 @@ class ArrayTabulatedFunctionTest {
                                                                           //которая вернет тип Executable
         assertThrows(IndexOutOfBoundsException.class,() ->func.remove(func.getCount()+1));
     }
-
+    //private double[] xs = {1, 2, 3, 4, 5};            <---- просто напоминаение о примере
+    //private double[] ys = {10, 20, 30, 40, 50};
+    @Test
+    void testInc() {
+        func.insert(2,5);
+        double[] nxs = {1, 2, 3, 4, 5};                     //заменим значение под икс=2 на y=5(вместо 20)
+        double[] nys = {10, 5, 30, 40, 50};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(nxs[i],func.getX(i));
+            assertEquals(nys[i],func.getY(i));
+        }
+    }
+    @Test
+    void testInc2() {
+        func.insert(13,42);
+        double[] nxs = {1, 2, 3, 4, 5, 13};                     //попробуем вставить элемент с x=13 и y=42
+        double[] nys = {10, 20, 30, 40, 50, 42};
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(nxs[i],func.getX(i));
+            assertEquals(nys[i],func.getY(i));
+        }
+    }
     @Test
     void testEdgeCasesEmptyAndSingleElement() {
         double[] singleX = {1.0};
