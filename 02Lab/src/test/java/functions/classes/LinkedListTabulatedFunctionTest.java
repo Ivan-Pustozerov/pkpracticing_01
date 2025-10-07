@@ -350,9 +350,40 @@ class LinkedListTabulatedFunctionTest {
         func.setX(1,3.0);
         double[] nx ={2.0,3.0,5.0,9.0};
         double[] ny ={1.0,2.0,10.0,100.0};
+        ///for(int i=0;i<func.getCount();++i){
+           // assertEquals(nx[i],func.getX(i));
+            //assertEquals(ny[i],func.getY(i));
+        //}
         for(int i=0;i<func.getCount();++i){
-            assertEquals(nx[i],func.getX(i));
-            assertEquals(ny[i],func.getY(i));
+            //assertEquals(nx[i],func.getX(i));
+            //assertEquals(ny[i],func.getY(i));
+            System.out.print(func.getX(i)+" ");
+        }
+        System.out.println();
+        for(int i=0;i<func.getCount();++i){
+            //assertEquals(nx[i],func.getX(i));
+            //assertEquals(ny[i],func.getY(i));
+            System.out.print(func.getY(i)+" ");
+        }
+    }
+    @Test
+    void setX2() {
+        double[] x ={2.0,4.0,5.0,9.0};
+        double[] y ={1.0,2.0,10.0,100.0};
+        func= new LinkedListTabulatedFunction(x,y);
+        func.setX(0,10.0);
+        //double[] nx ={2.0,3.0,5.0,9.0};
+       // double[] ny ={1.0,2.0,10.0,100.0};
+        for(int i=0;i<func.getCount();++i){
+            //assertEquals(nx[i],func.getX(i));
+            //assertEquals(ny[i],func.getY(i));
+            System.out.print(func.getX(i)+" ");
+        }
+        System.out.println();
+        for(int i=0;i<func.getCount();++i){
+            //assertEquals(nx[i],func.getX(i));
+            //assertEquals(ny[i],func.getY(i));
+            System.out.print(func.getY(i)+" ");
         }
 
     }

@@ -179,7 +179,11 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             point.x=s_x;
 
             Node point_pos=head;                        //ищем место
-            while(point_pos.x<=s_x){point_pos=point_pos.next;}
+            Node point_2=head;
+            //FIX: Были беды с циклом
+            if(point_pos.x<=s_x){point_pos=point_pos.next;}
+            while(point_pos.x<=s_x&&point_pos != point_2 ){point_pos=point_pos.next;}
+;
 
             point.next=point_pos;                       //перепривязываем
             point.prev=point_pos.prev;
