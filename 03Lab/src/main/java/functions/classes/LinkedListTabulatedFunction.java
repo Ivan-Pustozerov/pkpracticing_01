@@ -321,11 +321,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
         return res;
     }
-
-    public void insert(Object X,Object Y){
-        if(!(X instanceof Number) || !(Y instanceof Number)){throw new IllegalArgumentException();}
-        double x=((Number)X).doubleValue();
-        double y=((Number)Y).doubleValue();
+    @Override
+    public <T extends Number> void insert(T X,T Y){
+        double x=X.doubleValue();
+        double y=Y.doubleValue();
         Node where=floorNodeOfX(x);
         if(where.x==x){where.y=y;}
         else if(where.next==this.head){addNode(x,y);}
