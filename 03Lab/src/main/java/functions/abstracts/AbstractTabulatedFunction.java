@@ -1,10 +1,29 @@
 package functions.abstracts;
 
+import exceptions.ArrayIsNotSortedException;
+import exceptions.DifferentLengthOfArraysException;
 import functions.interfaces.TabulatedFunction;
+
+import static java.lang.Math.abs;
+
 
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
-    protected final double delta=1e-32;
+    protected final static double delta=1e-32;
+
+    protected static void checkLengthIsTheSame(double[] xVals, double[] yVals){
+        if(xVals.length != yVals.length){
+            throw new DifferentLengthOfArraysException("arrays have different length");
+        }
+    }
+    protected static void checkSorted(double[] xVals){
+        for(int i=0; i < xVals.length-1; ++i){
+            if (xVals[i] > xVals[i+1] && abs(xVals[i] - xVals[i+1]) > delta ){
+                throw new ArrayIsNotSortedException("arrays are not sorted");
+            }
+        }
+    }
+
 
     protected abstract void sort();
     protected abstract int floorIndexOfX(double x);

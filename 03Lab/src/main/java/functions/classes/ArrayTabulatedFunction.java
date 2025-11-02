@@ -15,14 +15,17 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     private double[] yVals;
 
     public ArrayTabulatedFunction(double[] xVals, double[] yVals){
-        if(xVals.length!=yVals.length){throw new IllegalArgumentException();}
+        //+ здесь проверка на длину таблы >2
+        checkLengthIsTheSame(xVals, yVals);
+        checkSorted(xVals);
+
         this.count=xVals.length;
         this.xVals=new double[count];
         this.yVals=new double[count];
         this.xVals=Arrays.copyOf(xVals,this.count);
         this.yVals=Arrays.copyOf(yVals,this.count);
-        this.sort();
     }
+
     public ArrayTabulatedFunction(MathFunction source,double xFrom,double xTo,int count){
         if(count<=0){throw new IllegalArgumentException();}
 

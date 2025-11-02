@@ -10,15 +10,15 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     private Node head;
 
     public LinkedListTabulatedFunction(double[] xVal, double[] yVal){
-        if(xVal.length != yVal.length){
-            throw new IllegalArgumentException("Массивам необходимо быть одинаковой длины");
-        }
+        //+ здесь проверка на длину таблы >2
+        checkLengthIsTheSame(xVal, yVal);
+        checkSorted(xVal);
+
         this.count = 0;
         this.head = null;
         for(int i = 0; i < xVal.length;i++){
             addNode(xVal[i], yVal[i]);
         }
-        this.sort();                    //дописал потом ХD
     }
     //конструктор с дискретизацией функции
     public LinkedListTabulatedFunction(MathFunction s, double xFrom, double xTo, int count){
