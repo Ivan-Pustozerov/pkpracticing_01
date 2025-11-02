@@ -1,5 +1,7 @@
 package functions.interfaces;
-public interface TabulatedFunction extends MathFunction {
+import functions.classes.Point;
+
+public interface TabulatedFunction extends MathFunction, Iterable<Point> {
     int getCount();
 
     double getX(int index);

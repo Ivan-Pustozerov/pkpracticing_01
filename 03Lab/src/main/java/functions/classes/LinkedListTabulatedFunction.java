@@ -4,6 +4,8 @@ import functions.interfaces.Insertable;
 import functions.interfaces.Removable;
 import functions.interfaces.MathFunction;
 
+import java.util.Iterator;
+
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable,Removable {
     private int count;
@@ -349,5 +351,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
         count--;
 
+    }
+    @Override
+    public Iterator<Point> iterator(){
+        throw new UnsupportedOperationException("under development");
     }
 }

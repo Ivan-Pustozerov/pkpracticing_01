@@ -5,6 +5,7 @@ import functions.interfaces.MathFunction;
 import functions.interfaces.Removable;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.TreeMap;
 
 import static java.lang.Math.abs;
@@ -144,6 +145,11 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         --count;
         xVals=Arrays.copyOf(xVals,count);
         yVals=Arrays.copyOf(yVals,count);
+    }
+
+    @Override
+    public Iterator<Point>  iterator(){
+        throw new UnsupportedOperationException("under development");
     }
 
     @Override protected void sort(){
