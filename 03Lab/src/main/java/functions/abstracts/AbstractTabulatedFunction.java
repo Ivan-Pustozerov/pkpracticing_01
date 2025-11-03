@@ -13,13 +13,13 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
 
     protected static void checkLengthIsTheSame(double[] xVals, double[] yVals){
         if(xVals.length != yVals.length){
-            throw new DifferentLengthOfArraysException("arrays have different length");
+            throw new DifferentLengthOfArraysException("Arrays have different length");
         }
     }
     protected static void checkSorted(double[] xVals){
         for(int i=0; i < xVals.length-1; ++i){
             if (xVals[i] > xVals[i+1] && abs(xVals[i] - xVals[i+1]) > delta ){
-                throw new ArrayIsNotSortedException("arrays are not sorted");
+                throw new ArrayIsNotSortedException("Arrays are not sorted");
             }
         }
     }
@@ -41,8 +41,9 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     @Override
     public <T extends Number> double apply(T X)
     {
-        double x = X.doubleValue();
 
+        double x = X.doubleValue();
+        /*
         if(x < leftBound()){
             return extrapolateLeft(x);
         }
@@ -57,6 +58,14 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
             else{
                 return getY(x_ind);
             }
-        }
+        }*/
+        if (x < leftBound()) return extrapolateLeft(x);
+        if (x > rightBound()) return extrapolateRight(x);
+
+        int pos = indexOfX(x);
+        if (pos != -1) return getY(pos);
+
+        int floorPos = floorIndexOfX(x);
+        return interpolate(x, floorPos);
     }
 }

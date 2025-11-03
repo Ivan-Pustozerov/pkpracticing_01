@@ -1,5 +1,5 @@
 package functions.interfaces;
 
 public interface Insertable {
-    <T extends Number> void insert(T x,T y);
+    <T extends Number> void insert(T x, T y);
 }
