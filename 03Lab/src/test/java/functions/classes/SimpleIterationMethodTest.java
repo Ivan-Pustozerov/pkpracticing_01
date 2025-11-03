@@ -14,7 +14,6 @@ class SimpleIterationMethodTest {
         double[] approx = {0.0, 0.0};
         SimpleIterationMethod method = new SimpleIterationMethod(epsilon, maxIter, matA, vecB, approx);
     }
-
     @Test
     void apply1() {
         double epsilon = 1e-6;

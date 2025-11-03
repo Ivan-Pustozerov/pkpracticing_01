@@ -159,6 +159,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yVals=Arrays.copyOf(yVals,count);
     }
 
+
     /// Фабрика итераторов:
     @Override
     public Iterator<Point>  iterator(){

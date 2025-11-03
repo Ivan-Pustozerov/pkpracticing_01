@@ -91,7 +91,6 @@ class CompositeFunctionTest {
         assertEquals(47.0, composition.apply(3.0), 1e-8, "f(g(3)) = f(13) = 47, GOOD");
         assertEquals(51.0, composition.apply(4.0), 1e-8, "f(g(3)) = f(14) = 51, GOOD");
     }
-
     @Test
     void testArrayWithLinkedListAndThen(){
         //f(x) = 4x - 5

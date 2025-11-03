@@ -12,6 +12,7 @@ class UnitFunctionTest {
         assertEquals(1.0, test.apply(-3));
         assertEquals(1.0, test.apply(0));
     }
+
     @Test
     public void testGetConst() {
         UnitFunction test = new UnitFunction();

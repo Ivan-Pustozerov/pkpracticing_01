@@ -45,6 +45,7 @@ class LinkedListTabulatedFunctionTest {
         double[] yVal = {100, 200, 300};
         LinkedListTabulatedFunction func = new LinkedListTabulatedFunction(xVal, yVal);
         assertThrows(IndexOutOfBoundsException.class, () -> func.getX(505), "Куда ты идешь?");
+
         assertThrows(IndexOutOfBoundsException.class, () -> func.getY(-404), "Видимо не туда");
 
     }

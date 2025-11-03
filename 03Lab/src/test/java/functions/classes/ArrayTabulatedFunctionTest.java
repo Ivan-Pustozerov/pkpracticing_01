@@ -101,7 +101,6 @@ class ArrayTabulatedFunctionTest {
             assertTrue(vals[i] >= vals[i - 1]);
         }
     }
-
     @Test
     void testInterpolationWithinRange() {
         double xMid = 2.5;

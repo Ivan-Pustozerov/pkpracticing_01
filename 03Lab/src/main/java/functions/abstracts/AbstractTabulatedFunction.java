@@ -6,7 +6,6 @@ import functions.interfaces.TabulatedFunction;
 
 import static java.lang.Math.abs;
 
-
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
     protected final static double delta=1e-32;
