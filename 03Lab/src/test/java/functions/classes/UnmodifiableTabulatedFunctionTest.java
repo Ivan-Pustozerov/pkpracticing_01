@@ -80,7 +80,6 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(array.rightBound(), Afunc.rightBound());
         assertEquals(list.rightBound(), Lfunc.rightBound());
     }
-
     @Test
     void iterator() {
         assertEquals(array.iterator(), Afunc.iterator());

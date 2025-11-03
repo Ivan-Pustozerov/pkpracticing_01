@@ -92,7 +92,6 @@ class ArrayTabulatedFunctionTest {
         //assertEquals(-1, func.indexOfY("string"));
         assertEquals(xs.length - 1, func.indexOfY(50));
     }
-
     @Test
     void testSortMaintainsOrdering() {
         func.setX(0, 10.0);

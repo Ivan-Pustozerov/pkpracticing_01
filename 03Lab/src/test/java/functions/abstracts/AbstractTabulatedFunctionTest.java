@@ -41,7 +41,6 @@ class AbstractTabulatedFunctionTest {
         doReturn(1).when(func).setY(1,y1);
         doReturn(1).when(func).setX(1,x1);
 
-        /// ///
         when(func.extrapolateLeft(x1)).thenReturn(func.interpolate(x1,0));
         when(func.extrapolateRight(x1)).thenReturn(func.interpolate(x1,1));
         when(func.leftBound()).thenReturn(x1);

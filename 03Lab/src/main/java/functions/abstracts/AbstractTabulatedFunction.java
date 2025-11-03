@@ -9,7 +9,6 @@ import static java.lang.Math.abs;
 public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     protected int count;
     protected final static double delta=1e-32;
-
     protected static void checkLengthIsTheSame(double[] xVals, double[] yVals){
         if(xVals.length != yVals.length){
             throw new DifferentLengthOfArraysException("Arrays have different length");

@@ -209,7 +209,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
 
         getNode(index).y = val.doubleValue();
     }
-
     @Override
     public <T extends Number> void setX(int index, T X)
     {

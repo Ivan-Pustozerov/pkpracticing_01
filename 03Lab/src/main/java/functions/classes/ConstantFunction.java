@@ -4,7 +4,6 @@ import functions.interfaces.MathFunction;
 
 public class ConstantFunction implements MathFunction {
     private final double Num;
-
     public <T extends Number> ConstantFunction(T a){
         Num=a.doubleValue();
     }

@@ -12,7 +12,6 @@ class ZeroFunctionTest {
         assertEquals(0, test.apply(-3));
         assertEquals(0, test.apply(0));
     }
-
     @Test
     public void testGetConst() {
         ZeroFunction test = new ZeroFunction();

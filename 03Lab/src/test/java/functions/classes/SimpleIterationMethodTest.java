@@ -26,6 +26,7 @@ class SimpleIterationMethodTest {
         double result = method.apply(0);
         assertEquals(1.0, result, 1e-8, "Apply должен вернуть значение приближения по индексу 0");
     }
+
     @Test
     void apply2() {
         double epsilon = 1e-6;

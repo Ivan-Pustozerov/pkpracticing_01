@@ -29,6 +29,7 @@ class LinkedListTabulatedFunctionTest {
 
         assertEquals(3, func.getCount());
     }
+
     @Test
     public void test_GetXY() {
         double[] xVal = {10, 20, 30};

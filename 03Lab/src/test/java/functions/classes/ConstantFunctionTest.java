@@ -12,7 +12,6 @@ class ConstantFunctionTest {
         assertEquals(5, f.apply(-3));
         assertEquals(5, f.apply(0));
     }
-
     @Test
     public void testGetConstReturnsConstant() {
         ConstantFunction f = new ConstantFunction(7.2);
