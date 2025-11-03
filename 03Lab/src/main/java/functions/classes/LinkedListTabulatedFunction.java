@@ -338,6 +338,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             ++count;
         }
     }
+
+    @Override
     public void remove(int index){
         if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
         Node point =head;

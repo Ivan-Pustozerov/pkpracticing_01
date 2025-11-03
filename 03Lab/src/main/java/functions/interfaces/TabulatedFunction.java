@@ -7,7 +7,7 @@ public interface TabulatedFunction extends MathFunction, Iterable<Point> {
     double getX(int index);
     double getY(int index);
 
-    <T extends Number> void setY(int index,T val);
+    <T extends Number> void setY(int index,T y);
     <T extends Number> void setX(int index,T x);
 
     <T extends Number> int indexOfX(T x);

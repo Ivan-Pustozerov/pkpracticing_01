@@ -6,6 +6,7 @@ import functions.interfaces.Removable;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import static java.lang.Math.abs;
@@ -147,10 +148,28 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yVals=Arrays.copyOf(yVals,count);
     }
 
-    @Override
-    public Iterator<Point>  iterator(){
-        throw new UnsupportedOperationException("under development");
+    /// Фабрика итераторов:
+    @Override public Iterator<Point>  iterator(){
+        Iterator<Point> ITERATOR = new Iterator<Point>()  {
+            private int i=0;
+            @Override
+            public boolean hasNext(){
+                return i<count;
+                ///Анонимный nested класс имеет неявную ссылку на объект внешнего
+                ///соответственно, можно безопасно использовать count
+            }
+            @Override
+            public Point next() {
+                if(!hasNext()) throw new NoSuchElementException("No element left");
+                Point res = new Point(xVals[i],yVals[i]);
+                ++i;
+                return res;
+            }
+        };
+        return ITERATOR;
     }
+
+
 
     @Override protected void sort(){
         TreeMap<Double,Double>dots =new TreeMap<>();
