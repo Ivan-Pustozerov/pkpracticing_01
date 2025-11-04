@@ -12,6 +12,7 @@ public class ConstantFunction implements MathFunction {
         return Num;
     }
 
+
     @Override
     public <T extends Number> double apply(T x){return Num;}
 

@@ -71,6 +71,7 @@ class CompositeFunctionTest {
         assertEquals(390625.0, level4.apply(5.0), 1.0, "sqr(identity(sqr(sqr(5)))) = 390625, GOOD");
     }
 
+
     @Test
     void testArrayWithArrayAndThen(){
         //f(x) = 4x - 5

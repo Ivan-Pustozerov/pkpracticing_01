@@ -13,6 +13,7 @@ import java.util.TreeMap;
 
 import static java.lang.Math.abs;
 
+
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
 
     private double[] xVals;

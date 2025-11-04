@@ -63,6 +63,7 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(list.indexOfX(xVals[0]), Lfunc.indexOfX(xVals[0]));
     }
 
+
     @Test
     void indexOfY() {
         assertEquals(array.indexOfY(yVals[0]), Afunc.indexOfY(yVals[0]));

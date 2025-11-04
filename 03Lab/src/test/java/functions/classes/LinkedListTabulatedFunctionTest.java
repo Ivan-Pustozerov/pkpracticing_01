@@ -11,6 +11,7 @@ class LinkedListTabulatedFunctionTest {
     private double[] yVal = {10, 20, 30, 40, 50};
     private double delta =1e-32;
     private LinkedListTabulatedFunction func;
+
     @Test
     void test_getHead() {
         func = new LinkedListTabulatedFunction(xVal, yVal);
