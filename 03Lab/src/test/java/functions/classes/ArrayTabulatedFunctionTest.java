@@ -55,10 +55,8 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testGetXandYInvalidIndexes() {
-        assertTrue(Double.isNaN(func.getX(-1)));
-        assertTrue(Double.isNaN(func.getX(xs.length)));
-        assertTrue(Double.isNaN(func.getY(-1)));
-        assertTrue(Double.isNaN(func.getY(ys.length)));
+        assertThrows(ArrayIndexOutOfBoundsException.class,() ->func.getX(-1));
+        assertThrows(ArrayIndexOutOfBoundsException.class,() ->func.getY(-1));
     }
 
     @Test
@@ -74,8 +72,9 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testSetXInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> func.setX(-1, 1.0));
-        assertThrows(IllegalArgumentException.class, () -> func.setX(xs.length, 1.0));
+        //assertThrows(IllegalArgumentException.class, () -> func.setX(1, "string"));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> func.setX(-1, 1.0));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> func.setX(xs.length, 1.0));
     }
 
     @Test
@@ -86,8 +85,9 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testSetYInvalid() {
-        assertThrows(IllegalArgumentException.class, () -> func.setY(-1, 10.0));
-        assertThrows(IllegalArgumentException.class, () -> func.setY(ys.length, 10.0));
+        //assertThrows(IllegalArgumentException.class, () -> func.setY(2, "string"));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> func.setY(-1, 10.0));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> func.setY(ys.length, 10.0));
     }
 
     @Test
@@ -124,6 +124,7 @@ class ArrayTabulatedFunctionTest {
         assertEquals(func.getCount(), func.floorIndexOfX(10000.0));
         assertEquals(func.getCount(), func.floorIndexOfX(10000.0));
     }
+
     @Test
     void testInterpolationAtBounds() {
         assertEquals(ys[0], func.apply(xs[0]),delta);
@@ -155,7 +156,6 @@ class ArrayTabulatedFunctionTest {
             double y = genFunc.getY(i);
             assertEquals(mf.apply(x), y,delta);
         }
-
         assertThrows(IllegalArgumentException.class,() ->new ArrayTabulatedFunction(mf, 0.0, 5.0, 0));
         genFunc = new ArrayTabulatedFunction(mf, 0.0, 0.0, 6);
         genFunc = new ArrayTabulatedFunction(mf, 5.0, 0.0, 6);

@@ -17,7 +17,6 @@ public class SimpleIterationMethod implements MathFunction{
         this.Approx=Approx.clone();
 
     }
-
     protected boolean Isconverge(){
         if (!IsDominant()){
             ReworkMat();

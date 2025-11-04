@@ -4,12 +4,15 @@ import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
 import functions.interfaces.Removable;
 
+import exceptions.InterpolationException;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 import static java.lang.Math.abs;
+
 
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
 
@@ -29,7 +32,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     public ArrayTabulatedFunction(MathFunction source,double xFrom,double xTo,int count){
-        if(count<=0){throw new IllegalArgumentException();}
+        if(count<=2){throw new IllegalArgumentException("Length of tabulated function must be at least 2");}
 
         this.xVals=new double[count];
         this.yVals=new double[count];
@@ -74,14 +77,23 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     @Override public double getX(int index) {
-        return (index>=count || index <0)?  Double.NaN : xVals[index];
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("INDEX OUT ARRAY");
+        }
+        return xVals[index];
     }
     @Override public double getY(int index) {
-        return (index>=count || index <0)? Double.NaN :yVals[index] ;
-    }
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("INDEX OUT ARRAY");
+        }
+        return yVals[index];
 
+    }
     @Override
     public <T extends Number> void setY(int index, T Y) {
+        if (index < 0 || index >= count) {
+            throw new ArrayIndexOutOfBoundsException("INDEX OUT ARRAY");
+        }
         yVals[index] = Y.doubleValue();
     }
     @Override
@@ -138,7 +150,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yVals=NyVals;
     }
     @Override public void remove(int index){
-        if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
+        if(index<0 || index >=count){throw new ArrayIndexOutOfBoundsException("INDEX OUT ARRAY");}
         for(int i=index;i<count-1;++i){
             xVals[i]=xVals[i+1];
             yVals[i]=yVals[i+1];
@@ -149,7 +161,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     /// Фабрика итераторов:
-    @Override public Iterator<Point>  iterator(){
+    @Override
+    public Iterator<Point>  iterator(){
         Iterator<Point> ITERATOR = new Iterator<Point>()  {
             private int i=0;
             @Override
@@ -189,7 +202,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     @Override protected double extrapolateLeft(double x) {return interpolate(x,0) ;}
     @Override protected double extrapolateRight(double x) {return interpolate(x,count);}
     @Override protected double interpolate(double x, int floorIndex) {
-        if(count==1){return yVals[0];}
+        /*if(count==1){return yVals[0];}
         else if(floorIndex==count){
             return interpolate(x,xVals[count-2],xVals[count-1],yVals[count-2],yVals[count-1]);
         }
@@ -199,7 +212,11 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
             double yleft=getY(floorIndex);
             double yright=getY(floorIndex+1);
             return interpolate(x,xleft,xright,yleft,yright);
-        }
+        }*/
+        double ourX = getX(floorIndex);
+        double nextX = getX(floorIndex + 1);
+        if (x < ourX || x > nextX) throw new InterpolationException();
+        return interpolate(x, ourX, nextX, getY(floorIndex), getY(floorIndex + 1));
     }
 
 }
