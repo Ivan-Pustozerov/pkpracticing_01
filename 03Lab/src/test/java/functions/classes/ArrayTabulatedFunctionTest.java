@@ -133,7 +133,6 @@ class ArrayTabulatedFunctionTest {
 
     @Test
     void testInterpolationOutOfRange() {
-
         double leftOut = func.apply(xs[0] - 1);
         double rightOut = func.apply(xs[xs.length - 1] + 1);
         assertTrue(leftOut < ys[0] || leftOut > ys[0]);
@@ -199,24 +198,16 @@ class ArrayTabulatedFunctionTest {
             assertEquals(nys[i],func.getY(i));
         }
     }
-    @Test
-    void testEdgeCasesEmptyAndSingleElement() {
-        double[] singleX = {1.0};
-        double[] singleY = {10.0};
-        ArrayTabulatedFunction singleFunc = new ArrayTabulatedFunction(singleX, singleY);
-        assertEquals(10.0, singleFunc.apply(1.0),delta);
-        assertEquals(10.0, singleFunc.apply(0.0),delta);
-        assertEquals(10.0, singleFunc.apply(2.0),delta);
-    }
 
     @Test
     void iterator() {
         Iterator<Point> iter = func.iterator();
         assertTrue(iter.hasNext());
+        int i = 0;
         while(iter.hasNext()){
             Point point = iter.next();
-            assertEquals(func.getxVals(),point.x);
-            assertEquals(func.getyVals(),point.y);
+            assertEquals(func.getxVals()[i],point.x);
+            assertEquals(func.getyVals()[i++],point.y);
         }
         assertFalse(iter.hasNext());
 

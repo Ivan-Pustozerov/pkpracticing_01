@@ -40,9 +40,8 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     @Override
     public <T extends Number> double apply(T X)
     {
-
         double x = X.doubleValue();
-        /*
+
         if(x < leftBound()){
             return extrapolateLeft(x);
         }
@@ -57,14 +56,6 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
             else{
                 return getY(x_ind);
             }
-        }*/
-        if (x < leftBound()) return extrapolateLeft(x);
-        if (x > rightBound()) return extrapolateRight(x);
-
-        int pos = indexOfX(x);
-        if (pos != -1) return getY(pos);
-
-        int floorPos = floorIndexOfX(x);
-        return interpolate(x, floorPos);
+        }
     }
 }
