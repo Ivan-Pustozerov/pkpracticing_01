@@ -3,6 +3,8 @@ package functions.classes;
 import exceptions.DifferentLengthOfArraysException;
 import org.junit.jupiter.api.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LinkedListTabulatedFunctionTest {
@@ -408,5 +410,26 @@ class LinkedListTabulatedFunctionTest {
     void test_sort() {
         func = new LinkedListTabulatedFunction(xVal, yVal);
         func.sort();                //ловушка заглушки :3
+    }
+    @Test
+    void test_Iterator(){
+        func = new LinkedListTabulatedFunction(new double[]{1,2,3},new double[]{2, 4, 6});
+
+        var it = func.iterator();
+        double value = 1;
+        while (it.hasNext()){
+            Point point = it.next();
+            assertEquals(point.x, value);
+            assertEquals(point.y, value*2);
+            value += 1;
+        }
+        assertThrows(NoSuchElementException.class, () -> it.next());
+        value = 1;
+        for(Point point : func){
+            assertEquals(point.x, value);
+            assertEquals(point.y, value*2);
+            value += 1;
+        }
+
     }
 }

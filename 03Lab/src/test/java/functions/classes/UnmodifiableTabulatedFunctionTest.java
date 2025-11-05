@@ -81,12 +81,27 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(array.rightBound(), Afunc.rightBound());
         assertEquals(list.rightBound(), Lfunc.rightBound());
     }
+    /*
     @Test
     void iterator() {
         assertEquals(array.iterator(), Afunc.iterator());
         assertEquals(list.iterator(), Lfunc.iterator());
     }
+    */
+    //НЕЛЬЗЯ ТАК! БУДЕТ ОШИБКА. ОНИ БУДУТ РАЗНЫЕ(ВРОДЕ)
+    //понял как
+    @Test
+    void test_Iterator_BTW(){
+        var arrayFunc = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+        var unmod = new UnmodifiableTabulatedFunction(arrayFunc);
 
+        int pointer = 1;
+        for(Point point: unmod){
+            assertEquals(point.x, pointer);
+            assertEquals(point.y, pointer * 10);
+            pointer++;
+        }
+    }
     @Test
     void apply() {
         assertEquals(array.apply(xVals[0]), Afunc.apply(xVals[0]));

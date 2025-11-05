@@ -7,6 +7,7 @@ import functions.interfaces.MathFunction;
 import functions.interfaces.Removable;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable,Removable {
     public static class Node {
@@ -442,6 +443,23 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
     @Override
     public Iterator<Point> iterator(){
-        throw new UnsupportedOperationException("under development");
+        return new Iterator <Point>(){
+            private Node current = head;
+            private int itcount = 0;
+            @Override
+            public boolean hasNext(){
+                return itcount<count;
+            }
+            @Override
+            public Point next(){
+                if(!hasNext()){
+                    throw new NoSuchElementException("There is no more elements");
+                }
+                Point Pi = new Point(current.x, current.y);
+                current = current.next;
+                itcount++;
+                return Pi;
+            }
+        };
     }
 }
