@@ -1,6 +1,7 @@
 package functions.interfaces;
 import functions.classes.Point;
 
+///  Самый общий функционал табулированных функций
 public interface TabulatedFunction extends MathFunction, Iterable<Point> {
     int getCount();
 
