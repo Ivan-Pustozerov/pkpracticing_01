@@ -1,11 +1,13 @@
 package io;
 
 import functions.classes.Point;
+import functions.factory.TabulatedFunctionFactory;
 import functions.interfaces.TabulatedFunction;
 
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
 
 /// Статический Сервис для ввода-вывода
 public final class FunctionsIO {
@@ -24,5 +26,33 @@ public final class FunctionsIO {
             printer.printf("%f %f\n", p.x(), p.y());       // печать точек
         }
         printer.flush();                         // подтвердить изменения и записать внутренний буффер в поток
+    }
+
+    public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory){
+        try{
+            int count = Integer.parseInt(reader.readLine());
+            double[] xVals = new double[count];
+            double[] yVals = new double[count];
+            NumberFormat format = NumberFormat.getInstance(Locale.forLanguageTag("ru"));
+
+
+            try{
+                for(int i=0; i < count; ++i){
+                    String[] line=reader.readLine().split(" ");
+                    xVals[i] = format.parse(line[0]).doubleValue();
+                    yVals[i] = format.parse(line[1]).doubleValue();
+                }
+            }
+            catch (ParseException pe){
+                IOException e = new IOException("Parse Error");
+                e.initCause(pe);
+                throw e;
+            }
+            return factory.create(xVals, yVals);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 }
