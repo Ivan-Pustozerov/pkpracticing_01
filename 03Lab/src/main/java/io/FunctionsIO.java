@@ -18,7 +18,7 @@ public final class FunctionsIO {
     }
 
 ///==================ФУНКЦИОНАЛ================================================================
-    /// Печатает в поток символов таб функцию - Printer - не выбрасывает исключений никогда
+    /// Печатает в поток СИМВОЛОВ таб функцию - Printer - не выбрасывает исключений никогда
     public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction func){
         PrintWriter printer = new PrintWriter(writer); // создание обертки над Writer
         printer.println(func.getCount());             // печать кол-ва точек
@@ -28,6 +28,7 @@ public final class FunctionsIO {
         printer.flush();                         // подтвердить изменения и записать внутренний буффер в поток
     }
 
+    /// Читает функцию из СИМВОЛЬНОГО потока записи - не выбрасывает вызываемых исключений никогда
     public static TabulatedFunction readTabulatedFunction(BufferedReader reader, TabulatedFunctionFactory factory){
         try{
             int count = Integer.parseInt(reader.readLine());
@@ -55,4 +56,18 @@ public final class FunctionsIO {
         }
         return null;
     }
+
+    public static void serialize(BufferedOutputStream stream, TabulatedFunction func) throws IOException {
+        ObjectOutputStream objStream = new ObjectOutputStream(stream);
+        objStream.writeObject(func);
+        objStream.flush();
+    }
+
+
+
+
+
+
+
+
 }
