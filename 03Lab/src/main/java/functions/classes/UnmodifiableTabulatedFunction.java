@@ -19,6 +19,7 @@ public class UnmodifiableTabulatedFunction implements TabulatedFunction{
         throw new UnsupportedOperationException("Y is constant");
     }
 
+
     @Override
     public <T extends Number> void setX(int index,T x){
         throw new UnsupportedOperationException("X is constant");

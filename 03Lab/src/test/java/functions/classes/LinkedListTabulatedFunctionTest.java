@@ -299,6 +299,7 @@ class LinkedListTabulatedFunctionTest {
         double result = func.extrapolateRight(5);
         assertEquals(yVal[yVal.length - 1], result);
     }
+
     @Test
     void test_interpolate() {
         double[] xVal= {0, 1, 2};

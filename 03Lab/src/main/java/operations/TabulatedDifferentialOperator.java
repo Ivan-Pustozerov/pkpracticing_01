@@ -5,6 +5,7 @@ import functions.factory.ArrayTabulatedFunctionFactory;
 import functions.factory.TabulatedFunctionFactory;
 import functions.interfaces.TabulatedFunction;
 
+
 public class TabulatedDifferentialOperator implements DifferentialOperator<TabulatedFunction>{
     ///===============================================================================================
     TabulatedFunctionFactory factory;

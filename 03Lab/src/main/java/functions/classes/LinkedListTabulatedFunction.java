@@ -303,6 +303,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             curr = curr.next;
         }
 
+
         return count - 1;
     }
     protected Node floorNodeOfX(double x){
