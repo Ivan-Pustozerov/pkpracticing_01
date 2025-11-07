@@ -42,12 +42,12 @@ class LinkedListTabulatedFunctionTest {
         double[] xVal = {1.0, 2.0};
         double[] yVal = {3.0};
 
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DifferentLengthOfArraysException exception = assertThrows(
+                DifferentLengthOfArraysException.class,
                 () -> new LinkedListTabulatedFunction(xVal, yVal)
         );
 
-        assertEquals("Массивам необходимо быть одинаковой длины", exception.getMessage());
+        assertEquals("arrays have different length", exception.getMessage());
     }
 
     @Test
@@ -344,42 +344,16 @@ class LinkedListTabulatedFunctionTest {
         func.setX(1,3.0);
         double[] nx ={2.0,3.0,5.0,9.0};
         double[] ny ={1.0,2.0,10.0,100.0};
-        ///for(int i=0;i<func.getCount();++i){
-           // assertEquals(nx[i],func.getX(i));
-            //assertEquals(ny[i],func.getY(i));
-        //}
-        for(int i=0;i<func.getCount();++i){
-            //assertEquals(nx[i],func.getX(i));
-            //assertEquals(ny[i],func.getY(i));
-            System.out.print(func.getX(i)+" ");
-        }
-        System.out.println();
-        for(int i=0;i<func.getCount();++i){
-            //assertEquals(nx[i],func.getX(i));
-            //assertEquals(ny[i],func.getY(i));
-            System.out.print(func.getY(i)+" ");
-        }
-    }
-    @Test
-    void setX2() {
-        double[] x ={2.0,4.0,5.0,9.0};
-        double[] y ={1.0,2.0,10.0,100.0};
-        func= new LinkedListTabulatedFunction(x,y);
-        func.setX(0,10.0);
-        //double[] nx ={2.0,3.0,5.0,9.0};
-       // double[] ny ={1.0,2.0,10.0,100.0};
-        for(int i=0;i<func.getCount();++i){
-            //assertEquals(nx[i],func.getX(i));
-            //assertEquals(ny[i],func.getY(i));
-            System.out.print(func.getX(i)+" ");
-        }
-        System.out.println();
-        for(int i=0;i<func.getCount();++i){
-            //assertEquals(nx[i],func.getX(i));
-            //assertEquals(ny[i],func.getY(i));
-            System.out.print(func.getY(i)+" ");
-        }
 
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(nx[i],func.getX(i));
+            assertEquals(ny[i],func.getY(i));
+        }
+        System.out.println();
+        for(int i=0;i<func.getCount();++i){
+            assertEquals(nx[i],func.getX(i));
+            assertEquals(ny[i],func.getY(i));
+        }
     }
     @Disabled
     void sort() {

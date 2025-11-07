@@ -152,10 +152,12 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
     }
 
     @Override public double getX(int index) {
-        return (index>=count || index <0)?  Double.NaN : xVals[index];
+        if (index>=count || index <0) throw new ArrayIndexOutOfBoundsException("Out of Index");
+        return xVals[index];
     }
     @Override public double getY(int index) {
-        return (index>=count || index <0)? Double.NaN :yVals[index] ;
+        if (index>=count || index <0) throw new ArrayIndexOutOfBoundsException("Out of Index");
+        return yVals[index] ;
     }
 
     @Override public double leftBound() {

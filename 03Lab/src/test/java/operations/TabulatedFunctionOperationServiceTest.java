@@ -27,6 +27,7 @@ class TabulatedFunctionOperationServiceTest {
     void setUp(){
         Afunc = new ArrayTabulatedFunction(xs,ys);
         Lfunc = new LinkedListTabulatedFunction(xs,ys);
+
         pnts = new Point[xs.length];
         for(int i=0; i<xs.length; ++i){
             pnts[i] = new Point(xs[i], ys[i]);
@@ -105,6 +106,7 @@ class TabulatedFunctionOperationServiceTest {
 
         ///with Array factory:
         //Array + List
+
         res = service.sum(Afunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
@@ -123,7 +125,7 @@ class TabulatedFunctionOperationServiceTest {
         }
         i=0;
         //List + List:
-        res = service.sum(Afunc, Afunc);
+        res = service.sum(Lfunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
             assertEquals(xs[i], p.x());
@@ -153,7 +155,7 @@ class TabulatedFunctionOperationServiceTest {
         }
         i=0;
         //List + List:
-        res = service.sum(Afunc, Afunc);
+        res = service.sum(Lfunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
             assertEquals(xs[i], p.x());
