@@ -7,9 +7,9 @@ import functions.interfaces.TabulatedFunction;
 
 
 public class TabulatedDifferentialOperator implements DifferentialOperator<TabulatedFunction>{
-    ///===============================================================================================
+    ///=====Фабрика===================================================================================
     TabulatedFunctionFactory factory;
-    ///===============================================================================================
+    ///==========Конструкторы=========================================================================
     public TabulatedDifferentialOperator(TabulatedFunctionFactory factory){
         this.factory=factory;
     }

@@ -169,7 +169,7 @@ class TabulatedFunctionOperationServiceTest {
         TabulatedFunction res;
 
         ///with Array factory:
-        //Array + List
+        //Array - List
         res = service.sub(Afunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunction.class, res);
         for(Point p : res){
@@ -178,7 +178,7 @@ class TabulatedFunctionOperationServiceTest {
             ++i;
         }
         i=0;
-        //Array + Array:
+        //Array - Array:
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(ArrayTabulatedFunction.class, res);
         for(Point p : res){
@@ -187,7 +187,7 @@ class TabulatedFunctionOperationServiceTest {
             ++i;
         }
         i=0;
-        //List + List:
+        //List - List:
         res = service.sub(Lfunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunction.class, res);
         for(Point p : res){
@@ -198,7 +198,7 @@ class TabulatedFunctionOperationServiceTest {
         i=0;
 
         ///with List factory:
-        //Array + List
+        //Array - List
         service = new TabulatedFunctionOperationService(new LinkedListTabulatedFunctionFactory());
         res = service.sub(Afunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunction.class, res);
@@ -208,7 +208,7 @@ class TabulatedFunctionOperationServiceTest {
             ++i;
         }
         i=0;
-        //Array + Array:
+        //Array - Array:
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(LinkedListTabulatedFunction.class, res);
         for(Point p : res){
@@ -217,12 +217,138 @@ class TabulatedFunctionOperationServiceTest {
             ++i;
         }
         i=0;
-        //List + List:
+        //List - List:
         res = service.sub(Lfunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunction.class, res);
         for(Point p : res){
             assertEquals(Lfunc.getX(i), p.x());
             assertEquals(Lfunc.getY(i) - Lfunc.getY(i), p.y());
+            ++i;
+        }
+    }
+    @Test
+    void mul() {
+        int i=0;
+        TabulatedFunction res;
+
+        ///with Array factory:
+        //Array * List
+        res = service.mul(Afunc, Lfunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] * ys[i], p.y());
+            ++i;
+        }
+        i=0;
+        //Array * Array:
+        res = service.mul(Afunc, Afunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] * Afunc.getyVals()[i], p.y());
+            ++i;
+        }
+        i=0;
+        //List * List:
+        res = service.mul(Afunc, Afunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] * ys[i], p.y());
+            ++i;
+        }
+        i=0;
+
+        ///with List factory:
+        //Array * List
+        service = new TabulatedFunctionOperationService(new LinkedListTabulatedFunctionFactory());
+        res = service.mul(Afunc, Lfunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] * ys[i], p.y());
+            ++i;
+        }
+        i=0;
+        //Array * Array:
+        res = service.mul(Afunc, Afunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] * Afunc.getyVals()[i], p.y());
+            ++i;
+        }
+        i=0;
+        //List * List:
+        res = service.mul(Afunc, Afunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] * ys[i], p.y());
+            ++i;
+        }
+    }
+    @Test
+    void div() {
+        int i=0;
+        TabulatedFunction res;
+
+        ///with Array factory:
+        //Array / List
+        res = service.div(Afunc, Lfunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] / ys[i], p.y());
+            ++i;
+        }
+        i=0;
+        //Array / Array:
+        res = service.div(Afunc, Afunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] / Afunc.getyVals()[i], p.y());
+            ++i;
+        }
+        i=0;
+        //List / List:
+        res = service.div(Afunc, Afunc);
+        assertInstanceOf(ArrayTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] / ys[i], p.y());
+            ++i;
+        }
+        i=0;
+
+        ///with List factory:
+        //Array / List
+        service = new TabulatedFunctionOperationService(new LinkedListTabulatedFunctionFactory());
+        res = service.div(Afunc, Lfunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] / ys[i], p.y());
+            ++i;
+        }
+        i=0;
+        //Array / Array:
+        res = service.div(Afunc, Afunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] / Afunc.getyVals()[i], p.y());
+            ++i;
+        }
+        i=0;
+        //List / List:
+        res = service.div(Afunc, Afunc);
+        assertInstanceOf(LinkedListTabulatedFunction.class, res);
+        for(Point p : res){
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] / ys[i], p.y());
             ++i;
         }
     }

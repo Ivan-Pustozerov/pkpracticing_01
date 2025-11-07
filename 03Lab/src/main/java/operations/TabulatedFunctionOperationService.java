@@ -45,6 +45,14 @@ public class TabulatedFunctionOperationService {
         BiOperation oper = (u, v) -> u-v;
         return doOperation(a, b, oper);
     }
+    public TabulatedFunction mul(TabulatedFunction a, TabulatedFunction b){
+        BiOperation oper = (u, v) -> u*v;
+        return doOperation(a, b, oper);
+    }
+    public TabulatedFunction div(TabulatedFunction a, TabulatedFunction b){
+        BiOperation oper = (u, v) -> u/v;
+        return doOperation(a, b, oper);
+    }
     ///--------------------------------------------------------------------------------------------
 
     /// Фабрика применения операций
