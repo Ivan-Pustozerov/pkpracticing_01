@@ -4,6 +4,8 @@ import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
 import functions.interfaces.Removable;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -13,10 +15,11 @@ import static java.lang.Math.abs;
 
 
 /// Табулированная функция на массиве
-public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable{
+public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
 ///================Служебные-переменные==========================================================
     private double[] xVals;  // точки по X
     private double[] yVals; // точки по Y
+    @Serial private static final long serialVersionUID = -4633298896101580232L;
 ///===============================================================================================
 
 
