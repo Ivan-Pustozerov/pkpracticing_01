@@ -4,6 +4,8 @@ import functions.interfaces.TabulatedFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Iterator;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -82,15 +84,16 @@ class UnmodifiableTabulatedFunctionTest {
         assertEquals(array.rightBound(), Afunc.rightBound());
         assertEquals(list.rightBound(), Lfunc.rightBound());
     }
-    /*
+
     @Test
     void iterator() {
+        /// Реализация 1:
         double delta = 1e-16;
         Iterator<Point> arrIter = array.iterator();
-        ///Iterator<Point> listIter = list.iterator();
+        Iterator<Point> listIter = list.iterator();
 
         Iterator<Point> AfuncIter = Afunc.iterator();
-        ///Iterator<Point> LfuncIter = Lfunc.iterator();
+        Iterator<Point> LfuncIter = Lfunc.iterator();
 
         while(arrIter.hasNext() && AfuncIter.hasNext()){
             Point a = arrIter.next();
@@ -100,7 +103,6 @@ class UnmodifiableTabulatedFunctionTest {
         }
         assertEquals(arrIter.hasNext(),AfuncIter.hasNext());
 
-        /***
         while(arrIter.hasNext() && LfuncIter.hasNext()){
             Point a = listIter.next();
             Point b = LfuncIter.next();
@@ -108,12 +110,9 @@ class UnmodifiableTabulatedFunctionTest {
             assertEquals(a.y(),b.y(),delta);
         }
         assertEquals(listIter.hasNext(),LfuncIter.hasNext());
-        ***/
 
-    //НЕЛЬЗЯ ТАК! БУДЕТ ОШИБКА. ОНИ БУДУТ РАЗНЫЕ(ВРОДЕ)
-    //понял как
-    @Test
-    void test_Iterator_BTW(){
+
+        /// Реализация 2:
         var arrayFunc = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
         var unmod = new UnmodifiableTabulatedFunction(arrayFunc);
 
