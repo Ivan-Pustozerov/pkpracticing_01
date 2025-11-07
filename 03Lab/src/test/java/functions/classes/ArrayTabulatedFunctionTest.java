@@ -206,8 +206,8 @@ class ArrayTabulatedFunctionTest {
         int i = 0;
         while(iter.hasNext()){
             Point point = iter.next();
-            assertEquals(func.getxVals()[i],point.x);
-            assertEquals(func.getyVals()[i++],point.y);
+            assertEquals(func.getxVals()[i], point.x());
+            assertEquals(func.getyVals()[i++], point.y());
         }
         assertFalse(iter.hasNext());
 

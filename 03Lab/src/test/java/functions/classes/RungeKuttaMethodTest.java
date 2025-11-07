@@ -28,6 +28,7 @@ class RungeKuttaMethodTest{
 
     @Test
     public void applyTest(){
+        func=new RungeKuttaMethod(dfunc,x0,y0,step);
         double[][] data= {
         {1.0, 1.0},
         {2.0, 8.0},
@@ -41,7 +42,7 @@ class RungeKuttaMethodTest{
         {-2.1, -9.261}
         };
         for(double[] p : data){
-            assertEquals(p[1],func.apply(p[0]));
+            assertEquals(p[1],func.apply(p[0]),delta);
         }
     }
 }

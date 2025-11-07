@@ -7,51 +7,26 @@ import functions.interfaces.TabulatedFunction;
 
 import static java.lang.Math.abs;
 
-
+/// Сервис операций над Табулированными функциями
 public class TabulatedFunctionOperationService {
+///================Служебные-переменные==========================================================
+    private TabulatedFunctionFactory factory;  // Фабрика для создания результата нужного формата
 
-    private TabulatedFunctionFactory factory;
-    private static interface BiOperation{
-        double apply(double u, double v);
+    private interface BiOperation{           //    Интерфейс
+        double apply(double u, double v);   // бинарной операции
     }
+///===============================================================================================
 
-    private TabulatedFunction doOperation(TabulatedFunction a, TabulatedFunction b, BiOperation oper){
-        double delta = 1e-16;
-        Point[] aP =asPoints(a);
-        Point[] bP =asPoints(b);
-
-        if(aP.length != bP.length)
-            throw new InconsistentFunctionsException("functions have different number of dots");
-
-        int len = aP.length;
-
-        double[] xVals = new double[len];
-        double[] yVals = new double[len];
-
-        for(int i=0; i < aP.length; ++i){
-            if(abs(aP[i].x - bP[i].x) > delta)
-                throw new InconsistentFunctionsException("functions have different X");
-
-            xVals[i] = aP[i].x;
-            yVals[i] = oper.apply(aP[i].y, bP[i].y);
-        }
-        return factory.create(xVals, yVals);
-    }
-
+    /// Конструктор с аргументами
     public TabulatedFunctionOperationService(TabulatedFunctionFactory factory) {
         this.factory = factory;
     }
+    /// Конструктор по умолчанию
     public TabulatedFunctionOperationService(){
         factory = new ArrayTabulatedFunctionFactory();
     }
 
-    public TabulatedFunctionFactory getFactory() {
-        return factory;
-    }
-    public void setFactory(TabulatedFunctionFactory factory) {
-        this.factory = factory;
-    }
-
+    ///представление функции в виде массива точек
     public static Point[] asPoints(TabulatedFunction func){
         int i=0;
         Point[] res = new Point[func.getCount()];
@@ -61,6 +36,7 @@ public class TabulatedFunctionOperationService {
         return res;
     }
 
+    ///-------------------Операции-----------------------------------------------------------------
     public TabulatedFunction sum(TabulatedFunction a, TabulatedFunction b){
         BiOperation oper = (u, v) -> u+v;
         return doOperation(a, b, oper);
@@ -68,5 +44,40 @@ public class TabulatedFunctionOperationService {
     public TabulatedFunction sub(TabulatedFunction a, TabulatedFunction b){
         BiOperation oper = (u, v) -> u-v;
         return doOperation(a, b, oper);
+    }
+    ///--------------------------------------------------------------------------------------------
+
+    /// Фабрика применения операций
+    private TabulatedFunction doOperation(TabulatedFunction a, TabulatedFunction b, BiOperation oper){
+        double delta = 1e-16;
+        // Если несовместны по количеству точек
+        if(a.getCount()!= b.getCount())
+            throw new InconsistentFunctionsException("functions have different number of dots");
+
+        Point[] aP =asPoints(a);
+        Point[] bP =asPoints(b);
+
+        int len = aP.length;
+
+        double[] xVals = new double[len];
+        double[] yVals = new double[len];
+
+        for(int i=0; i < len; ++i){
+            if(abs(aP[i].x() - bP[i].x()) > delta)// Если xVals отличны
+                throw new InconsistentFunctionsException("functions have different X");
+
+            xVals[i] = aP[i].x();
+            yVals[i] = oper.apply(aP[i].y(), bP[i].y());
+        }
+        return factory.create(xVals, yVals);
+    }
+
+
+    //геттеры/сеттеры
+    public TabulatedFunctionFactory getFactory() {
+        return factory;
+    }
+    public void setFactory(TabulatedFunctionFactory factory) {
+        this.factory = factory;
     }
 }

@@ -27,6 +27,7 @@ class TabulatedFunctionOperationServiceTest {
     void setUp(){
         Afunc = new ArrayTabulatedFunction(xs,ys);
         Lfunc = new LinkedListTabulatedFunction(xs,ys);
+
         pnts = new Point[xs.length];
         for(int i=0; i<xs.length; ++i){
             pnts[i] = new Point(xs[i], ys[i]);
@@ -105,11 +106,12 @@ class TabulatedFunctionOperationServiceTest {
 
         ///with Array factory:
         //Array + List
+
         res = service.sum(Afunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -117,17 +119,17 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sum(Afunc, Afunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i], p.y());
             ++i;
         }
         i=0;
         //List + List:
-        res = service.sum(Afunc, Afunc);
+        res = service.sum(Lfunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(ys[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -138,8 +140,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sum(Afunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -147,17 +149,17 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sum(Afunc, Afunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i], p.y());
             ++i;
         }
         i=0;
         //List + List:
-        res = service.sum(Afunc, Afunc);
+        res = service.sum(Lfunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(ys[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] + ys[i], p.y());
             ++i;
         }
     }
@@ -172,8 +174,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Lfunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -181,8 +183,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i], p.y());
             ++i;
         }
         i=0;
@@ -190,8 +192,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(ArrayTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(ys[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -202,8 +204,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Lfunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + ys[i], p.y());
             ++i;
         }
         i=0;
@@ -211,8 +213,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(Afunc.getyVals()[i] + Afunc.getyVals()[i], p.y());
             ++i;
         }
         i=0;
@@ -220,8 +222,8 @@ class TabulatedFunctionOperationServiceTest {
         res = service.sub(Afunc, Afunc);
         assertInstanceOf(LinkedListTabulatedFunctionFactory.class, res);
         for(Point p : res){
-            assertEquals(xs[i],p.x);
-            assertEquals(ys[i] + ys[i],p.y);
+            assertEquals(xs[i], p.x());
+            assertEquals(ys[i] + ys[i], p.y());
             ++i;
         }
     }

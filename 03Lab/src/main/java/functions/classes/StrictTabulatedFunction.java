@@ -7,6 +7,9 @@ import java.util.Iterator;
 public class StrictTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction func;
     ///А надо ли? private final
+    /// Да, можно, т.к это оптимизация компиля
+    /// Но в будущем может поменяться что-либо
+    /// Кстати, зацени Класс Point
     public StrictTabulatedFunction(TabulatedFunction func){
         this.func=func;
     }
@@ -56,6 +59,7 @@ public class StrictTabulatedFunction implements TabulatedFunction {
             return func.getY(ind);
         }
         throw new UnsupportedOperationException("А по голове");
+
     }
     @Override
     public Iterator<Point> iterator(){

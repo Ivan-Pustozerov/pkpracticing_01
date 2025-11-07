@@ -79,15 +79,16 @@ class StrictTabulatedFunctionTest {
         assertThrows(UnsupportedOperationException.class, () -> str_l.setY(0, 15.0));
     }
     @Test
-    void test_Iterator_BTW(){
+    void test_Iterator(){
+        double delta = 1e-16;
         var list = new LinkedListTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
         var str_l = new StrictTabulatedFunction(list);
 
-        int pointer = 1;
+        double pointer = 1;
         for(Point point: str_l){
-            assertEquals(point.x, pointer);
-            assertEquals(point.y, pointer * 10);
-            pointer++;
+            assertEquals(point.x(), pointer, delta);
+            assertEquals(point.y(), pointer * 10, delta);
+            pointer+=1;
         }
     }
 }
