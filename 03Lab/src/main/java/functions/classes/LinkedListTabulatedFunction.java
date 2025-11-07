@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable,Removable {
+    ///================Nesquik(Nested) класс Node==========================================================
     public static class Node {
 
         public Node next;
@@ -24,16 +25,18 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             this.prev = null;
         }
     }
-
+    ///================Служебные-переменные==========================================================
 
     private int count;
     private Node head;
+    ///===============================================================================================
 
-
+    ///================Конструкторы==========================================================
+    //Конструктор через массивы double[]
     public LinkedListTabulatedFunction(double[] xVal, double[] yVal){
-        if (xVal.length < 2) {
-            throw new IllegalArgumentException("Length must be >2");
-        }
+
+        if (xVal.length < 2) {throw new IllegalArgumentException("Length must be >2");}
+
         checkLengthIsTheSame(xVal, yVal);
         checkSorted(xVal);
 
@@ -45,9 +48,8 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
     //конструктор с дискретизацией функции
     public LinkedListTabulatedFunction(MathFunction s, double xFrom, double xTo, int count){
-        if (count < 2) {
-            throw new IllegalArgumentException("Must be >2 points");
-        }
+        if (count < 2) {throw new IllegalArgumentException("Must be >2 points");}
+
         if (xFrom > xTo){
             double temp = xFrom;
             xFrom = xTo;
@@ -71,6 +73,255 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             }
         }
     }
+    ///================Итератор==========================================================
+    @Override
+    public Iterator<Point> iterator(){
+        return new Iterator <Point>(){
+            private Node current = head;
+            private int itcount = 0;
+            @Override
+            public boolean hasNext(){
+                return itcount<count;
+            }
+            @Override
+            public Point next(){
+                if(!hasNext()){throw new NoSuchElementException("There is no more elements");}
+
+                Point Pi = new Point(current.x, current.y);
+                current = current.next;
+                itcount++;
+                return Pi;
+            }
+        };
+    }
+    ///================Удаление/Вставка==========================================================
+    @Override
+    public <T extends Number> void insert(T X,T Y){
+        double x=X.doubleValue();
+        double y=Y.doubleValue();
+        if (head == null) {
+            addNode(x, y);
+            return;
+        }
+        Node curr = head;
+        do {
+            if (Math.abs(curr.x - x) < 1e-10) {
+                curr.y = y;
+                return;
+            }
+            if (x < curr.x) {
+                Node newNode = new Node(x, y);
+
+                Node prevNode = curr.prev;
+                prevNode.next = newNode;
+                newNode.prev = prevNode;
+
+                newNode.next = curr;
+                curr.prev = newNode;
+
+                if (curr == head) {
+                    head = newNode;
+                }
+
+                count++;
+                return;
+            }
+
+            curr = curr.next;
+        } while (curr != head);
+
+        Node last = head.prev;
+        Node newNode = new Node(x, y);
+
+        last.next = newNode;
+        newNode.prev = last;
+
+        newNode.next = head;
+        head.prev = newNode;
+
+        count++;
+    }
+
+    @Override
+    public void remove(int index){
+        if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
+        Node point =head;
+        for(int i=0;i<index;++i){point=point.next;}
+        if(count==1){head=null;}else{
+            //как обычно,перенаправляем указатели
+            point.prev.next = point.next;
+            point.next.prev = point.prev;
+            // Если удаляем голову, сдвигаем head
+            if (point == head) {head = point.next;}
+        }
+        count--;
+
+    }
+    ///================Геттеры========================================================================
+    ///-----------------Геттеры-1-----------------------------------------------------------------
+    public Node getHead(){
+        return head;
+    }
+
+    public Node getNode(int index){
+        if (index < 0 || index >= count){
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + count);
+        }
+        if(index < count / 2){
+            Node curr = head;
+            for(int i = 0; i < index; i++){
+                curr = curr.next;
+            }
+            return curr;
+        } else{
+            Node curr = head.prev;
+            for (int i = count - 1; i > index; i--){
+                curr = curr.prev;
+            }
+            return curr;
+        }
+    }
+    ///-----------------Геттеры-Точек-----------------------------------------------------------------
+    @Override
+    public double leftBound() {
+        if(head == null){throw new IllegalArgumentException("EMPTY LIST ERR");}
+
+        return head.x;
+    }
+
+    @Override
+    public double rightBound() {
+        if(head == null){throw new IllegalArgumentException("EMPTY LIST ERR");}
+
+        return head.prev.x;
+    }
+    @Override
+    public double getX(int index){
+        if (index < 0 || index >= count) {throw new IndexOutOfBoundsException("GetX index out of bounds");}
+
+        return getNode(index).x;
+    }
+
+    @Override
+    public double getY(int index){
+        if (index < 0 || index >= count) {throw new IndexOutOfBoundsException("GetY index out of bounds");}
+
+        return getNode(index).y;
+    }
+    ///-----------------Геттеры-Индексов-----------------------------------------------------------------
+    @Override
+    public <T extends Number> int indexOfY(T Y)
+    {
+        if (head == null){throw new IllegalStateException("EMPTY LIST ERR");}
+
+        double y = Y.doubleValue();
+        Node curr = head;
+        for (int i = 0; i < count; i++) {
+            if (Math.abs(curr.y - y) < 1e-10) {
+                return i;
+            }
+            curr = curr.next;
+        }
+        return -1;
+    }
+    @Override
+    public <T extends Number> int indexOfX(T X)
+    {
+        if (head == null){throw new IllegalStateException("EMPTY LIST ERR");}
+
+        double x = X.doubleValue();
+        Node curr = head;
+        for (int i = 0; i < count; i++) {
+            if (Math.abs(curr.x - x) < 1e-10) {
+                return i;
+            }
+            curr = curr.next;
+        }
+        return -1;
+    }
+    ///-----------------Геттеры-Числа-----------------------------------------------------------------
+    @Override
+    public int getCount(){
+        return count;
+    }
+    ///-------------------------------------------------------------------------------------------------
+    ///===============================================================================================
+
+    ///================Сеттеры========================================================================
+
+    @Override
+    public <T extends Number> void setY(int index, T val)
+    {
+        if (index < 0 || index >= count) {throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + count);}
+
+        getNode(index).y = val.doubleValue();
+    }
+    ///==!!!WIP-UNDER-RE-CONCTRUCTION!!!!=============!!!
+    @Override
+    public <T extends Number> void setX(int index, T X)
+    {
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + count);
+        if (head == null) throw new IllegalStateException("Список пуст");
+        //число и инедкс верные
+        double s_x = X.doubleValue();
+        Node point = head;
+        if(count==1){point.x=s_x;return;}
+        for(int i=0;i<index;i++){point=point.next;} //просто проходим до нужного индекса
+
+        if(point == head){  head = point.next;}     //если голова(решил заранее ,т.к. потом изменится point)
+        point.next.prev=point.prev;                 //меняем указатели
+        point.prev.next=point.next;
+        point.x=s_x;
+
+        Node point_pos=head;                        //ищем место
+        while(point_pos.x<=s_x){point_pos=point_pos.next;}
+
+        point.next=point_pos;                       //перепривязываем
+        point.prev=point_pos.prev;
+        point_pos.prev.next=point;
+        point_pos.prev=point;
+        if (head.x>s_x && point_pos==head){head=point;}//Если вставили вперед - меняем голову
+    }
+    /// ----------------------------------------------------------------------------------------------------------
+
+
+    ///==================СЛУЖЕБНОЕ================================================================================
+    @Override
+    protected int floorIndexOfX(double x)
+    {
+        if(head == null){   throw new IllegalArgumentException("EMPTY LIST ERR");}
+
+        if (x < head.x) {   throw new IllegalArgumentException("x = " + x + " < LEFT BOUND " + head.x);}
+
+        if(x > head.prev.x)return count;
+
+        Node curr = head;
+        for(int i = 0; i < count - 1; i++){
+            if(x < curr.next.x){
+                return i;
+            }
+            curr = curr.next;
+        }
+
+        return count - 1;
+    }
+    protected Node floorNodeOfX(double x){
+        if (head == null){    throw new IllegalArgumentException("EMPTY LIST ERR");}
+
+        if (x < head.x){   throw new IllegalArgumentException("x = " + x + " < LEFT BOUND " + head.x);}
+
+        if (x > head.prev.x)return head.prev;
+
+        Node curr = head;
+        for(int i = 0; i < count - 1; i++){
+            if(x < curr.next.x){
+                return curr;
+            }
+            curr = curr.next;
+        }
+        return head.prev;
+    }
+
     private void addNode(double x, double y){
         Node nwNode = new Node(x, y);
 
@@ -91,67 +342,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         count++;
     }
 
-    public Node getHead(){
-        return head;
-    }
-
-    public Node getNode(int index){
-        if (index < 0 || index >= count){
-            throw new IndexOutOfBoundsException("Индекс: " + index + ", размер: " + count);
-        }
-        if(index < count / 2){
-            Node curr = head;
-            for(int i = 0; i < index; i++){
-                curr = curr.next;
-            }
-            return curr;
-        } else{
-            Node curr = head.prev;
-            for (int i = count - 1; i > index; i--){
-                curr = curr.prev;
-            }
-            return curr;
-        }
-    }
-
-    @Override
-    protected int floorIndexOfX(double x)
-    {
-        if(head == null){
-            throw new IllegalArgumentException("Список пуст, ы");
-        }
-        if (x < head.x) {
-            throw new IllegalArgumentException("x = " + x + " меньше левой границы " + head.x);
-        }
-        if(x > head.prev.x)return count;
-
-        Node curr = head;
-        for(int i = 0; i < count - 1; i++){
-            if(x < curr.next.x){
-                return i;
-            }
-            curr = curr.next;
-        }
-        return count - 1;
-    }
-    protected Node floorNodeOfX(double x){
-        if (head == null) {
-            throw new IllegalArgumentException("EMPTY LIST ERR");
-        }
-        if (x < head.x) {
-            throw new IllegalArgumentException("x = " + x + " < LEFT BOUND " + head.x);
-        }
-        if (x > head.prev.x)return head.prev;
-        Node curr = head;
-        for(int i = 0; i < count - 1; i++){
-            if(x < curr.next.x){
-                return curr;
-            }
-            curr = curr.next;
-        }
-
-        return head.prev;
-    }
     @Override
     protected double extrapolateLeft(double x) {
         if (count < 2) throw new IllegalArgumentException("EXTR: <2 ELEM");
@@ -183,124 +373,9 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
 
     @Override
-    public int getCount(){
-        return count;
-    }
-
-    @Override
-    public double getX(int index){
-        if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("GetX index out of bounds");
-        }
-        return getNode(index).x;
-    }
-
-    @Override
-    public double getY(int index){
-        if (index < 0 || index >= count) {
-            throw new IndexOutOfBoundsException("GetY index out of bounds");
-        }
-        return getNode(index).y;
-    }
-
-    @Override
-    public <T extends Number> void setY(int index, T val)
-    {
-        if (index < 0 || index >= count) {throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + count);}
-
-        getNode(index).y = val.doubleValue();
-    }
-
-    @Override
-    public <T extends Number> void setX(int index, T X)
-    {
-        if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Индекс: " + index + ", размер: " + count);
-        if (head == null) throw new IllegalStateException("Список пуст");
-        //число и инедкс верные
-        double s_x = X.doubleValue();
-        Node point = head;
-        if(count==1){point.x=s_x;return;}
-        for(int i=0;i<index;i++){point=point.next;} //просто проходим до нужного индекса
-
-        if(point == head){  head = point.next;}     //если голова(решил заранее ,т.к. потом изменится point)
-        point.next.prev=point.prev;                 //меняем указатели
-        point.prev.next=point.next;
-        point.x=s_x;
-
-        Node point_pos=head;                        //ищем место
-        while(point_pos.x<=s_x){point_pos=point_pos.next;}
-
-        point.next=point_pos;                       //перепривязываем
-        point.prev=point_pos.prev;
-        point_pos.prev.next=point;
-        point_pos.prev=point;
-        if (head.x>s_x && point_pos==head){head=point;}//Если вставили вперед - меняем голову
-    }
-    @Override
-    public double leftBound() {
-        if(head == null){
-            throw new IllegalArgumentException("EMPTY LIST ERR");
-        }
-        return head.x;
-    }
-
-    @Override
-    public double rightBound() {
-        if(head == null){
-            throw new IllegalArgumentException("EMPTY LIST ERR");
-        }
-        return head.prev.x;
-    }
-
-    @Override
-    public <T extends Number> int indexOfY(T Y)
-    {
-        if (head == null){
-            throw new IllegalStateException("EMPTY LIST ERR");
-        }
-        double y = Y.doubleValue();
-        Node curr = head;
-        for (int i = 0; i < count; i++) {
-            if (Math.abs(curr.y - y) < 1e-10) {
-                return i;
-            }
-            curr = curr.next;
-        }
-        return -1;
-    }
-    @Override
-    public <T extends Number> int indexOfX(T X)
-    {
-        if (head == null){
-            throw new IllegalStateException("EMPTY LIST ERR");
-        }
-        double x = X.doubleValue();
-        Node curr = head;
-        for (int i = 0; i < count; i++) {
-            if (Math.abs(curr.x - x) < 1e-10) {
-                return i;
-            }
-            curr = curr.next;
-        }
-        return -1;
-    }
-
-    @Override
     public <T extends Number> double apply(T X) {
         double x = X.doubleValue();
-        /*
-        if (x < leftBound()) {
-            return extrapolateLeft(x);
-        } else if (x > rightBound()) {
-            return extrapolateRight(x);
-        } else {
-            Node floorNode = floorNodeOfX(x);
-            if (Math.abs(floorNode.x - x) < 1e-10) {
-                return floorNode.y;
-            }
 
-            return interpolate(x, floorNode.x, floorNode.next.x, floorNode.y, floorNode.next.y);
-        }*/
         Node floorNode = floorNodeOfX(x);
 
         if (x < head.x) return extrapolateLeft(x);
@@ -368,98 +443,4 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
     */
 
-    @Override
-    public <T extends Number> void insert(T X,T Y){
-        double x=X.doubleValue();
-        double y=Y.doubleValue();
-        if (head == null) {
-            addNode(x, y);
-            return;
-        }
-        /*
-        Node where=floorNodeOfX(x);
-        if(where.x==x){where.y=y;}
-        else if(where.next==this.head){addNode(x,y);}
-        else{
-            Node temp=new Node(x,y);
-            temp.prev=where;
-            temp.next=where.next;
-            where.next=temp;
-            ++count;
-        }*/
-        Node curr = head;
-        do {
-            if (Math.abs(curr.x - x) < 1e-10) {
-                curr.y = y;
-                return;
-            }
-            if (x < curr.x) {
-                Node newNode = new Node(x, y);
-
-                Node prevNode = curr.prev;
-                prevNode.next = newNode;
-                newNode.prev = prevNode;
-
-                newNode.next = curr;
-                curr.prev = newNode;
-
-                if (curr == head) {
-                    head = newNode;
-                }
-
-                count++;
-                return;
-            }
-
-            curr = curr.next;
-        } while (curr != head);
-
-        Node last = head.prev;
-        Node newNode = new Node(x, y);
-
-        last.next = newNode;
-        newNode.prev = last;
-
-        newNode.next = head;
-        head.prev = newNode;
-
-        count++;
-    }
-
-    @Override
-    public void remove(int index){
-        if(index<0 || index >=count){throw new IndexOutOfBoundsException();}
-        Node point =head;
-        for(int i=0;i<index;++i){point=point.next;}
-        if(count==1){head=null;}else{
-                                                    //как обычно,перенаправляем указатели
-            point.prev.next = point.next;
-            point.next.prev = point.prev;
-                                                    // Если удаляем голову, сдвигаем head
-            if (point == head) {head = point.next;}
-        }
-        count--;
-
-    }
-    @Override
-    public Iterator<Point> iterator(){
-        return new Iterator <Point>(){
-            private Node current = head;
-            private int itcount = 0;
-            @Override
-            public boolean hasNext(){
-                return itcount<count;
-            }
-            @Override
-            public Point next(){
-                if(!hasNext()){
-                    throw new NoSuchElementException("There is no more elements");
-                }
-                Point Pi = new Point(current.x, current.y);
-                current = current.next;
-                itcount++;
-                return Pi;
-            }
-        };
-    }
 }

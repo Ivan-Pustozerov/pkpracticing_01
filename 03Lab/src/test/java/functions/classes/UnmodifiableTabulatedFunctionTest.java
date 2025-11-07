@@ -4,9 +4,8 @@ import functions.interfaces.TabulatedFunction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UnmodifiableTabulatedFunctionTest {
     private final static double[] xVals = {1, 2, 3, 4, 5};
@@ -110,8 +109,7 @@ class UnmodifiableTabulatedFunctionTest {
         }
         assertEquals(listIter.hasNext(),LfuncIter.hasNext());
         ***/
-    }
-    */
+
     //НЕЛЬЗЯ ТАК! БУДЕТ ОШИБКА. ОНИ БУДУТ РАЗНЫЕ(ВРОДЕ)
     //понял как
     @Test
@@ -121,8 +119,8 @@ class UnmodifiableTabulatedFunctionTest {
 
         int pointer = 1;
         for(Point point: unmod){
-            assertEquals(point.x, pointer);
-            assertEquals(point.y, pointer * 10);
+            assertEquals(point.x(), pointer);
+            assertEquals(point.y(), pointer * 10);
             pointer++;
         }
     }
