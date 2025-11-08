@@ -1,14 +1,20 @@
 package io;
 
+import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.thoughtworks.xstream.security.NoTypePermission;
 import functions.classes.ArrayTabulatedFunction;
 import functions.classes.Point;
 import functions.factory.TabulatedFunctionFactory;
 import functions.interfaces.TabulatedFunction;
 
+import javax.xml.stream.XMLStreamConstants;
 import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
+import com.thoughtworks.xstream.XStream;
+
 
 /// Статический Сервис для ввода-вывода
 public final class FunctionsIO {
@@ -65,4 +71,23 @@ public final class FunctionsIO {
     public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
         return null;
     }
+
+    public static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction func) throws IOException {
+        XStream xstream = new XStream();  // с помощью рефлексии способен автоматически сериализовать
+        writer.write(xstream.toXML(func));
+        writer.flush();
+    }
+
+    public static ArrayTabulatedFunction deserializeXml(BufferedReader reader) throws IOException {
+        XStream xstream = new XStream();
+        // Разрешить использовать класс ArrayTabulatedFunction
+        xstream.addPermission(NoTypePermission.NONE); // отключить все разрешения
+        xstream.addPermission(AnyTypePermission.ANY);// разрешить все классы
+        Object func = xstream.fromXML(reader);
+
+        if(func instanceof ArrayTabulatedFunction) return (ArrayTabulatedFunction)func;
+        else throw new IOException("Wrong Type was read");
+    }
+
+
 }
