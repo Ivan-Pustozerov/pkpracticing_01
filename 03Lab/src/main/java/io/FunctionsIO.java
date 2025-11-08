@@ -18,14 +18,14 @@ public final class FunctionsIO {
     }
 
 ///==================ФУНКЦИОНАЛ================================================================
-    /// Печатает в поток СИМВОЛОВ таб функцию - Printer - не выбрасывает исключений никогда
+    /// Печатает в поток СИМВОЛОВ таб функцию - Printer - не выбрасывает вызываемых исключений никогда
     public static void writeTabulatedFunction(BufferedWriter writer, TabulatedFunction func){
-        PrintWriter printer = new PrintWriter(writer); // создание обертки над Writer
-        printer.println(func.getCount());             // печать кол-ва точек
+        PrintWriter printer = new PrintWriter(writer);    // создание обертки над Writer
+        printer.println(func.getCount());                // печать кол-ва точек
         for(Point p : func){
-            printer.printf("%f %f\n", p.x(), p.y());       // печать точек
+            printer.printf("%f %f\n", p.x(), p.y());   // печать точек
         }
-        printer.flush();                         // подтвердить изменения и записать внутренний буффер в поток
+        printer.flush();                             // подтвердить изменения и записать внутренний буффер в поток
     }
 
     /// Читает функцию из СИМВОЛЬНОГО потока записи - не выбрасывает вызываемых исключений никогда
@@ -35,7 +35,6 @@ public final class FunctionsIO {
             double[] xVals = new double[count];
             double[] yVals = new double[count];
             NumberFormat format = NumberFormat.getInstance(Locale.forLanguageTag("ru"));
-
 
             try{
                 for(int i=0; i < count; ++i){
