@@ -57,10 +57,15 @@ public final class FunctionsIO {
         return null;
     }
 
+    /// Механизм сериализации объекта-функции  - выбрасывает проверяемое исключение
     public static void serialize(BufferedOutputStream stream, TabulatedFunction func) throws IOException {
         ObjectOutputStream objStream = new ObjectOutputStream(stream);
         objStream.writeObject(func);
         objStream.flush();
+    }
+
+    public static TabulatedFunction deserialize(BufferedInputStream stream)throws IOException, ClassNotFoundException {
+        return null;
     }
 
 
