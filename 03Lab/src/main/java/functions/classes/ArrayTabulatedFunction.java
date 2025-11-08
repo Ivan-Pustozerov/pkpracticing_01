@@ -77,9 +77,8 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         this.count=count;
     }
 
-    ///  Вставка элемента по точке
-    @Override
-    public <T extends Number> void insert(T X, T Y){
+    /// Вставка элемента по точке
+    @Override public <T extends Number> void insert(T X, T Y){
         double x = X.doubleValue();
         double y = Y.doubleValue();
         int count = xVals.length;
@@ -108,7 +107,7 @@ public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements
         yVals=NyVals;
     }
 
-    ///  Удаление элемента по индексу
+    /// Удаление элемента по индексу
     @Override public void remove(int index){
         if(index<0 || index >=count) throw new IndexOutOfBoundsException(); // Валидность
 
