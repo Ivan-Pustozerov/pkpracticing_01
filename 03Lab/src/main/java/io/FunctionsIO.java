@@ -1,5 +1,6 @@
 package io;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import com.thoughtworks.xstream.security.NoTypePermission;
@@ -108,6 +109,20 @@ public final class FunctionsIO {
 
         if(func instanceof ArrayTabulatedFunction) return (ArrayTabulatedFunction)func;
         else throw new IOException("Wrong Type was read");
+    }
+    ///по крайней мере я понял что наверное так надо =)
+    //надеюсь без ошибок
+    public static void serializeJson(BufferedWriter writer, ArrayTabulatedFunction function) throws IOException {
+        var object=new ObjectMapper();                              // Создается объект ObjectMapper - главный класс библы вроде как
+        String jsonString = object.writeValueAsString(function);    // Метод writeValueAsString конвертирует объект function в JSON-строку.
+        writer.write(jsonString);                                   // JSON-строка записывается в переданный BufferedWriter.
+        writer.flush();
+    }
+    public static ArrayTabulatedFunction deserializeJson(BufferedReader reader) throws IOException {
+        var mapper = new ObjectMapper();                // Создается объект ObjectMapper для чтения JSON.
+        return mapper.readerFor(ArrayTabulatedFunction.class).readValue(reader);
+        // Метод readerFor задает тип объекта, который нужно получить из JSON.
+        // Метод readValue читает JSON из переданного BufferedReader и возвращает объект типа ArrayTabulatedFunction.
     }
 
 
