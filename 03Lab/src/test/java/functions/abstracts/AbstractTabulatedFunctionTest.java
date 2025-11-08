@@ -1,5 +1,6 @@
 package functions.abstracts;
 
+import functions.classes.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -93,5 +94,12 @@ class AbstractTabulatedFunctionTest {
         verify(func).setY(1,y1);
         verify(func).setX(0,x2);
         verify(func).setY(0,y2);
+    }
+    @Test
+    void testToString() {
+        var function = new ArrayTabulatedFunction(new double[]{1.0, 2.0, 3.0}, new double[]{10.0, 20.0, 30.0});
+        var result = function.toString();
+
+        assertEquals("ArrayTabulatedFunction size = 3\n[1.0; 10.0]\n[2.0; 20.0]\n[3.0; 30.0]", result);
     }
 }

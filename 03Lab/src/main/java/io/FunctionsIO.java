@@ -1,6 +1,6 @@
 package io;
 
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import com.thoughtworks.xstream.security.NoTypePermission;
 import functions.classes.ArrayTabulatedFunction;
@@ -8,12 +8,10 @@ import functions.classes.Point;
 import functions.factory.TabulatedFunctionFactory;
 import functions.interfaces.TabulatedFunction;
 
-import javax.xml.stream.XMLStreamConstants;
 import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
-import com.thoughtworks.xstream.XStream;
 
 
 /// Статический Сервис для ввода-вывода
@@ -60,7 +58,29 @@ public final class FunctionsIO {
         }
         return null;
     }
+    /// Печатает буферизованный байтовый поток outputStream - выбрасывает исключение IOException
+    public static void writeTabulatedFunction(BufferedOutputStream outputStream, TabulatedFunction func) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(outputStream); // создание обертки над outputStream
+        dataOutputStream.writeInt(func.getCount());             // печать кол-ва точек
+        for (Point p : func) {                                  // печать значений
+            dataOutputStream.writeDouble(p.x());
+            dataOutputStream.writeDouble(p.y());
+        }
+        dataOutputStream.flush();                       // подтвердить изменения и записать внутренний буффер в поток
+    }
+    /// Считывает из буферизованного байтового потока inputStream и на их основе создать новую функцию с помощью фабрики factory(выбрасывает IOException)
+    public static TabulatedFunction  readTabulatedFunction(BufferedInputStream inputStream, TabulatedFunctionFactory factory) throws IOException{
+        DataInputStream datainputStream = new DataInputStream(inputStream); // создание обертки входного потока в DataInputStream
+        int count = datainputStream.readInt();                              // Считываем длинну у обьекта полученного ранее
 
+        double[] xVals = new double[count];                 //просто
+        double[] yVals = new double[count];               //два массива для значений
+        for (int i=0;i<count;i++){
+            xVals[i]=datainputStream.readDouble();        //засовываем
+            yVals[i]=datainputStream.readDouble();
+        }
+        return factory.create(xVals,yVals);             //возвращаем новую функцию создавая ее через фабрику
+    }
     /// Механизм сериализации объекта-функции  - выбрасывает проверяемое исключение
     public static void serialize(BufferedOutputStream stream, TabulatedFunction func) throws IOException {
         ObjectOutputStream objStream = new ObjectOutputStream(stream);
@@ -69,7 +89,8 @@ public final class FunctionsIO {
     }
 
     public static TabulatedFunction deserialize(BufferedInputStream stream) throws IOException, ClassNotFoundException {
-        return null;
+        var inputstream = new ObjectInputStream(stream);
+        return (TabulatedFunction) inputstream.readObject();
     }
 
     public static void serializeXml(BufferedWriter writer, ArrayTabulatedFunction func) throws IOException {

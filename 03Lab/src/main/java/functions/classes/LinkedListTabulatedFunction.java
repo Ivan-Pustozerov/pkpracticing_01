@@ -6,13 +6,18 @@ import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
 import functions.interfaces.Removable;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Insertable,Removable {
-    ///================Nesquik(Nested) класс Node==========================================================
-    public static class Node {
+public class LinkedListTabulatedFunction extends AbstractTabulatedFunction implements Serializable,Insertable,Removable {
 
+    ///================Nesquik(Nested) класс Node==========================================================
+    public static class Node implements Serializable{
+
+        @Serial
+        private static final long serialVersionUID = 3762688909897012711L;
         public Node next;
         public Node prev;
         public double x;
@@ -26,9 +31,10 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
         }
     }
     ///================Служебные-переменные==========================================================
-
+    @Serial private static final long serialVersionUID = 6887288776748630273L;      //Hallelujah
     private int count;
     private Node head;
+
     ///===============================================================================================
 
     ///================Конструкторы==========================================================

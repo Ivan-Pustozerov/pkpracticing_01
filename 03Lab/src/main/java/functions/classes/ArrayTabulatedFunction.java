@@ -1,4 +1,8 @@
 package functions.classes;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import functions.abstracts.AbstractTabulatedFunction;
 import functions.interfaces.Insertable;
 import functions.interfaces.MathFunction;
@@ -17,14 +21,19 @@ import static java.lang.Math.abs;
 /// Табулированная функция на массиве
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
 ///================Служебные-переменные==========================================================
+    @JsonProperty("xVal")
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] xVals;  // точки по X
+    @JsonProperty("yVals")
+    @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] yVals; // точки по Y
     @Serial private static final long serialVersionUID = -4633298896101580232L;
 ///===============================================================================================
 
 
     /// Конструктор через массивы double[]
-    public ArrayTabulatedFunction(double[] xVals, double[] yVals){
+    @JsonCreator
+    public ArrayTabulatedFunction(@JsonProperty(value = "xVals") double[] xVals,@JsonProperty(value = "yVals") double[] yVals){
         //+ здесь проверка на длину таблы >2    //
         checkLengthIsTheSame(xVals, yVals);    //    Проверки на валидность
         checkSorted(xVals);                   //

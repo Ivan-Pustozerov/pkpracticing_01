@@ -7,12 +7,9 @@ import functions.factory.ArrayTabulatedFunctionFactory;
 import functions.interfaces.TabulatedFunction;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.security.DigestException;
-import java.sql.SQLOutput;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -33,7 +30,7 @@ class FunctionsIOTest {
     private File createFile(String filename){
         File file = new File(Dir.getPath() + filename);
         try {
-            file.createNewFile();
+            if(!file.exists()){file.createNewFile();}
             return file;
         } catch (IOException e) {
             return null;
@@ -70,8 +67,6 @@ class FunctionsIOTest {
                 throw new IOException("System failed to parse data");
             }
         }
-
-
     }
 
     @Test
@@ -105,9 +100,81 @@ class FunctionsIOTest {
     }
 
     @Test
-    void deserialize() {
-    }
+    void test_deserialize_list() throws IOException, ClassNotFoundException{
+        double[] xValues = {0.5, 1.5, 2.5};
+        double[] yValues = {1.5, 2.5, 3.5};
+        TabulatedFunction originalFunction = new LinkedListTabulatedFunction(xValues, yValues);
 
+        var file = createFile("/WriteTest.txt");
+
+        try (var outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            FunctionsIO.serialize(outputStream, originalFunction);
+        }
+
+        try (var inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
+
+            assertEquals(originalFunction, deserializedFunction);
+        }
+    }
+    @Test
+    void test_deserialize_array() throws IOException, ClassNotFoundException{
+        double[] xValues = {0.5, 1.5, 2.5};
+        double[] yValues = {1.5, 2.5, 3.5};
+        TabulatedFunction func = new ArrayTabulatedFunction(xValues, yValues);
+
+        var file = createFile("/WriteTest.txt");
+
+        try (var outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            FunctionsIO.serialize(outputStream, func);
+        }
+
+        try (var inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
+
+            assertEquals(func, deserializedFunction);
+        }
+    }
+    @Test
+    void writeTabulatedFunctionWithBufferedOutputStream() throws IOException {
+        // Подготовка тестовых данных
+        double[] xValues = {1.5, 2.5, 3.5};
+        double[] yValues = {4.5, 5.5, 6.5};
+        TabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
+
+        var file = createFile("/WriteTest.txt");
+
+        // Вызов тестируемого метода
+        try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            FunctionsIO.writeTabulatedFunction(outputStream, function);
+        }}
+    @Test
+    void readTabulatedFunctionWithBufferedInputStream() throws IOException {
+
+        var file = createFile("/WriteTest.txt");
+
+        try (var dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+            dataOutputStream.writeInt(2);
+            dataOutputStream.writeDouble(1.5);
+            dataOutputStream.writeDouble(4.5);
+            dataOutputStream.writeDouble(2.5);
+            dataOutputStream.writeDouble(5.5);
+        }
+
+
+        try (var inputStream = new BufferedInputStream(new FileInputStream(file))) {
+            var factory = new ArrayTabulatedFunctionFactory();
+            TabulatedFunction function = FunctionsIO.readTabulatedFunction(inputStream, factory);
+
+            // Проверка результата
+            assertNotNull(function);
+            assertEquals(2, function.getCount());
+            assertEquals(1.5, function.getX(0), 0.0001);
+            assertEquals(4.5, function.getY(0), 0.0001);
+            assertEquals(2.5, function.getX(1), 0.0001);
+            assertEquals(5.5, function.getY(1), 0.0001);
+        }
+    }
     @AfterAll
     static void clearEverything(){
         Dir.delete();

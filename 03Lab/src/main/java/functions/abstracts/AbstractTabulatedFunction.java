@@ -2,7 +2,9 @@ package functions.abstracts;
 
 import exceptions.ArrayIsNotSortedException;
 import exceptions.DifferentLengthOfArraysException;
+import functions.classes.Point;
 import functions.interfaces.TabulatedFunction;
+import operations.TabulatedFunctionOperationService;
 
 import static java.lang.Math.abs;
 
@@ -59,4 +61,30 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     // Количество точек - геттер
     @Override
     public int getCount(){return count;}
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getClass().getSimpleName()).append(" size= ").append(getCount());
+        for(int i=0; i<getCount();i++){
+            sb.append("\n[").append(getX(i)).append(";").append(getY(i)).append("]\n");
+        }
+        return sb.toString();
+    }
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof TabulatedFunction otherTab)) return false;
+
+        int count = otherTab.getCount();
+        if (getCount() != otherTab.getCount()) return false;
+
+        Point[] ourPoints = TabulatedFunctionOperationService.asPoints(this);
+        Point[] otherPoints = TabulatedFunctionOperationService.asPoints(otherTab);
+        for (int i = 0; i < count; ++i) {
+            if (!ourPoints[i].equals(otherPoints[i])) return false;
+        }
+
+        return true;
+    }
 }
