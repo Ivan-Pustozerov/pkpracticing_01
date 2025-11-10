@@ -21,15 +21,17 @@ import static java.lang.Math.abs;
 /// Табулированная функция на массиве
 public class ArrayTabulatedFunction extends AbstractTabulatedFunction implements Insertable, Removable, Serializable {
 ///================Служебные-переменные==========================================================
+    @Serial private static final long serialVersionUID = -4633298896101580232L;
+
     @JsonProperty("xVal")
     @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] xVals;  // точки по X
+
     @JsonProperty("yVals")
     @JsonFormat(shape = JsonFormat.Shape.ARRAY)
     private double[] yVals; // точки по Y
-    @Serial private static final long serialVersionUID = -4633298896101580232L;
-///===============================================================================================
 
+///===============================================================================================
 
     /// Конструктор через массивы double[]
     @JsonCreator

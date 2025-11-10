@@ -28,6 +28,8 @@ public class TabulatedFunctionOperationService {
 
     ///представление функции в виде массива точек
     public static Point[] asPoints(TabulatedFunction func){
+        if (func.getCount()==0) throw new IllegalArgumentException("empty function");
+
         int i=0;
         Point[] res = new Point[func.getCount()];
         for(Point p : func){

@@ -32,7 +32,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     }
     ///================Служебные-переменные==========================================================
     @Serial private static final long serialVersionUID = 6887288776748630273L;      //Hallelujah
-    private int count;
     private Node head;
 
     ///===============================================================================================
@@ -244,11 +243,6 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
             curr = curr.next;
         }
         return -1;
-    }
-    ///-----------------Геттеры-Числа-----------------------------------------------------------------
-    @Override
-    public int getCount(){
-        return count;
     }
     ///-------------------------------------------------------------------------------------------------
     ///===============================================================================================

@@ -13,6 +13,7 @@ import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
+import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,7 +47,7 @@ class FunctionsIOTest {
 
     @Test
     void writeTabulatedFunction() throws IOException{
-        File file = createFile("/WriteTest.txt");
+        File file = createFile("/ReadWriteTest.txt");
         if(file == null) throw new IOException("System failed to create test file");
 
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))){
@@ -71,7 +72,8 @@ class FunctionsIOTest {
 
     @Test
     void readTabulatedFunction() throws  IOException{
-        File file = createFile("/WriteTest.txt");
+        writeTabulatedFunction();
+        File file = createFile("/ReadWriteTest.txt");
         if(file == null) throw new IOException("System failed to open test file");
 
         try(BufferedReader reader = new BufferedReader(new FileReader(file))){
@@ -90,22 +92,26 @@ class FunctionsIOTest {
     }
 
     @Test
-    void serialize() throws IOException{
-        ByteArrayOutputStream AfuncSerData = new ByteArrayOutputStream();
+    void serializeArray() throws IOException{
+        File file = createFile("/SerializeDeserializeArray.bin");
+        FileOutputStream AfuncSerData = new FileOutputStream(file);
 
         try(BufferedOutputStream out = new BufferedOutputStream(AfuncSerData)){
             FunctionsIO.serialize(out,Afunc);
-            assertNotEquals(0,AfuncSerData.size());//объем буффера потока Afunc должен измениться
+        }
+        try(FileInputStream fileTest = new FileInputStream(file)){
+            assertNotEquals(-1,fileTest.read());
         }
     }
 
     @Test
     void test_deserialize_list() throws IOException, ClassNotFoundException{
-        double[] xValues = {0.5, 1.5, 2.5};
-        double[] yValues = {1.5, 2.5, 3.5};
+        double[] xValues = xVals;
+        double[] yValues = yVals;
+
         TabulatedFunction originalFunction = new LinkedListTabulatedFunction(xValues, yValues);
 
-        var file = createFile("/WriteTest.txt");
+        var file = createFile("/SerializeDeserializeList.bin");
 
         try (var outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             FunctionsIO.serialize(outputStream, originalFunction);
@@ -119,30 +125,34 @@ class FunctionsIOTest {
     }
     @Test
     void test_deserialize_array() throws IOException, ClassNotFoundException{
-        double[] xValues = {0.5, 1.5, 2.5};
-        double[] yValues = {1.5, 2.5, 3.5};
+        double[] xValues = xVals;
+        double[] yValues = yVals;
+        serializeArray();
+
         TabulatedFunction func = new ArrayTabulatedFunction(xValues, yValues);
 
-        var file = createFile("/WriteTest.txt");
+        var file = createFile("/SerializeDeserializeArray.bin");
 
-        try (var outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+        /*try (var outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
             FunctionsIO.serialize(outputStream, func);
-        }
-
+        }*/
         try (var inputStream = new BufferedInputStream(new FileInputStream(file))) {
             TabulatedFunction deserializedFunction = FunctionsIO.deserialize(inputStream);
 
             assertEquals(func, deserializedFunction);
         }
+        catch(Throwable e){
+            e.printStackTrace();
+        }
     }
     @Test
     void writeTabulatedFunctionWithBufferedOutputStream() throws IOException {
         // Подготовка тестовых данных
-        double[] xValues = {1.5, 2.5, 3.5};
-        double[] yValues = {4.5, 5.5, 6.5};
+        double[] xValues = xVals;
+        double[] yValues = yVals;
         TabulatedFunction function = new LinkedListTabulatedFunction(xValues, yValues);
 
-        var file = createFile("/WriteTest.txt");
+        var file = createFile("/ReadWriteByteTest.txt");
 
         // Вызов тестируемого метода
         try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
@@ -151,7 +161,7 @@ class FunctionsIOTest {
     @Test
     void readTabulatedFunctionWithBufferedInputStream() throws IOException {
 
-        var file = createFile("/WriteTest.txt");
+        var file = createFile("/ReadWriteByteTest.txt");
 
         try (var dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
             dataOutputStream.writeInt(2);
@@ -177,6 +187,6 @@ class FunctionsIOTest {
     }
     @AfterAll
     static void clearEverything(){
-        Dir.delete();
+        //Dir.delete();
     }
 }

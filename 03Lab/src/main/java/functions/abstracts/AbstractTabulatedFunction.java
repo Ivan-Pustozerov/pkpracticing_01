@@ -6,15 +6,19 @@ import functions.classes.Point;
 import functions.interfaces.TabulatedFunction;
 import operations.TabulatedFunctionOperationService;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 import static java.lang.Math.abs;
 
 /// конкретный функционал табулированных функций
-public abstract class AbstractTabulatedFunction implements TabulatedFunction {
+public abstract class AbstractTabulatedFunction implements TabulatedFunction, Serializable {
  ///================Служебные-переменные==========================================================
+    @Serial
+    private static final long serialVersionUID = -5779587941366237851L;
     protected final static double delta=1e-32;  // Для сравнения double чисел
-    protected int count;                       // Количество точек в фунцииы
+    protected int count;                       // Количество точек в фунции
 ///===============================================================================================
-
 
     ///общий механизм функции
     @Override
@@ -66,10 +70,14 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
     public String toString(){
         StringBuilder sb = new StringBuilder();
 
-        sb.append(getClass().getSimpleName()).append(" size= ").append(getCount());
-        for(int i=0; i<getCount();i++){
-            sb.append("\n[").append(getX(i)).append(";").append(getY(i)).append("]\n");
+        sb.append(getClass().getSimpleName()).append(" size = ").append(getCount() + "\n");
+
+        int i=0;
+        for(; i<getCount()-1;i++){
+            sb.append("[").append(getX(i)).append("; ").append(getY(i)).append("]\n");
         }
+        sb.append("[").append(getX(i)).append("; ").append(getY(i)).append("]");
+
         return sb.toString();
     }
     @Override
@@ -82,7 +90,8 @@ public abstract class AbstractTabulatedFunction implements TabulatedFunction {
         Point[] ourPoints = TabulatedFunctionOperationService.asPoints(this);
         Point[] otherPoints = TabulatedFunctionOperationService.asPoints(otherTab);
         for (int i = 0; i < count; ++i) {
-            if (!ourPoints[i].equals(otherPoints[i])) return false;
+            if (abs(ourPoints[i].x()-otherPoints[i].x())>delta) return false;
+            if (abs(ourPoints[i].y()-otherPoints[i].y())>delta) return false;
         }
 
         return true;
