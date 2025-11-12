@@ -62,16 +62,18 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
             Point[] points = TabulatedFunctionOperationService.asPoints(tfunc);
             return new Iterator<Point>() {
                 private int index = 0;
+                //Не знаю , но возмножно так лучше будет
+                private final Point[] pointsCopy = points;
                 @Override
                 public boolean hasNext() {
-                    return index < points.length;
+                    return index < pointsCopy.length;
                 }
                 @Override
                 public Point next() {
                     if (!hasNext()) {
                         throw new NoSuchElementException();
                     }
-                    return points[index++];
+                    return pointsCopy[index++];
                 }
             };
         }
