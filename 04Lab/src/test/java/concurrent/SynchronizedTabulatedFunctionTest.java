@@ -36,7 +36,7 @@ class SynchronizedTabulatedFunctionTest {
     void setY() {
         func.setX(2,2);
         Sfunc.setX(2,2);
-        assertEquals(func.getX(2),Sfunc.getX(2));
+        assertEquals(func.getY(2),Sfunc.getY(2));
     }
 
     @Test
