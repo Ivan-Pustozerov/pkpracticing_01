@@ -5,9 +5,7 @@ import functions.classes.Point;
 import functions.interfaces.TabulatedFunction;
 import org.junit.jupiter.api.Test;
 
-import java.util.Iterator;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SynchronizedTabulatedFunctionTest {
     private static TabulatedFunction func = new ArrayTabulatedFunction(new double[]{1,2,3},new double[]{1,2,3});
@@ -17,7 +15,15 @@ class SynchronizedTabulatedFunctionTest {
     void getCount() {
         assertEquals(func.getCount(),Sfunc.getCount());
     }
-
+    @Test
+    void iterator() {
+        int i = 1;
+        for (Point p : func) {
+            assertEquals(p.x(), i);
+            assertEquals(p.y(), i);
+            i++;
+        }
+    }
     @Test
     void getX() {
         for(int i = 0; i< func.getCount();++i){
@@ -53,7 +59,10 @@ class SynchronizedTabulatedFunctionTest {
 
     @Test
     void indexOfY() {
-        assertEquals(func.indexOfX(1),Sfunc.indexOfX(1));
+        func = new ArrayTabulatedFunction(new double[]{1,2,3},new double[]{1,2,3});
+        Sfunc = new SynchronizedTabulatedFunction(func);
+
+        assertEquals(func.indexOfY(1),Sfunc.indexOfY(1));
     }
 
     @Test
@@ -69,15 +78,6 @@ class SynchronizedTabulatedFunctionTest {
     @Test
     void apply() {
         assertEquals(func.apply(2),Sfunc.apply(2));
-    }
-
-    @Test
-    void iterator() {
-        Iterator<Point> fi = func.iterator();
-        Iterator<Point> sfi = Sfunc.iterator();
-        while(fi.hasNext()){
-            assertEquals(fi.next(),sfi.next());
-        }
     }
 
     @Test

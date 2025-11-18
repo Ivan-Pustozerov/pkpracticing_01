@@ -17,6 +17,8 @@ public abstract class SteppingDifferentialOperator implements DifferentialOperat
 
 ///-------------------Геттер/Сеттер---------------------------------------------------------
     public void setStep(double step) {
+        if (step < 0 || Double.isNaN(step) || Double.isInfinite(step) )
+            throw new IllegalArgumentException("Некорректный шаг производной");
         this.step = step;
     }
     public double getStep() {

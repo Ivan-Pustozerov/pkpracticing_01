@@ -9,100 +9,51 @@ import java.util.NoSuchElementException;
 
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction tfunc; //final чтобы была корректная публикация + атомарность конструктора
-    private final static Object EditLock = new Object();
-    private final static Object CountLock = new Object();
-    private final static Object getXLock = new Object();
-    private final static Object getYLock = new Object();
-    private final static Object IndXLock = new Object();
-    private final static Object IndYLock = new Object();
-    private final static Object leftBondLock = new Object();
-    private final static Object rightBondLock = new Object();
-    private final static Object applyLock = new Object();
-
-
-    //остальные методы из AbstractTabFunc не нужны?
-
-
-
     public SynchronizedTabulatedFunction(TabulatedFunction tfunc) {
         this.tfunc = tfunc;
     }
     @Override
-    public int getCount(){
-        synchronized (CountLock){
-            synchronized (EditLock) {
-                return tfunc.getCount();
-            }
-        }
+    public synchronized int getCount(){
+        return tfunc.getCount();
     }
     @Override
-    public double getX(int index){
-        synchronized (getXLock){
-            synchronized (EditLock) {
-                return tfunc.getX(index);
-            }
-        }
+    public synchronized double getX(int index){
+        return tfunc.getX(index);
+
     };
     @Override
-    public double getY(int index){
-        synchronized (getYLock){
-            return tfunc.getY(index);
-        }
+    public synchronized double getY(int index){
+        return tfunc.getY(index);
     };
 
     @Override
-    public <T extends Number> void setY(int index, T y){
-        synchronized (EditLock){
-            tfunc.setY(index,y);
-        }
+    public synchronized<T extends Number> void setY(int index, T y){
+        tfunc.setY(index,y);
     };
     @Override
-    public <T extends Number> void setX(int index, T x){
-        synchronized (EditLock) {
-            synchronized (EditLock) {
-                tfunc.setX(index, x);
-            }
-        }
+    public synchronized<T extends Number> void setX(int index, T x){
+        tfunc.setX(index,x);
     };
     @Override
-    public <T extends Number> int indexOfX(T x){
-        synchronized (IndXLock){
-            synchronized (EditLock) {
-                return tfunc.indexOfX(x);
-            }
-        }
+    public synchronized<T extends Number> int indexOfX(T x){
+        return tfunc.indexOfX(x);
     };
     @Override
-    public <T extends Number> int indexOfY(T y){
-        synchronized (IndYLock) {
-            synchronized (EditLock) {
-                return tfunc.indexOfY(y);
-            }
-        }
+    public synchronized<T extends Number> int indexOfY(T y){
+        return tfunc.indexOfY(y);
     };
     @Override
-    public double leftBound(){
-        synchronized (leftBondLock) {
-            synchronized (EditLock) {
-                return tfunc.leftBound();
-            }
-        }
+    public synchronized double leftBound(){
+        return tfunc.leftBound();
     };
     @Override
-    public double rightBound(){
-        synchronized (rightBondLock) {
-            synchronized (EditLock) {
-                return tfunc.rightBound();
-            }
-        }
+    public synchronized double rightBound(){
+        return tfunc.rightBound();
+
     };
     @Override
-    public <T extends Number> double apply(T x) {
-        synchronized (applyLock) {
-            synchronized (EditLock) {
-                return tfunc.apply(x);
-            }
-        }
+    public synchronized<T extends Number> double apply(T x) {
+        return tfunc.apply(x);
     }
     @Override
     public Iterator<Point> iterator() {
@@ -131,7 +82,7 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     }
 
     public <T> T doSynchronously(Operation<? extends T> operation) {
-        synchronized (EditLock) {
+        synchronized (tfunc) {
             return operation.apply(this);
         }
     }
