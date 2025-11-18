@@ -4,9 +4,11 @@ import functions.classes.Point;
 import functions.interfaces.TabulatedFunction;
 import operations.TabulatedFunctionOperationService;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+@ThreadSafe
 public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final TabulatedFunction tfunc; //final чтобы была корректная публикация + атомарность конструктора
     private final static Object EditLock = new Object();
@@ -18,11 +20,7 @@ public class SynchronizedTabulatedFunction implements TabulatedFunction {
     private final static Object leftBondLock = new Object();
     private final static Object rightBondLock = new Object();
     private final static Object applyLock = new Object();
-
-
     //остальные методы из AbstractTabFunc не нужны?
-
-
 
     public SynchronizedTabulatedFunction(TabulatedFunction tfunc) {
         this.tfunc = tfunc;

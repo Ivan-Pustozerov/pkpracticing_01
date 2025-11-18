@@ -6,6 +6,7 @@ import functions.interfaces.TabulatedFunction;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,7 +54,7 @@ class SynchronizedTabulatedFunctionTest {
 
     @Test
     void indexOfY() {
-        assertEquals(func.indexOfX(1),Sfunc.indexOfX(1));
+        assertEquals(func.indexOfY(1),Sfunc.indexOfY(1));
     }
 
     @Test
@@ -75,9 +76,10 @@ class SynchronizedTabulatedFunctionTest {
     void iterator() {
         Iterator<Point> fi = func.iterator();
         Iterator<Point> sfi = Sfunc.iterator();
-        while(fi.hasNext()){
+        while(sfi.hasNext()){
             assertEquals(fi.next(),sfi.next());
         }
+        assertThrows(NoSuchElementException.class,() -> sfi.next());
     }
 
     @Test

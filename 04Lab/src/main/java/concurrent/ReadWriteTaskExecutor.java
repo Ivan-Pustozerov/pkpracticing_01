@@ -12,7 +12,8 @@ public class ReadWriteTaskExecutor {
         Thread Readthread = new Thread(new ReadTask(list));
         Thread Writethread = new Thread(new WriteTask(list,0.5));
 
-        Readthread.start();
         Writethread.start();
+        Readthread.start();
+
     }
 }

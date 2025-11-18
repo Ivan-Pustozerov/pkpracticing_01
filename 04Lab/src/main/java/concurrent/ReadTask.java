@@ -11,8 +11,8 @@ public class ReadTask implements Runnable{
 
     @Override
     public void run(){
-        for (int i=0;tfunc.getCount()>i;i++){
-            synchronized (tfunc){
+        for (int i=0;tfunc.getCount()>i;i++) {
+            synchronized (tfunc) {
                 System.out.printf("After read: i = %d, x = %f, y = %f\n", i, tfunc.getX(i), tfunc.getY(i));
             }
         }
