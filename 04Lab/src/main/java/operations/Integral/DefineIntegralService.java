@@ -41,11 +41,13 @@ public class DefineIntegralService {
      */
     public double TrapezoidMethod(int FuncIndex, int Ndot, double from, double to){
         if(FuncIndex <0 || FuncIndex >= FuncList.size()) throw new IllegalArgumentException("Index Out Of Range");
+        double res=0.0;
         try{
-            return TrapezoidDefineIntegralXY.apply(ThreadPool,FuncList.get(FuncIndex),Ndot,from,to);
+             res = TrapezoidDefineIntegralXY.apply(ThreadPool,FuncList.get(FuncIndex),Ndot,from,to);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return res;
     }
 
     /**
@@ -63,8 +65,12 @@ public class DefineIntegralService {
             throw new DifferentLengthOfArraysException();
 
         double[] result = new double[funcLen];
-        for(int i =0; i<funcLen;++i){
-            result[i] = TrapezoidDefineIntegralXY.apply(ThreadPool,FuncList.get(i),Ndot[i],from[i],to[i]);
+        try {
+            for (int i = 0; i < funcLen; ++i) {
+                result[i] = TrapezoidDefineIntegralXY.apply(ThreadPool, FuncList.get(i), Ndot[i], from[i], to[i]);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return result;
     }
