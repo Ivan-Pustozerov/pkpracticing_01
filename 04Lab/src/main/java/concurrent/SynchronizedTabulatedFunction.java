@@ -5,6 +5,7 @@ import functions.interfaces.TabulatedFunction;
 import operations.TabulatedFunctionOperationService;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.text.EditorKit;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

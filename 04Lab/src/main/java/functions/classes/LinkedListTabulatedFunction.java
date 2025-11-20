@@ -366,9 +366,7 @@ public class LinkedListTabulatedFunction extends AbstractTabulatedFunction imple
     protected double interpolate(double x, int floorIndex) {
         Node leftNode = getNode(floorIndex);
         Node rightNode = leftNode.next;
-        //System.out.println(leftNode.x);
-        //System.out.println(rightNode.x);
-        //System.out.println(x);
+
         if (x < leftNode.x || x > rightNode.x) {throw new InterpolationException("X out of inter range");}
         return interpolate(x, leftNode.x, rightNode.x, leftNode.y, rightNode.y);
     }
