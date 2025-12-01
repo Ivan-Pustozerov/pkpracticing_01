@@ -1,0 +1,2 @@
+SELECT * FROM AnalyticFunctions
+WHERE id = $1;

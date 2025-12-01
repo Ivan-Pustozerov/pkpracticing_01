@@ -1,0 +1,5 @@
+CREATE TABLE MathFunctions
+(id BIGSERIAL PRIMARY KEY,
+type VARCHAR(10) CHECK(type IN('analytic','tabulated')) NOT NULL,
+name VARCHAR(20) NOT NULL,
+owner_id BIGINT REFERENCES Users(id) ON DELETE CASCADE NOT NULL);
