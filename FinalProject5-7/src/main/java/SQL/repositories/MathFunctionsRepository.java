@@ -1,6 +1,9 @@
 package SQL.repositories;
 
+import SQL.DTO.DTO;
+import SQL.DTO.IdDTO;
 import SQL.DTO.MathFunctionDTO;
+import SQL.SQLRepositoryException;
 import SQL.repositories.tools.Repository;
 
 import java.util.ArrayList;
@@ -28,24 +31,33 @@ public class MathFunctionsRepository extends Repository {
 ///=================================================================================================================
 
 ///---------------------------------------------------UPDATER-------------------------------------------------------
-    public int initTable(){
+    public int initTable()
+            throws SQLRepositoryException {
         return super.initTable(MFuncInit);
     }
-    public int insertMFunc(String type, String name, long owner_id){
-        return executeUpdate(MFuncInsert, ps -> { ps.setString(1, type);
-                                                                        ps.setString(2,name);
-                                                                        ps.setLong(3, owner_id);});
+
+    public ArrayList<IdDTO> insertMFunc(String type, String name, long owner_id)
+            throws SQLRepositoryException{
+        return executeQuery(MFuncInsert, ps -> { ps.setString(1, type);
+                                                                  ps.setString(2,name);
+                                                                  ps.setLong(3, owner_id);},
+                set -> {return new IdDTO(set.getLong("id"));});
     }
-    public int removeMFunc(long id){
+
+    public int removeMFunc(long id)
+            throws SQLRepositoryException{
         return executeUpdate(MFuncRemove, ps -> ps.setLong(1, id));
     }
-    public int updateMFunc(long id, String new_name){
+
+    public int updateMFunc(long id, String new_name)
+            throws SQLRepositoryException{
         return executeUpdate(MFuncUpdate, ps ->{ ps.setLong(1, id);
                                                                  ps.setString(2, new_name);});
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<MathFunctionDTO> readMFuncInfo(long id){
+    public ArrayList<MathFunctionDTO> readMFuncInfo(long id)
+            throws SQLRepositoryException{
         return executeQuery(MFuncReadInfo, ps -> ps.setLong(1, id),
                 set ->{ return new MathFunctionDTO( set.getLong("id"),
                         set.getString("type"),

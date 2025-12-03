@@ -1,2 +1,1 @@
-INSERT INTO MathFunctions (type, name, owner_id)
-VALUES (?, ?, ?);
+INSERT INTO MathFunctions (type, name, owner_id) VALUES (?, ?, ?) RETURNING id;

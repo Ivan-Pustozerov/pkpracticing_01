@@ -1,6 +1,7 @@
 package SQL.repositories;
 
 import SQL.DTO.TabulatedFunctionToServerDTO;
+import SQL.SQLRepositoryException;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 
@@ -29,12 +30,14 @@ public class TabulatedFunctionsRepository extends Repository {
 ///================================================================================================================
 
 ///---------------------------------------------------UPDATER------------------------------------------------------
-    public int initTable(){
+    public int initTable()
+            throws SQLRepositoryException {
         return initTable(TabulatedInit);
     }
 
     /// МОЖЕТ ОЧЕНЬ СИЛЬНО РАЗОЧАРОВАТЬ - ПРОБЛЕМЫ НЕ МОИ - СОЗДАТЕЛЯ java.sql.Array
-    public int insertTabulatedFunction(long func_id, double[] xVals, double[] yVals) throws SQLException {
+    public int insertTabulatedFunction(long func_id, double[] xVals, double[] yVals)
+            throws SQLRepositoryException {
 
         try(SQLArray sqlXvals = new SQLArray(toDoubleSQLArray(xVals));
             SQLArray sqlYvals = new SQLArray(toDoubleSQLArray(yVals))){
@@ -45,15 +48,19 @@ public class TabulatedFunctionsRepository extends Repository {
                                              if(sqlYvals.isAlive()) ps.setArray(3, sqlYvals.innerArray());});
         }
     }
-    public int updateTabulatedFunctionIndex(long id, int x_index, double x_val, int y_index, double y_val){
+
+    public int updateTabulatedFunctionIndex(long id, int x_index, double x_val, int y_index, double y_val)
+            throws SQLRepositoryException{
         return executeUpdate(TabulatedUpdateIndex, ps -> { ps.setLong(1, id);
                                                                             ps.setInt(2, x_index);
                                                                             ps.setDouble(3, x_val);
                                                                             ps.setInt(4, y_index);
                                                                             ps.setDouble(5, y_val);});
     }
+
     /// МОЖЕТ ОЧЕНЬ СИЛЬНО РАЗОЧАРОВАТЬ - ПРОБЛЕМЫ НЕ МОИ - СОЗДАТЕЛЯ java.sql.Array
-    public int updateTabulatedFunctionFull(long id, double[] xVals, double[] yVals) throws SQLException {
+    public int updateTabulatedFunctionFull(long id, double[] xVals, double[] yVals)
+            throws SQLRepositoryException {
 
         try(SQLArray sqlXvals = new SQLArray(toDoubleSQLArray(xVals));
             SQLArray sqlYvals = new SQLArray(toDoubleSQLArray(yVals))){
@@ -67,7 +74,8 @@ public class TabulatedFunctionsRepository extends Repository {
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<TabulatedFunctionToServerDTO> readTabulatedFunctionInfo(long id){
+    public ArrayList<TabulatedFunctionToServerDTO> readTabulatedFunctionInfo(long id)
+            throws SQLRepositoryException{
         return executeQuery(TabulatedReadInfo, ps -> ps.setLong(1, id),
                                                     set ->{ return new TabulatedFunctionToServerDTO(
                                                                     set.getLong("id"),

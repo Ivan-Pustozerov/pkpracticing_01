@@ -1,5 +1,7 @@
 package SQL.repositories.tools;
 
+import SQL.SQLRepositoryException;
+
 import java.sql.Array;
 import java.sql.SQLException;
 
@@ -17,8 +19,13 @@ public class SQLArray implements AutoCloseable {
 
 
     @Override
-    public void close() throws SQLException {
+    public void close() throws SQLRepositoryException {
         isAlive = false;
-        this.innerArray.free();
+        try{
+            this.innerArray.free();
+        } catch (SQLException e) {
+            throw new SQLRepositoryException("SQL Array Close Error");
+        }
+
     }
 }

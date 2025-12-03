@@ -1,6 +1,7 @@
 package SQL.repositories.tools;
 
 import SQL.DTO.DTO;
+import SQL.SQLRepositoryException;
 
 import java.io.*;
 import java.sql.*;
@@ -14,21 +15,21 @@ public class Repository {
 ///===================================================================================================
 
     /// Универсальный конструктор таблиц
-    protected int initTable(String sql){
+    protected int initTable(String sql) throws SQLRepositoryException
+    {
         try(Connection connect = DriverManager.getConnection(url,username,password)) {
-
             Statement statement = connect.createStatement();
             return statement.executeUpdate(sql);
 
         } catch (SQLException e) {
-            System.err.println("create Error");
-            throw new RuntimeException("ЗАМЕНИТЬ");
+            //log
+            throw new SQLRepositoryException("Init Table Error!");
         }
     }
 
     /// Универсальный запрос на обновление
     protected int executeUpdate(String sql,
-                                SQLConsumer<PreparedStatement> pstateTemplate)
+                                SQLConsumer<PreparedStatement> pstateTemplate) throws SQLRepositoryException
     {
         try(Connection connect = DriverManager.getConnection(url,username,password);
             PreparedStatement pstate = connect.prepareStatement(sql)) {
@@ -39,8 +40,9 @@ public class Repository {
             return pstate.executeUpdate();
         }
         catch (SQLException e) {
-            System.err.println("create Error");
-            throw new RuntimeException("ЗАМЕНИТЬ");
+            //log
+            System.err.println(e.toString());
+            throw new SQLRepositoryException("Execute Update Error!");
         }
     }
 
@@ -48,15 +50,17 @@ public class Repository {
     protected <T extends DTO> ArrayList<T> executeQuery(String sql,
                                                         SQLConsumer<PreparedStatement> pstateTemplate,
                                                         SQLResultSetFunction<T> funcTemplate)
+                                                            throws SQLRepositoryException
     {
         try(Connection connect = DriverManager.getConnection(url,username,password);
-            PreparedStatement pstate = connect.prepareStatement(sql);) {
+            PreparedStatement pstate = connect.prepareStatement(sql.trim());) {
 
 
             ArrayList<T> result = new ArrayList<>();
 
 
             pstateTemplate.accept(pstate);
+
 
             ///ОБЯЗАТЕЛЬНО! ResultSet и PreparedStatement, Array ЗАКРЫВАТЬ - ОБЕРТКИ НАД СИСТЕМНЫМИ ПОТОКАМИ!
             try(ResultSet set = pstate.executeQuery()){
@@ -68,8 +72,9 @@ public class Repository {
             }
 
         } catch (SQLException e) {
-            System.err.println("create Error");
-            throw new RuntimeException("ЗАМЕНИТЬ");
+            //log
+            e.printStackTrace();
+            throw new SQLRepositoryException("Execute Query Error!");
         }
     }
 
@@ -80,6 +85,7 @@ public class Repository {
         this.username = username; //более того компиль всегда добавляет пустой конструктор
         this.password = password;//                 если не указаны другие
     }
+
     protected static String readCommand(String filepath){
         StringBuffer res = new StringBuffer();
         String line;
@@ -90,10 +96,12 @@ public class Repository {
             return res.toString();
 
         }catch (IOException e) {
+            //log
             throw new RuntimeException("Command Error");
         }
     }
-    protected static double[] toDoubleBaseArray(java.sql.Array array) throws SQLException {
+
+    protected static double[] toDoubleBaseArray(java.sql.Array array) throws SQLRepositoryException{
         double[] result = null;
         try {
             Double[] arr = (Double[]) array.getArray();
@@ -101,14 +109,24 @@ public class Repository {
             for(int i = 0;i<arr.length;++i) result[i] = arr[i];
         }
         catch (SQLException e) {
-            throw new RuntimeException("ЗАМЕНИТЬ!");
+            //log
+            throw new SQLRepositoryException("From SQLArray Cast Error");
         }
         finally{
-            array.free();
+            try{
+                array.free();
+            }
+            catch (SQLException e) {
+                //log
+                throw new SQLRepositoryException("SQLArray Free Error");
+            }
+
+
         }
         return result;
     }
-    protected java.sql.Array toDoubleSQLArray(double[] array){
+
+    protected java.sql.Array toDoubleSQLArray(double[] array) throws SQLRepositoryException{
         Double[] arr = new Double[array.length];
         for(int i =0; i < array.length;++i){ arr[i] = Double.valueOf(array[i]); }
 
@@ -116,7 +134,7 @@ public class Repository {
             return connect.createArrayOf("float8", arr);
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new SQLRepositoryException("To SQL Array Cast Exception");
         }
     }
 

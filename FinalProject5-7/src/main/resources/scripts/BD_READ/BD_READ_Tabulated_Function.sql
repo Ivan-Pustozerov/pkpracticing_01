@@ -1,2 +1,1 @@
-SELECT * FROM TabulatedFunctions
-WHERE id = $1;
+SELECT * FROM TabulatedFunctions WHERE id = $1;

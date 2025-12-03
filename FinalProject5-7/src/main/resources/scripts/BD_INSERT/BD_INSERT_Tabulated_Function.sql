@@ -1,2 +1,1 @@
-INSERT INTO TabulatedFunctions (func_id, xVals, yVals)
-VALUE (?, ?, ?);
+INSERT INTO TabulatedFunctions (func_id, xVals, yVals) VALUES (?, ?, ?);

@@ -1,4 +1,4 @@
-CREATE TABLE MathFunctions
+CREATE TABLE IF NOT EXISTS MathFunctions
 (id BIGSERIAL PRIMARY KEY,
 type VARCHAR(10) CHECK(type IN('analytic','tabulated')) NOT NULL,
 name VARCHAR(20) NOT NULL,

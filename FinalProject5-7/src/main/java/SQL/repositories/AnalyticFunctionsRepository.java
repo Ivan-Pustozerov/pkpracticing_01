@@ -1,6 +1,7 @@
 package SQL.repositories;
 
 import SQL.DTO.AnalyticFunctionDTO;
+import SQL.SQLRepositoryException;
 import SQL.repositories.tools.Repository;
 
 import java.util.ArrayList;
@@ -24,20 +25,26 @@ public class AnalyticFunctionsRepository extends Repository {
 ///================================================================================================================
 
 ///---------------------------------------------------UPDATER------------------------------------------------------
-    public int initTable(){
+    public int initTable()
+            throws SQLRepositoryException {
         return initTable(AnalyticFunctionInit);
     }
-    public int insertAnalyticFunction(long func_id, String function_expression){
+
+    public int insertAnalyticFunction(long func_id, String function_expression)
+            throws SQLRepositoryException{
         return executeUpdate(AnalyticFunctionInsert, ps -> { ps.setLong(1, func_id);
                                                                   ps.setString(2, function_expression);});
     }
-    public int updateAnalyticFunction(long id, String function_expression){
+
+    public int updateAnalyticFunction(long id, String function_expression)
+            throws SQLRepositoryException{
         return executeUpdate(AnalyticFunctionUpdate, ps -> { ps.setLong(1, id);
                                                                               ps.setString(2, function_expression);});
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<AnalyticFunctionDTO> readAnalyticFunctionInfo(long id){
+    public ArrayList<AnalyticFunctionDTO> readAnalyticFunctionInfo(long id)
+            throws SQLRepositoryException{
         return executeQuery(AnalyticFunctionReadInfo, ps -> ps.setLong(1, id),
                                                         set ->{ return new AnalyticFunctionDTO(
                                                                  set.getLong("id"),
