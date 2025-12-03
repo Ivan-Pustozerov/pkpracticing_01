@@ -3,9 +3,11 @@ package core.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "analytic_functions")
+@Table(name = "analyticfunctions")
 @Data
 @NoArgsConstructor
 public class AnalyticFunctionsEntity {
@@ -14,8 +16,9 @@ public class AnalyticFunctionsEntity {
     @Column(name = "func_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @MapsId
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "func_id")
     private MathFunctionsEntity mathFunction;
 

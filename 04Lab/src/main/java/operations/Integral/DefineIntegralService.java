@@ -57,6 +57,7 @@ public class DefineIntegralService {
      * @param to Массив верхних пределов интегрирования
      * @return массив значений определенных интегралов по индексам в списке функций
      */
+
     public double[] TrapezoidMethodToALL(int[] Ndot, double[] from, double[] to){
         int funcLen =FuncList.size();
         if(Ndot.length != funcLen

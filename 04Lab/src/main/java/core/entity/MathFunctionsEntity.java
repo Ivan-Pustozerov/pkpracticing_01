@@ -3,6 +3,8 @@ package core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Objects;
 @Entity
@@ -15,13 +17,15 @@ public class MathFunctionsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "type", nullable = false, length = 10)
-    private FunctionType type; // "analytic" или "tabulated"
+    private String type; // "analytic" или "tabulated"
 
     @Column(name = "name", nullable = false, unique = true, length = 20)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;
+
 }
 
