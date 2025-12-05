@@ -157,8 +157,8 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void C_MF() {
         UserEntity owner = new UserEntity();
-        owner.setName("mf_owner");
-        owner.setEmail("owner@example.com");
+        owner.setName("IRONMAN");
+        owner.setEmail("IM@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
