@@ -63,8 +63,8 @@ public class SQL_BasePerformanceTest {
 
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("test_create_user_" + i);
-            user.setEmail("test_create_" + i + "@example.com");
+            user.setName("Anon" + i);
+            user.setEmail("dungeon" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             userRepository.save(user);
@@ -81,8 +81,8 @@ public class SQL_BasePerformanceTest {
         List<Long> userIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("user_for_read_" + i);
-            user.setEmail("read_" + i + "@example.com");
+            user.setName("MachoMan" + i);
+            user.setEmail("Macho" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             UserEntity saved = userRepository.save(user);
@@ -109,8 +109,8 @@ public class SQL_BasePerformanceTest {
         List<UserEntity> users = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("user_for_update_" + i);
-            user.setEmail("update_" + i + "@example.com");
+            user.setName("OPTIMUSPRIME" + i);
+            user.setEmail("ssau" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             users.add(userRepository.save(user));
@@ -120,7 +120,7 @@ public class SQL_BasePerformanceTest {
 
         for (int i = 0; i < users.size(); i++) {
             UserEntity user = users.get(i);
-            user.setName("updated_name_" + i);
+            user.setName("NAPOLEON" + i);
             userRepository.save(user); // Это UPDATE, клянусь
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
@@ -166,7 +166,7 @@ public class SQL_BasePerformanceTest {
 
         for (int i = 0; i < ITERATIONS; i++) {
             MathFunctionsEntity func = new MathFunctionsEntity();
-            func.setName("test_math_func_" + i);
+            func.setName("GIMYMNy" + i);
             func.setType(i % 2 == 0 ? "analytic" : "tabulated");
             func.setOwner(savedOwner);
             mathFunctionsRepository.save(func);
@@ -182,8 +182,8 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void R_MF() {
         UserEntity owner = new UserEntity();
-        owner.setName("mf_read_owner");
-        owner.setEmail("read_owner@example.com");
+        owner.setName("DR_GASTER");
+        owner.setEmail("WD@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -191,7 +191,7 @@ public class SQL_BasePerformanceTest {
         List<Long> mfIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             MathFunctionsEntity func = new MathFunctionsEntity();
-            func.setName("mf_for_read_" + i);
+            func.setName("exper" + i);
             func.setType("analytic");
             func.setOwner(savedOwner);
             MathFunctionsEntity saved = mathFunctionsRepository.save(func);
@@ -252,8 +252,8 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void D_MF() {
         UserEntity owner = new UserEntity();
-        owner.setName("mf_delete_owner");
-        owner.setEmail("delete_owner@example.com");
+        owner.setName("MR.Afton");
+        owner.setEmail("FFP@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -261,7 +261,7 @@ public class SQL_BasePerformanceTest {
         List<Long> mfIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             MathFunctionsEntity func = new MathFunctionsEntity();
-            func.setName("mf_for_delete_" + i);
+            func.setName("Henry" + i);
             func.setType("analytic");
             func.setOwner(savedOwner);
             MathFunctionsEntity saved = mathFunctionsRepository.save(func);
@@ -285,8 +285,8 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void C_AF() {
         UserEntity owner = new UserEntity();
-        owner.setName("af_owner");
-        owner.setEmail("af_owner@example.com");
+        owner.setName("Megatron");
+        owner.setEmail("Dec@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -296,7 +296,7 @@ public class SQL_BasePerformanceTest {
         for (int i = 0; i < ITERATIONS; i++) {
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("math_for_af_" + i);
+            mathFunc.setName("Generator" + i);
             mathFunc.setType("analytic");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
@@ -317,8 +317,8 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void R_AF() {
         UserEntity owner = new UserEntity();
-        owner.setName("af_read_owner");
-        owner.setEmail("af_read@example.com");
+        owner.setName("ILSSAU");
+        owner.setEmail("PMI@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -332,7 +332,7 @@ public class SQL_BasePerformanceTest {
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
-            analyticFunc.setFunctionExpression("read_expr_" + i);
+            analyticFunc.setFunctionExpression("4+1+1" + i);
             AnalyticFunctionsEntity savedAf = analyticFunctionsRepository.save(analyticFunc);
             afIds.add(savedAf.getId());
         }
@@ -355,8 +355,8 @@ public class SQL_BasePerformanceTest {
     void U_AF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("af_update_owner");
-        owner.setEmail("af_update@example.com");
+        owner.setName("DarkWingDuck");
+        owner.setEmail("DWD@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -371,7 +371,7 @@ public class SQL_BasePerformanceTest {
 
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
-            analyticFunc.setFunctionExpression("initial_expr_" + i);
+            analyticFunc.setFunctionExpression("YYY" + i);
             afList.add(analyticFunctionsRepository.save(analyticFunc));
         }
         analyticFunctionsRepository.flush();
@@ -380,7 +380,7 @@ public class SQL_BasePerformanceTest {
 
         for (int i = 0; i < afList.size(); i++) {
             AnalyticFunctionsEntity af = afList.get(i);
-            af.setFunctionExpression("updated_expr_" + i);
+            af.setFunctionExpression("NEW" + i);
             analyticFunctionsRepository.save(af);
         }
 
@@ -397,8 +397,8 @@ public class SQL_BasePerformanceTest {
     void D_AF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("af_delete_owner");
-        owner.setEmail("af_delete@example.com");
+        owner.setName("Sans");
+        owner.setEmail("JustSans@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -415,7 +415,7 @@ public class SQL_BasePerformanceTest {
 
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
-            analyticFunc.setFunctionExpression("delete_expr_" + i);
+            analyticFunc.setFunctionExpression("none" + i);
             AnalyticFunctionsEntity savedAf = analyticFunctionsRepository.save(analyticFunc);
             afIds.add(savedAf.getId());
         }
@@ -442,8 +442,8 @@ public class SQL_BasePerformanceTest {
     void C_TF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("tf_owner");
-        owner.setEmail("tf_owner@example.com");
+        owner.setName("Iforgot");
+        owner.setEmail("XD@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -454,7 +454,7 @@ public class SQL_BasePerformanceTest {
         for (int i = 0; i < ITERATIONS; i++) {
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("math_for_tf_" + i);
+            mathFunc.setName("Chad" + i);
             mathFunc.setType("tabulated");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
@@ -478,15 +478,15 @@ public class SQL_BasePerformanceTest {
     void U_TF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("tf_update_owner");
-        owner.setEmail("tf_update@example.com");
+        owner.setName("UTF");
+        owner.setEmail("UTF@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
         TabulatedFunctionsEntity tf = null;
         MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-        mathFunc.setName("math_for_tf_update");
+        mathFunc.setName("UTF-8");
         mathFunc.setType("tabulated");
         mathFunc.setOwner(savedOwner);
         MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
@@ -516,8 +516,8 @@ public class SQL_BasePerformanceTest {
     void D_TF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("tf_delete_owner");
-        owner.setEmail("tf_delete@example.com");
+        owner.setName("Kuplinov");
+        owner.setEmail("Best@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -563,14 +563,14 @@ public class SQL_BasePerformanceTest {
         Instant start = Instant.now();
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("complex_user_" + i);
-            user.setEmail("complex_" + i + "@example.com");
+            user.setName("Tanks" + i);
+            user.setEmail("T" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             UserEntity savedUser = userRepository.save(user);
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("complex_func_" + i);
+            mathFunc.setName("TankiX" + i);
             mathFunc.setType(i % 2 == 0 ? "analytic" : "tabulated");
             mathFunc.setOwner(savedUser);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
@@ -578,7 +578,7 @@ public class SQL_BasePerformanceTest {
             if ("analytic".equals(savedMathFunc.getType())) {
                 AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
                 analyticFunc.setMathFunction(savedMathFunc);
-                analyticFunc.setFunctionExpression("x^2 + " + i);
+                analyticFunc.setFunctionExpression("x^13 + " + i);
                 analyticFunctionsRepository.save(analyticFunc);
             } else {
                 TabulatedFunctionsEntity tabulatedFunc = new TabulatedFunctionsEntity();
@@ -598,29 +598,29 @@ public class SQL_BasePerformanceTest {
     @Transactional
     void THANOS() {
         List<Long> userIds = new ArrayList<>();
-        Instant start = Instant.now();
 
         for (int i = 0; i < ITERATIONS; i++) {
             // Создаем пользователя с функциями
             UserEntity user = new UserEntity();
-            user.setName("thanos_user_" + i);
-            user.setEmail("thanos_" + i + "@example.com");
+            user.setName("Thanos" + i);
+            user.setEmail("Ironman" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             UserEntity savedUser = userRepository.save(user);
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("thanos_func_" + i);
+            mathFunc.setName("Thor" + i);
             mathFunc.setType("analytic");
             mathFunc.setOwner(savedUser);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
 
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
-            analyticFunc.setFunctionExpression("x^2 + " + i);
+            analyticFunc.setFunctionExpression("x^0 + " + i);
             analyticFunctionsRepository.save(analyticFunc);
             userIds.add(savedUser.getId());
         }
+        Instant start = Instant.now();
         for (Long id : userIds) {
             userRepository.deleteById(id);
         }
