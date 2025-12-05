@@ -22,7 +22,7 @@ public class MathFunctionsEntity {
     @Column(name = "name", nullable = false, unique = true, length = 20)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "owner_id", nullable = false)
     private UserEntity owner;

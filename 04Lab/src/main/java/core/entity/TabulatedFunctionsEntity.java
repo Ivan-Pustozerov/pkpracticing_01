@@ -16,7 +16,7 @@ public class TabulatedFunctionsEntity {
     @Column(name = "func_id")
     private Long id;
     //
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "func_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
