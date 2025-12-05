@@ -217,8 +217,8 @@ public class SQL_BasePerformanceTest {
     void U_MF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("mf_update_owner");
-        owner.setEmail("update_owner@example.com");
+        owner.setName("MEGAMIND");
+        owner.setEmail("MEGAMEGAMIND@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
@@ -237,7 +237,7 @@ public class SQL_BasePerformanceTest {
 
         for (int i = 0; i < functions.size(); i++) {
             MathFunctionsEntity func = functions.get(i);
-            func.setName("updated_mf_name_" + i);
+            func.setName("Kronos" + i);
             mathFunctionsRepository.save(func);
         }
 
@@ -631,7 +631,7 @@ public class SQL_BasePerformanceTest {
     @Test
     @Order(18)
     void WHEREISMYRESULTS() {
-        System.out.println("\n============================ CRUD PERFORMANCE RESULTS ==========");
+        System.out.println("\n============================ CRUD PERFORMANCE RESULTS ========================");
 
         try {
             List<String> lines = java.nio.file.Files.readAllLines(
