@@ -1,0 +1,15 @@
+Метод,"Время, мс","Cкорость, мс"
+Create User,4670.00,0.47
+Update User,107.00,0.01
+Delete User,3995.00,0.40
+Create MathFunction,2482.00,0.25
+Update MathFunction,41.00,0.00
+Delete MathFunction,1822.00,0.18
+Create AnalyticFunction,3487.00,0.35
+Update AnalyticFunction,34.00,0.00
+Delete AnalyticFunction,3135.00,0.31
+Create TabulatedFunction,2909.00,0.29
+Update TabulatedFunction,40.00,0.00
+Delete TabulatedFunction,2799.00,0.28
+Create all:,4212.00,0.42
+DeleteCascade,4207.00,0.42
