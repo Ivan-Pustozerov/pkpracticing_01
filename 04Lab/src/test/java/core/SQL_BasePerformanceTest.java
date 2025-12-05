@@ -137,8 +137,8 @@ public class SQL_BasePerformanceTest {
         List<Long> userIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("user_for_delete_" + i);
-            user.setEmail("delete_" + i + "@example.com");
+            user.setName("Lol" + i);
+            user.setEmail("MAN" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             UserEntity saved = userRepository.save(user);
