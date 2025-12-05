@@ -1,7 +1,5 @@
 package core;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import core.entity.AnalyticFunctionsEntity;
 import core.entity.MathFunctionsEntity;
 import core.entity.TabulatedFunctionsEntity;
@@ -13,7 +11,6 @@ import core.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,176 +45,261 @@ public class SQL_BasePerformanceTest {
     @BeforeAll
     static void setupCsv() throws IOException {
         try (BufferedWriter w = new BufferedWriter(new FileWriter(CSV_FILE))) {
-            w.write("Метод,\"Время, мс\",\"Cкорость, мс\"");
+            w.write("Метод,Среднее_время_мс,Общее_время_мс");
             w.newLine();
         }
     }
-
-    private void appendResult(String method, double speed,double theworld) {
+    private void appendResult(String method, double avgMs, double totalMs) {
         try (BufferedWriter w = new BufferedWriter(new FileWriter(CSV_FILE, true))) {
-            w.write(String.format(Locale.US, "%s,%.2f,%.2f", method, theworld,speed));
+            w.write(String.format(Locale.US, "%s,%.2f,%.2f", method, avgMs, totalMs));
             w.newLine();
         } catch (IOException ignore) {}
     }
-
-
     @Test
     @Order(1)
     @Transactional
     void C_User() {
         Instant start = Instant.now();
+
         for (int i = 0; i < ITERATIONS; i++) {
             UserEntity user = new UserEntity();
-            user.setName("crud_user_" + i);
-            user.setEmail("crud_" + i + "@example.com");
+            user.setName("test_create_user_" + i);
+            user.setEmail("test_create_" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
             userRepository.save(user);
         }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Create User", (double) ms / ITERATIONS,(double) ms);
+        appendResult("1. Create User", (double) ms / ITERATIONS, (double) ms);
     }
 
     @Test
     @Order(2)
     @Transactional
-    void U_user() {
+    void R_User() {
+        List<Long> userIds = new ArrayList<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            UserEntity user = new UserEntity();
+            user.setName("user_for_read_" + i);
+            user.setEmail("read_" + i + "@example.com");
+            user.setPassword(new byte[]{1, 2, 3, 4});
+            user.setIsAdmin(false);
+            UserEntity saved = userRepository.save(user);
+            userIds.add(saved.getId());
+        }
+        userRepository.flush();
 
         Instant start = Instant.now();
-        UserEntity user = new UserEntity();
-        user.setName("update_test_user");
-        user.setEmail("update@example.com");
-        user.setPassword(new byte[]{1, 2, 3, 4});
-        user.setIsAdmin(false);
-        UserEntity savedUser = userRepository.save(user);
 
-        for (int i = 0; i < ITERATIONS; i++) {
-            savedUser.setName("updated_name_" + i);
-            userRepository.save(savedUser);
+        for (Long id : userIds) {
+            userRepository.findById(id);
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Update User", (double) ms / ITERATIONS,(double) ms);
+        appendResult("2. Read User", (double) ms / ITERATIONS, (double) ms);
+        for (Long id : userIds) {
+            userRepository.deleteById(id);
+        }
     }
 
     @Test
     @Order(3)
     @Transactional
-    void D_user() {
-        Instant start = Instant.now();
+    void U_User() {
+        List<UserEntity> users = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
-
             UserEntity user = new UserEntity();
-            user.setName("delete_user_" + i);
-            user.setEmail("delete_" + i + "@example.com");
+            user.setName("user_for_update_" + i);
+            user.setEmail("update_" + i + "@example.com");
             user.setPassword(new byte[]{1, 2, 3, 4});
             user.setIsAdmin(false);
-            UserEntity saved = userRepository.save(user);
-            userRepository.delete(saved);
+            users.add(userRepository.save(user));
+        }
+        userRepository.flush();
+        Instant start = Instant.now();
+
+        for (int i = 0; i < users.size(); i++) {
+            UserEntity user = users.get(i);
+            user.setName("updated_name_" + i);
+            userRepository.save(user); // Это UPDATE, клянусь
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Delete User", (double) ms / ITERATIONS,(double) ms);
+        appendResult("3. Update User", (double) ms / ITERATIONS, (double) ms);
+        for (UserEntity user : users) {
+            userRepository.delete(user);
+        }
     }
 
     @Test
     @Order(4)
     @Transactional
+    void D_User() {
+        List<Long> userIds = new ArrayList<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            UserEntity user = new UserEntity();
+            user.setName("user_for_delete_" + i);
+            user.setEmail("delete_" + i + "@example.com");
+            user.setPassword(new byte[]{1, 2, 3, 4});
+            user.setIsAdmin(false);
+            UserEntity saved = userRepository.save(user);
+            userIds.add(saved.getId());
+        }
+        userRepository.flush();
+        Instant start = Instant.now();
+        for (Long id : userIds) {
+            userRepository.deleteById(id);
+        }
+        long ms = Duration.between(start, Instant.now()).toMillis();
+        appendResult("4. Delete User", (double) ms / ITERATIONS, (double) ms);
+    }
+    @Test
+    @Order(5)
+    @Transactional
     void C_MF() {
-
         UserEntity owner = new UserEntity();
-        owner.setName("mathfunc_owner");
+        owner.setName("mf_owner");
         owner.setEmail("owner@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
-
         Instant start = Instant.now();
+
         for (int i = 0; i < ITERATIONS; i++) {
             MathFunctionsEntity func = new MathFunctionsEntity();
-            func.setName("crud_math_func_" + i);
+            func.setName("test_math_func_" + i);
             func.setType(i % 2 == 0 ? "analytic" : "tabulated");
             func.setOwner(savedOwner);
             mathFunctionsRepository.save(func);
         }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Create MathFunction", (double) ms / ITERATIONS,(double) ms);
-    }
-
-    @Test
-    @Order(5)
-    @Transactional
-    void U_MF() {
-
-        UserEntity owner = new UserEntity();
-        owner.setName("update_func_owner");
-        owner.setEmail("update_func@example.com");
-        owner.setPassword(new byte[]{1, 2, 3, 4});
-        owner.setIsAdmin(false);
-        UserEntity savedOwner = userRepository.save(owner);
-
-        MathFunctionsEntity func = new MathFunctionsEntity();
-        func.setName("func_to_update");
-        func.setType("analytic");
-        func.setOwner(savedOwner);
-        MathFunctionsEntity savedFunc = mathFunctionsRepository.save(func);
-
-        Instant start = Instant.now();
-        for (int i = 0; i < ITERATIONS; i++) {
-            savedFunc.setName("updated_func_name_" + i);
-            mathFunctionsRepository.save(savedFunc);
-        }
-        long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Update MathFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("5. Create MathFunction", (double) ms / ITERATIONS, (double) ms);
+        userRepository.delete(savedOwner);
     }
 
     @Test
     @Order(6)
     @Transactional
-    void D_MF() {
-
+    void R_MF() {
         UserEntity owner = new UserEntity();
-        owner.setName("delete_func_owner");
-        owner.setEmail("delete_func@example.com");
+        owner.setName("mf_read_owner");
+        owner.setEmail("read_owner@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
-        Instant start = Instant.now();
+        List<Long> mfIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             MathFunctionsEntity func = new MathFunctionsEntity();
-            func.setName("delete_func_" + i);
+            func.setName("mf_for_read_" + i);
             func.setType("analytic");
             func.setOwner(savedOwner);
             MathFunctionsEntity saved = mathFunctionsRepository.save(func);
-            mathFunctionsRepository.delete(saved);
+            mfIds.add(saved.getId());
         }
+        mathFunctionsRepository.flush();
+
+
+        Instant start = Instant.now();
+        for (Long id : mfIds) {
+            mathFunctionsRepository.findById(id);
+        }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Delete MathFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("6. Read MathFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
     }
-
-
 
     @Test
     @Order(7)
     @Transactional
-    void C_AF() {
-
+    void U_MF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("analytic_owner");
-        owner.setEmail("analytic@example.com");
+        owner.setName("mf_update_owner");
+        owner.setEmail("update_owner@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
+
+        List<MathFunctionsEntity> functions = new ArrayList<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            MathFunctionsEntity func = new MathFunctionsEntity();
+            func.setName("mf_for_update_" + i);
+            func.setType("analytic");
+            func.setOwner(savedOwner);
+            functions.add(mathFunctionsRepository.save(func));
+        }
+        mathFunctionsRepository.flush();
+
+        Instant start = Instant.now();
+
+        for (int i = 0; i < functions.size(); i++) {
+            MathFunctionsEntity func = functions.get(i);
+            func.setName("updated_mf_name_" + i);
+            mathFunctionsRepository.save(func);
+        }
+
+        long ms = Duration.between(start, Instant.now()).toMillis();
+        appendResult("7. Update MathFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
+    }
+
+    @Test
+    @Order(8)
+    @Transactional
+    void D_MF() {
+        UserEntity owner = new UserEntity();
+        owner.setName("mf_delete_owner");
+        owner.setEmail("delete_owner@example.com");
+        owner.setPassword(new byte[]{1, 2, 3, 4});
+        owner.setIsAdmin(false);
+        UserEntity savedOwner = userRepository.save(owner);
+
+        List<Long> mfIds = new ArrayList<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            MathFunctionsEntity func = new MathFunctionsEntity();
+            func.setName("mf_for_delete_" + i);
+            func.setType("analytic");
+            func.setOwner(savedOwner);
+            MathFunctionsEntity saved = mathFunctionsRepository.save(func);
+            mfIds.add(saved.getId());
+        }
+        mathFunctionsRepository.flush();
+
+        Instant start = Instant.now();
+        for (Long id : mfIds) {
+            mathFunctionsRepository.deleteById(id);
+        }
+
+        long ms = Duration.between(start, Instant.now()).toMillis();
+        appendResult("8. Delete MathFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
+    }
+
+    @Test
+    @Order(9)
+    @Transactional
+    void C_AF() {
+        UserEntity owner = new UserEntity();
+        owner.setName("af_owner");
+        owner.setEmail("af_owner@example.com");
+        owner.setPassword(new byte[]{1, 2, 3, 4});
+        owner.setIsAdmin(false);
+        UserEntity savedOwner = userRepository.save(owner);
+
 
         Instant start = Instant.now();
         for (int i = 0; i < ITERATIONS; i++) {
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("AMF" + i);
+            mathFunc.setName("math_for_af_" + i);
             mathFunc.setType("analytic");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
 
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
@@ -225,95 +307,157 @@ public class SQL_BasePerformanceTest {
             analyticFunctionsRepository.save(analyticFunc);
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Create AnalyticFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("9. Create AnalyticFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
     }
 
     @Test
-    @Order(8)
+    @Order(10)
+    @Transactional
+    void R_AF() {
+        UserEntity owner = new UserEntity();
+        owner.setName("af_read_owner");
+        owner.setEmail("af_read@example.com");
+        owner.setPassword(new byte[]{1, 2, 3, 4});
+        owner.setIsAdmin(false);
+        UserEntity savedOwner = userRepository.save(owner);
+        List<Long> afIds = new ArrayList<>();
+
+        for (int i = 0; i < ITERATIONS; i++) {
+            MathFunctionsEntity mathFunc = new MathFunctionsEntity();
+            mathFunc.setName("MF" + i);
+            mathFunc.setType("analytic");
+            mathFunc.setOwner(savedOwner);
+            MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
+            AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
+            analyticFunc.setMathFunction(savedMathFunc);
+            analyticFunc.setFunctionExpression("read_expr_" + i);
+            AnalyticFunctionsEntity savedAf = analyticFunctionsRepository.save(analyticFunc);
+            afIds.add(savedAf.getId());
+        }
+        analyticFunctionsRepository.flush();
+
+
+        Instant start = Instant.now();
+        for (Long id : afIds) {
+            analyticFunctionsRepository.findById(id);
+        }
+        long ms = Duration.between(start, Instant.now()).toMillis();
+        appendResult("10. Read AnalyticFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
+    }
+
+    @Test
+    @Order(11)
     @Transactional
     void U_AF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("update_analytic_owner");
-        owner.setEmail("update_analytic@example.com");
+        owner.setName("af_update_owner");
+        owner.setEmail("af_update@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
-        MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-        mathFunc.setName("amfuOBD");
-        mathFunc.setType("analytic");
-        mathFunc.setOwner(savedOwner);
-        MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
-        AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
-        analyticFunc.setMathFunction(savedMathFunc);
-        analyticFunc.setFunctionExpression("initial");
-        AnalyticFunctionsEntity savedAnalytic = analyticFunctionsRepository.save(analyticFunc);
-
-        Instant start = Instant.now();
+        List<AnalyticFunctionsEntity> afList = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
-            savedAnalytic.setFunctionExpression("updated_expr_" + i);
-            analyticFunctionsRepository.save(savedAnalytic);
-        }
-        long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Update AnalyticFunction", (double) ms / ITERATIONS,(double) ms);
-    }
-
-    @Test
-    @Order(9)
-    @Transactional
-    void D_AF() {
-
-        UserEntity owner = new UserEntity();
-        owner.setName("delete_analytic_owner");
-        owner.setEmail("delete_analytic@example.com");
-        owner.setPassword(new byte[]{1, 2, 3, 4});
-        owner.setIsAdmin(false);
-        UserEntity savedOwner = userRepository.save(owner);
-
-        Instant start = Instant.now();
-        for (int i = 0; i < ITERATIONS; i++) {
-
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("DELAF" + i);
+            mathFunc.setName("MF" + i);
             mathFunc.setType("analytic");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
 
-
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
-            analyticFunc.setFunctionExpression("x^2 + " + i);
-            AnalyticFunctionsEntity savedAnalytic = analyticFunctionsRepository.save(analyticFunc);
-
-            analyticFunctionsRepository.delete(savedAnalytic);
-            mathFunctionsRepository.delete(savedMathFunc);
+            analyticFunc.setFunctionExpression("initial_expr_" + i);
+            afList.add(analyticFunctionsRepository.save(analyticFunc));
         }
+        analyticFunctionsRepository.flush();
+
+        Instant start = Instant.now();
+
+        for (int i = 0; i < afList.size(); i++) {
+            AnalyticFunctionsEntity af = afList.get(i);
+            af.setFunctionExpression("updated_expr_" + i);
+            analyticFunctionsRepository.save(af);
+        }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Delete AnalyticFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("11. Update AnalyticFunction", (double) ms / ITERATIONS, (double) ms);
+
+
+        userRepository.delete(savedOwner);
     }
+
     @Test
-    @Order(10)
+    @Order(12)
     @Transactional
-    void C_TF() {
+    void D_AF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("tabulated_owner");
-        owner.setEmail("tabulated@example.com");
+        owner.setName("af_delete_owner");
+        owner.setEmail("af_delete@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
+        List<Long> afIds = new ArrayList<>();
+        List<Long> mfIds = new ArrayList<>();
+        for (int i = 0; i < ITERATIONS; i++) {
+            MathFunctionsEntity mathFunc = new MathFunctionsEntity();
+            mathFunc.setName("MF" + i);
+            mathFunc.setType("analytic");
+            mathFunc.setOwner(savedOwner);
+            MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
+            mfIds.add(savedMathFunc.getId());
+
+            AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
+            analyticFunc.setMathFunction(savedMathFunc);
+            analyticFunc.setFunctionExpression("delete_expr_" + i);
+            AnalyticFunctionsEntity savedAf = analyticFunctionsRepository.save(analyticFunc);
+            afIds.add(savedAf.getId());
+        }
+        analyticFunctionsRepository.flush();
+
         Instant start = Instant.now();
+
+        for (Long id : afIds) {
+            analyticFunctionsRepository.deleteById(id);
+        }
+
+        long ms = Duration.between(start, Instant.now()).toMillis();
+        appendResult("12. Delete AnalyticFunction", (double) ms / ITERATIONS, (double) ms);
+
+        for (Long id : mfIds) {
+            mathFunctionsRepository.deleteById(id);
+        }
+        userRepository.delete(savedOwner);
+    }
+
+    @Test
+    @Order(13)
+    @Transactional
+    void C_TF() {
+
+        UserEntity owner = new UserEntity();
+        owner.setName("tf_owner");
+        owner.setEmail("tf_owner@example.com");
+        owner.setPassword(new byte[]{1, 2, 3, 4});
+        owner.setIsAdmin(false);
+        UserEntity savedOwner = userRepository.save(owner);
+
+
+        Instant start = Instant.now();
+
         for (int i = 0; i < ITERATIONS; i++) {
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("TBMF" + i);
+            mathFunc.setName("math_for_tf_" + i);
             mathFunc.setType("tabulated");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
 
             TabulatedFunctionsEntity tabulatedFunc = new TabulatedFunctionsEntity();
             tabulatedFunc.setMathFunction(savedMathFunc);
@@ -321,86 +465,103 @@ public class SQL_BasePerformanceTest {
             tabulatedFunc.setYVals(new Double[]{1.0 + i, 4.0 + i, 9.0 + i});
             tabulatedFunctionRepository.save(tabulatedFunc);
         }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Create TabulatedFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("13. Create TabulatedFunction", (double) ms / ITERATIONS, (double) ms);
+
+        userRepository.delete(savedOwner);
     }
 
     @Test
-    @Order(11)
+    @Order(14)
     @Transactional
     void U_TF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("update_tabulated_owner");
-        owner.setEmail("update_tabulated@example.com");
+        owner.setName("tf_update_owner");
+        owner.setEmail("tf_update@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
+        TabulatedFunctionsEntity tf = null;
         MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-        mathFunc.setName("TFtUP");
+        mathFunc.setName("math_for_tf_update");
         mathFunc.setType("tabulated");
         mathFunc.setOwner(savedOwner);
         MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
 
-        TabulatedFunctionsEntity tabulatedFunc = new TabulatedFunctionsEntity();
-        tabulatedFunc.setMathFunction(savedMathFunc);
-        tabulatedFunc.setXVals(new Double[]{1.0, 2.0, 3.0});
-        tabulatedFunc.setYVals(new Double[]{1.0, 4.0, 9.0});
-        TabulatedFunctionsEntity savedTabulated = tabulatedFunctionRepository.save(tabulatedFunc);
+        tf = new TabulatedFunctionsEntity();
+        tf.setMathFunction(savedMathFunc);
+        tf.setXVals(new Double[]{1.0, 2.0, 3.0});
+        tf.setYVals(new Double[]{1.0, 4.0, 9.0});
+        TabulatedFunctionsEntity savedTf = tabulatedFunctionRepository.save(tf);
+        tabulatedFunctionRepository.flush();
 
         Instant start = Instant.now();
         for (int i = 0; i < ITERATIONS; i++) {
-            savedTabulated.setXVals(new Double[]{1.0 + i, 2.0 + i, 3.0 + i});
-            savedTabulated.setYVals(new Double[]{1.0 + i, 4.0 + i, 9.0 + i});
-            tabulatedFunctionRepository.save(savedTabulated);
+            savedTf.setXVals(new Double[]{1.0 + i, 2.0 + i, 3.0 + i});
+            savedTf.setYVals(new Double[]{1.0 + i, 4.0 + i, 9.0 + i});
+            tabulatedFunctionRepository.save(savedTf);
         }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Update TabulatedFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("14. Update TabulatedFunction", (double) ms / ITERATIONS, (double) ms);
+        userRepository.delete(savedOwner);
     }
 
     @Test
-    @Order(12)
+    @Order(15)
     @Transactional
     void D_TF() {
 
         UserEntity owner = new UserEntity();
-        owner.setName("delete_tabulated_owner");
-        owner.setEmail("delete_tabulated@example.com");
+        owner.setName("tf_delete_owner");
+        owner.setEmail("tf_delete@example.com");
         owner.setPassword(new byte[]{1, 2, 3, 4});
         owner.setIsAdmin(false);
         UserEntity savedOwner = userRepository.save(owner);
 
-        Instant start = Instant.now();
+        List<Long> tfIds = new ArrayList<>();
+        List<Long> mfIds = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
-
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("DelTF" + i);
+            mathFunc.setName("MF" + i);
             mathFunc.setType("tabulated");
             mathFunc.setOwner(savedOwner);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
+            mfIds.add(savedMathFunc.getId());
 
             TabulatedFunctionsEntity tabulatedFunc = new TabulatedFunctionsEntity();
             tabulatedFunc.setMathFunction(savedMathFunc);
             tabulatedFunc.setXVals(new Double[]{1.0, 2.0, 3.0});
             tabulatedFunc.setYVals(new Double[]{1.0, 4.0, 9.0});
-            TabulatedFunctionsEntity savedTabulated = tabulatedFunctionRepository.save(tabulatedFunc);
-
-            tabulatedFunctionRepository.delete(savedTabulated);
-            mathFunctionsRepository.delete(savedMathFunc);
+            TabulatedFunctionsEntity savedTf = tabulatedFunctionRepository.save(tabulatedFunc);
+            tfIds.add(savedTf.getId());
         }
+        tabulatedFunctionRepository.flush();
+
+
+        Instant start = Instant.now();
+
+        for (Long id : tfIds) {
+            tabulatedFunctionRepository.deleteById(id);
+        }
+
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Delete TabulatedFunction", (double) ms / ITERATIONS,(double) ms);
+        appendResult("15. Delete TabulatedFunction", (double) ms / ITERATIONS, (double) ms);
+        for (Long id : mfIds) {
+            mathFunctionsRepository.deleteById(id);
+        }
+        userRepository.delete(savedOwner);
     }
 
     @Test
-    @Order(13)
+    @Order(16)
     @Transactional
     void CREATOR() {
         Instant start = Instant.now();
         for (int i = 0; i < ITERATIONS; i++) {
-
             UserEntity user = new UserEntity();
             user.setName("complex_user_" + i);
             user.setEmail("complex_" + i + "@example.com");
@@ -408,13 +569,11 @@ public class SQL_BasePerformanceTest {
             user.setIsAdmin(false);
             UserEntity savedUser = userRepository.save(user);
 
-
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
             mathFunc.setName("complex_func_" + i);
             mathFunc.setType(i % 2 == 0 ? "analytic" : "tabulated");
             mathFunc.setOwner(savedUser);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
 
             if ("analytic".equals(savedMathFunc.getType())) {
                 AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
@@ -430,61 +589,72 @@ public class SQL_BasePerformanceTest {
             }
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("Create all:", (double) ms / ITERATIONS,(double) ms);
+        appendResult("16. Complex Create", (double) ms / ITERATIONS, (double) ms);
+        userRepository.deleteAll();
     }
 
     @Test
-    @Order(14)
+    @Order(17)
     @Transactional
     void THANOS() {
-
-        UserEntity user = new UserEntity();
-        user.setName("cascade_user");
-        user.setEmail("cascade@example.com");
-        user.setPassword(new byte[]{1, 2, 3, 4});
-        user.setIsAdmin(false);
-        UserEntity savedUser = userRepository.save(user);
-
+        List<Long> userIds = new ArrayList<>();
         Instant start = Instant.now();
+
         for (int i = 0; i < ITERATIONS; i++) {
+            // Создаем пользователя с функциями
+            UserEntity user = new UserEntity();
+            user.setName("thanos_user_" + i);
+            user.setEmail("thanos_" + i + "@example.com");
+            user.setPassword(new byte[]{1, 2, 3, 4});
+            user.setIsAdmin(false);
+            UserEntity savedUser = userRepository.save(user);
 
             MathFunctionsEntity mathFunc = new MathFunctionsEntity();
-            mathFunc.setName("cascade_func_" + i);
+            mathFunc.setName("thanos_func_" + i);
             mathFunc.setType("analytic");
             mathFunc.setOwner(savedUser);
             MathFunctionsEntity savedMathFunc = mathFunctionsRepository.save(mathFunc);
-
 
             AnalyticFunctionsEntity analyticFunc = new AnalyticFunctionsEntity();
             analyticFunc.setMathFunction(savedMathFunc);
             analyticFunc.setFunctionExpression("x^2 + " + i);
             analyticFunctionsRepository.save(analyticFunc);
-
-
-            userRepository.delete(savedUser);
-
-
-            user = new UserEntity();
-            user.setName("cascade_user_" + i);
-            user.setEmail("cascade_" + i + "@example.com");
-            user.setPassword(new byte[]{1, 2, 3, 4});
-            user.setIsAdmin(false);
-            savedUser = userRepository.save(user);
+            userIds.add(savedUser.getId());
+        }
+        for (Long id : userIds) {
+            userRepository.deleteById(id);
         }
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("DeleteCascade", (double) ms / ITERATIONS,(double) ms);
+        appendResult("17. Cascade Delete", (double) ms / ITERATIONS, (double) ms);
     }
 
     @Test
-    @Order(15)
+    @Order(18)
     void WHEREISMYRESULTS() {
-        System.out.println("\n========== CRUD PERFORMANCE RESULTS ==========");
+        System.out.println("\n============================ CRUD PERFORMANCE RESULTS ==========");
+
         try {
             List<String> lines = java.nio.file.Files.readAllLines(
                     java.nio.file.Paths.get(CSV_FILE)
             );
-            System.out.println("CRUD операции (время в мс на операцию):");
-            lines.forEach(System.out::println);
+
+            System.out.println("№  Операция                          | Среднее время (мс) | Общее время (мс)");
+            System.out.println("----------------------------------------------------------------------------");
+
+            for (String line : lines) {
+                if (!line.startsWith("Метод")) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 3) {
+                        String method = parts[0];
+                        String avgTime = String.format("%10s", parts[1]);
+                        String totalTime = String.format("%10s", parts[2]);
+
+                        System.out.printf("%-35s | %18s | %16s%n",
+                                method, avgTime, totalTime);
+                    }
+                }
+            }
+
         } catch (IOException e) {
             System.err.println("Error reading CSV: " + e.getMessage());
         }

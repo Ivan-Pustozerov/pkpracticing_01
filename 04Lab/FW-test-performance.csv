@@ -1,15 +1,18 @@
-Метод,"Время, мс","Cкорость, мс"
-Create User,4670.00,0.47
-Update User,107.00,0.01
-Delete User,3995.00,0.40
-Create MathFunction,2482.00,0.25
-Update MathFunction,41.00,0.00
-Delete MathFunction,1822.00,0.18
-Create AnalyticFunction,3487.00,0.35
-Update AnalyticFunction,34.00,0.00
-Delete AnalyticFunction,3135.00,0.31
-Create TabulatedFunction,2909.00,0.29
-Update TabulatedFunction,40.00,0.00
-Delete TabulatedFunction,2799.00,0.28
-Create all:,4212.00,0.42
-DeleteCascade,4207.00,0.42
+Метод,Среднее_время_мс,Общее_время_мс
+1. Create User,0.57,5733.00
+2. Read User,0.02,215.00
+3. Update User,0.01,82.00
+4. Delete User,0.01,69.00
+5. Create MathFunction,0.24,2405.00
+6. Read MathFunction,0.00,36.00
+7. Update MathFunction,0.00,40.00
+8. Delete MathFunction,0.01,61.00
+9. Create AnalyticFunction,0.37,3673.00
+10. Read AnalyticFunction,0.01,63.00
+11. Update AnalyticFunction,0.00,28.00
+12. Delete AnalyticFunction,0.01,62.00
+13. Create TabulatedFunction,0.30,3022.00
+14. Update TabulatedFunction,0.00,27.00
+15. Delete TabulatedFunction,0.00,42.00
+16. Complex Create,0.47,4675.00
+17. Cascade Delete,0.59,5904.00
