@@ -5,6 +5,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AnalyticFunctionsRepository extends JpaRepository<AnalyticFunctionsEntity, Long> {
-    // Найти аналитическую функцию по имени связанной математической функции
     AnalyticFunctionsEntity findByMathFunctionName(String name);
 }

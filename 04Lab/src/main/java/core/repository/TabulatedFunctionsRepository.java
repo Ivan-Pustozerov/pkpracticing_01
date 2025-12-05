@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TabulatedFunctionsRepository extends JpaRepository<TabulatedFunctionsEntity, Long> {
-    // Найти табулированную функцию по имени связанной математической функции
     TabulatedFunctionsEntity findByMathFunctionName(String name);
 }

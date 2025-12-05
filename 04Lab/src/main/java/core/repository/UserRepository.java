@@ -10,14 +10,10 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByName(String name);
-
+    Optional<UserEntity> findByEmail(String email);
     boolean existsByName(String name);
 
     boolean existsByEmail(String email);
-
-    Optional<UserEntity> findByEmail(String email);
-
-    // Кастомный запрос с JPQL
     @Query("SELECT u FROM UserEntity u WHERE u.isAdmin = true")
     List<UserEntity> findAllAdmins();
 }

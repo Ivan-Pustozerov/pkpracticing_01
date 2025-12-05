@@ -36,6 +36,7 @@ public class UserEntity {
      */
     @OneToMany(mappedBy = "owner")
     @BatchSize(size = 20)
+    @ToString.Exclude
     private List<MathFunctionsEntity> functions = new ArrayList<>();
     @Override
     public boolean equals(Object o) {
