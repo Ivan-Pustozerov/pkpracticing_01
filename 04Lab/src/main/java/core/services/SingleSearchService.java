@@ -30,10 +30,7 @@ public class SingleSearchService {
         log.info("SingleSearch: User/Name '{}'", name);
         return userRepository.findByName(name);
     }
-    public Optional<UserEntity> findUserByEmail(String email) {
-        log.info("SingleSearch: User/Email '{}'", email);
-        return userRepository.findByEmail(email);
-    }
+
     public Optional<MathFunctionsEntity> findMathFunctionByName(String name) {
         log.info("SingleSearch: MathFunction/Name '{}'", name);
         MathFunctionsEntity function = mathFunctionsRepository.findByName(name);
