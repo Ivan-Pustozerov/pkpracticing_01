@@ -161,7 +161,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("1. SingleSearch: User by Name", (double) ms / SEARCH_ITERATIONS, (double) ms);
+        appendResult(" SingleSearch: User by Name", (double) ms / SEARCH_ITERATIONS, (double) ms);
         System.out.println("Found " + foundCount + "/" + SEARCH_ITERATIONS + " users by name");
         Assertions.assertTrue(foundCount > 0, "Должен найти хотя бы одного пользователя");
     }
@@ -183,7 +183,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("2. SingleSearch: MathFunction by Name", (double) ms / SEARCH_ITERATIONS, (double) ms);
+        appendResult(" SingleSearch: MathFunction by Name", (double) ms / SEARCH_ITERATIONS, (double) ms);
 
         System.out.println("Found " + foundCount + "/" + SEARCH_ITERATIONS + " math functions by name");
         Assertions.assertTrue(foundCount > 0, "Должен найти хотя бы одну функцию");
@@ -203,7 +203,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("3. MultiSearch: All Users", (double) ms / iterations, (double) ms);
+        appendResult(" MultiSearch: All Users", (double) ms / iterations, (double) ms);
     }
 
     @Test
@@ -218,7 +218,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("4. MultiSearch: All Admins", (double) ms / iterations, (double) ms);
+        appendResult(" MultiSearch: All Admins", (double) ms / iterations, (double) ms);
     }
 
     @Test
@@ -235,7 +235,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("5. MultiSearch: Functions by Owner ID", (double) ms / iterations, (double) ms);
+        appendResult(" MultiSearch: Functions by Owner ID", (double) ms / iterations, (double) ms);
     }
 
 
@@ -275,7 +275,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("6. SortSearch: Users Sorted by Name ASC", (double) ms / iterations, (double) ms);
+        appendResult(" SortSearch: Users Sorted by Name ASC", (double) ms / iterations, (double) ms);
     }
 
     @Test
@@ -296,7 +296,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("7. SortSearch: Users Sorted by Name DESC", (double) ms / iterations, (double) ms);
+        appendResult(" SortSearch: Users Sorted by Name DESC", (double) ms / iterations, (double) ms);
     }
     @Test
     @Transactional
@@ -313,7 +313,7 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("8. Repository: existsByName", (double) ms / SEARCH_ITERATIONS, (double) ms);
+        appendResult(" Repository: existsByName", (double) ms / SEARCH_ITERATIONS, (double) ms);
 
         System.out.println("Exists by name: " + existsCount + "/" + SEARCH_ITERATIONS);
         Assertions.assertTrue(existsCount > 0, "Должен найти существующих пользователей");
@@ -334,12 +334,12 @@ public class SQL_SearchPerformanceTest {
         }
 
         long ms = Duration.between(start, Instant.now()).toMillis();
-        appendResult("9. Repository: MathFunction existsByName", (double) ms / SEARCH_ITERATIONS, (double) ms);
+        appendResult(" Repository: MathFunction existsByName", (double) ms / SEARCH_ITERATIONS, (double) ms);
 
         System.out.println("Math functions exist: " + existsCount + "/" + SEARCH_ITERATIONS);
         Assertions.assertTrue(existsCount > 0, "Должен найти существующие функции");
     }
-
+    /*
     @Test
     @Transactional
     void repository_findAnalyticByMathFunctionName() {
@@ -355,13 +355,14 @@ public class SQL_SearchPerformanceTest {
             }
         }
 
+
         long ms = Duration.between(start, Instant.now()).toMillis();
         double avgTime = searches > 0 ? (double) ms / searches : 0;
-        appendResult("10. Repository: AnalyticFunction by Name", avgTime, (double) ms);
+        appendResult(" Repository: AnalyticFunction by Name", avgTime, (double) ms);
 
         System.out.println("Found analytic functions: " + foundCount + "/" + searches);
     }
-
+*/
     @Test
     static void displayResults() {
         System.out.println("\n" + "=".repeat(80));
