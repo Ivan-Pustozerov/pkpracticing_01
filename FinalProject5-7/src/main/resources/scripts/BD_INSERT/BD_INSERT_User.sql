@@ -1,1 +1,1 @@
-INSERT INTO Users (is_admin, name, password) VALUES (?, ?, ?) ON CONFLICT (name) DO NOTHING;
+INSERT INTO Users (is_admin, name, email, password) VALUES (?, ?, ?, ?)

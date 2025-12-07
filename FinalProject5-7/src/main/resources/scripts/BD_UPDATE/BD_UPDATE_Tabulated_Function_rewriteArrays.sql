@@ -1,5 +1,5 @@
 UPDATE TabulatedFunctions
  SET
- xVals = COALESCE($2, xVals),
- yVals = COALESCE($3, yVals)
- WHERE id = $1;
+ xVals = COALESCE(?, xVals),
+ yVals = COALESCE(?, yVals)
+ WHERE func_id = ?;

@@ -1,1 +1,1 @@
-DELETE FROM MathFunctions WHERE owner_id = $1 AND id = $2;
+DELETE FROM MathFunctions WHERE owner_id = ? AND id = ?;

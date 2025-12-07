@@ -1,0 +1,2 @@
+SELECT id FROM Users WHERE name = ANY(?::VARCHAR(50)[])
+ ORDER BY id ASC;

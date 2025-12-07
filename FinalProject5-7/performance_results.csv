@@ -1,0 +1,41 @@
+Test Name,Records Processed,Execution Time (ms),Operations Per Second
+Insert Users,10000,1309,7639,42
+Insert Math Functions,10000,1219,8203,45
+Insert Analytic Functions,5000,550,9090,91
+Insert Tabulated Functions,5000,561,8912,66
+Read User Info by name - -,10000,50,200000,00
+Read User Info by id - -,10000,51,196078,43
+Read User Info by name - name_asc,10000,44,227272,73
+Read User Info by id - name_asc,10000,42,238095,24
+Read User Info by name - name_desc,10000,45,222222,22
+Read User Info by id - name_desc,10000,45,222222,22
+Read User Info by name - id_asc,10000,10,1000000,00
+Read User Info by id - id_asc,10000,10,1000000,00
+Read User Info by name - id_desc,10000,12,833333,33
+Read User Info by id - id_desc,10000,15,666666,67
+Read User Info by name - is_admin_asc,10000,47,212765,96
+Read User Info by id - is_admin_asc,10000,46,217391,30
+Read User Info by name - is_admin_desc,10000,47,212765,96
+Read User Info by id - is_admin_desc,10000,46,217391,30
+Read User ID - -,10000,7,1428571,43
+Read User ID - asc,10000,6,1666666,67
+Read User ID - desc,10000,6,1666666,67
+Read Users by Role ASC,10000,7,1428571,43
+Read Users by Role DESC,10000,7,1428571,43
+Read User Functions by ID,10000,11,909090,91
+Read User Functions by Name,5000,13,384615,38
+Read Mfunction Info - -,10000,12,833333,33
+Read Mfunction Info - name_asc,10000,11,909090,91
+Read Mfunction Info - name_desc,10000,50,200000,00
+Read Mfunction Info - id_asc,10000,8,1250000,00
+Read Mfunction Info - id_desc,10000,8,1250000,00
+Read Mfunction Info - is_admin_asc,10000,7,1428571,43
+Read Mfunction Info - is_admin_desc,10000,9,1111111,11
+Read Analytic Functions ,10000,26,384615,38
+Read Tabulated Functions ,10000,33,303030,30
+Update Users,10000,1654,6045,95
+Update Math Function,10000,1649,6064,28
+Update Analytic Function,5000,526,9505,70
+Update Tabulated Function Full,5000,523,9560,23
+Remove Functions,10000,1688,5924,17
+Remove Users,10000,2437,4103,41

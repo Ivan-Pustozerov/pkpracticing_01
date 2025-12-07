@@ -1,26 +1,33 @@
+/*
 package SQL;
 import SQL.DTO.*;
 import SQL.repositories.*;
-import SQL.repositories.tools.Repository;
+import SQL.repositories.tools.ConnectPool;
+import SQL.repositories.tools.ConnectPoolException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+
 
 public class Server {
     private final String url;
     private final String username;
     private final String password;
-    public final UsersRepository Users;
-    public final MathFunctionsRepository MathFunctions;
-    public final AnalyticFunctionsRepository AnalyticFunctions;
-    public final TabulatedFunctionsRepository TabulatedFunctions;
+
+    private ConnectPool connections;
+    private final int UPoolIndex = 0;
+    private final int MPoolIndex = 1;
+    private final int APoolIndex = 2;
+    private final int TPoolIndex = 3;
+
+    protected final UsersRepository Users = new UsersRepository();
+    protected final MathFunctionsRepository MathFunctions = new MathFunctionsRepository();
+    protected final AnalyticFunctionsRepository AnalyticFunctions = new AnalyticFunctionsRepository();
+    protected final TabulatedFunctionsRepository TabulatedFunctions = new TabulatedFunctionsRepository();
+
+
 
     private static void logger(String log){
         System.out.println(log);
@@ -36,55 +43,180 @@ public class Server {
         }
     }
 
-    public Server(String url, String username, String password){
+    public Server(String url, String username, String password) throws ConnectPoolException {
         this.url = url;
         this.username = username;
         this.password = password;
-        Users = new UsersRepository(url, username, password);
-        MathFunctions = new MathFunctionsRepository(url, username, password);
-        AnalyticFunctions = new AnalyticFunctionsRepository(url, username, password);
-        TabulatedFunctions = new TabulatedFunctionsRepository(url, username, password);
+        connections = new ConnectPool(url, username, password, 4);
         logger("SERVER CREATED");
     }
-
+///==============================================================================
     public void initDataBase()
-            throws SQLRepositoryException{
-        Users.initTable();
-        MathFunctions.initTable();
-        AnalyticFunctions.initTable();
-        TabulatedFunctions.initTable();
-        logger("TABLE INIT");
+            throws SQLRepositoryException, ConnectPoolException {
+
+        Users.initTable(connections.getConnection(UPoolIndex));
+        MathFunctions.initTable(connections.getConnection(MPoolIndex));
+        AnalyticFunctions.initTable(connections.getConnection(APoolIndex));
+        TabulatedFunctions.initTable(connections.getConnection(TPoolIndex));
+
+        connections.free();
+        if(connections.isEmpty()) logger("TABLE INIT");
     }
 
-    public int addUser(boolean isAdmin, String name, String password)
-            throws SQLRepositoryException {
+///------------------------------------------------------------------------------
+    public int addUser(boolean isAdmin, String name, String email, String password)
+            throws SQLRepositoryException, ConnectPoolException {
         byte[] pswd = passwordHash(password);
         logger("USER ADDED");
-        return Users.insertUser(isAdmin, name, pswd);
+        try{
+            return Users.insertUser(connections.getConnection(UPoolIndex),isAdmin, name, email, pswd);
+        }
+        finally{
+            connections.free();
+        }
     }
+
 
     public int addAnalyticMFunction(String function_expression, String name, long owner_id)
-            throws SQLRepositoryException {
-        long mfId = MathFunctions.insertMFunc("analytic", name, owner_id).get(0).id();
-        logger("ANALYTIC FUNCTION ADDED");
-        return AnalyticFunctions.insertAnalyticFunction(mfId,function_expression);
+            throws SQLRepositoryException, ConnectPoolException {
+        try {
+            long mfId = MathFunctions.insertMFunc(connections.getConnection(MPoolIndex), "analytic", name, owner_id).get(0).id();
+            logger("ANALYTIC FUNCTION ADDED");
+            return AnalyticFunctions.insertAnalyticFunction(connections.getConnection(APoolIndex), mfId, function_expression);
+        }
+        finally{
+            connections.free();
+        }
     }
     public int addAnalyticMFunction(String function_expression, String name, String owner_name)
-            throws SQLRepositoryException {
-        long userId = Users.readUserId(owner_name).get(0).id();
-        return addAnalyticMFunction(function_expression, name, userId);
+            throws SQLRepositoryException, ConnectPoolException {
+        try {
+
+            long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
+            return addAnalyticMFunction(function_expression, name, userId);
+        }
+        finally{
+            connections.free();
+        }
     }
 
+
     public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, long owner_id)
-            throws SQLRepositoryException {
-        long mfId = MathFunctions.insertMFunc("tabulated", name, owner_id).get(0).id();
-        logger("TABULATED FUNCTION ADDED");
-        return TabulatedFunctions.insertTabulatedFunction(mfId, xVals, yVals);
+            throws SQLRepositoryException, ConnectPoolException {
+        try {
+            long mfId = MathFunctions.insertMFunc(connections.getConnection(MPoolIndex), "tabulated", name, owner_id).get(0).id();
+            logger("TABULATED FUNCTION ADDED");
+            return TabulatedFunctions.insertTabulatedFunction(connections.getConnection(TPoolIndex), mfId, xVals, yVals);
+        }
+        finally{
+            connections.free();
+        }
     }
     public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, String owner_name)
-            throws SQLRepositoryException {
-        long userId = Users.readUserId(owner_name).get(0).id();
-        return addTabulatedMFunction(xVals, yVals, name, userId);
+            throws SQLRepositoryException, ConnectPoolException {
+        try {
+            long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
+            return addTabulatedMFunction(xVals, yVals, name, userId);
+        }
+        finally{
+            connections.free();
+        }
+    }
+
+///------------------------------------------------------------------------------
+    public int removeMFunction(long owner_id, long id)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return MathFunctions.removeMFunc(connections.getConnection(MPoolIndex), owner_id, id);
+        }
+        finally{
+            connections.free();
+        }
+    }
+    public int removeMFunction(String owner_name, long id)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
+            return removeMFunction(userId, id);
+        }
+        finally{
+            connections.free();
+        }
+    }
+
+
+    public int removeUser(long id)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.removeUser(connections.getConnection(UPoolIndex), id, null);
+        }
+        finally{
+            connections.free();
+        }
+    }
+    public int removeUser(String name)
+            throws
+            ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.removeUser(connections.getConnection(UPoolIndex), -1, name);
+        }
+        finally{
+            connections.free();
+        }
+    }
+
+///------------------------------------------------------------------------------
+    public ArrayList<UserToServerDTO> readUsersInfo(long[] id)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.readUserInfo(connections.getConnection(UPoolIndex), id, null);
+        }
+        finally{
+            connections.free();
+        }
+
+    }
+    public ArrayList<UserToServerDTO> readUsersInfo(String[] name)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.readUserInfo(connections.getConnection(UPoolIndex), new long[]{-1}, name);
+        }
+        finally{
+            connections.free();
+        }
+    }
+
+
+    public ArrayList<MathFunctionDTO> readUsersFunctions(long[] id)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.readUserFunctions(connections.getConnection(UPoolIndex), id, null);
+        }
+        finally{
+            connections.free();
+        }
+
+    }
+    public ArrayList<MathFunctionDTO> readUsersFunctions(String[] name)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.readUserFunctions(connections.getConnection(UPoolIndex), new long[]{-1}, name);
+        }
+        finally{
+            connections.free();
+        }
+
+    }
+
+
+    public ArrayList<IdDTO> readUsersID(String[] name)
+            throws ConnectPoolException, SQLRepositoryException {
+        try {
+            return Users.readUserId(connections.getConnection(UPoolIndex), name);
+        }
+        finally{
+            connections.free();
+        }
     }
 
     public static void main(String[] args) {
@@ -92,21 +224,25 @@ public class Server {
         String username = "postgres";
         String password = "lkroot";
 
-        Server server = new Server(url, username, password);
+
         try{
+            Server server = new Server(url, username, password);
             server.initDataBase();
-            server.addUser(true,"Zaharov","08Lab");
+            server.addUser(true, "Zaharov" ,null, "08Lab");
             server.addAnalyticMFunction("z^2","Zaharov^2","Zaharov");
             server.addTabulatedMFunction(new double[]{1,2,3}, new double[]{-2,2.3,3.1},"Zaharov Tabulated", "Zaharov");
 
-            //server.MathFunctions.removeMFunc(8);
-            System.out.println(server.Users.readUserInfo(42));
-            System.out.println(server.Users.readUserFunctions(42));
+            System.out.println(server.readUsersInfo(new String[]{"Zaharov"}));
+            System.out.println(server.readUsersFunctions(new String[]{"Zaharov"}));
+            System.out.println(server.readUsersID(new String[]{"Zaharov"}));
 
+            //server.removeMFunction("Zaharov",)
             //server.Users.removeUser(42);
         } catch (SQLRepositoryException e) {
             logger("ERROR: - " + e.getMessage());
             e.printStackTrace();
+        } catch (ConnectPoolException e) {
+            System.out.println(e.getMessage());
         }
     }
-}
+}*/

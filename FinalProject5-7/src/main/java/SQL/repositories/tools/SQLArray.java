@@ -22,7 +22,7 @@ public class SQLArray implements AutoCloseable {
     public void close() throws SQLRepositoryException {
         isAlive = false;
         try{
-            this.innerArray.free();
+            if(innerArray != null) this.innerArray.free();
         } catch (SQLException e) {
             throw new SQLRepositoryException("SQL Array Close Error");
         }

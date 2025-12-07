@@ -1,0 +1,1 @@
+SELECT * FROM Users us WHERE us.is_admin = ?::BOOLEAN;

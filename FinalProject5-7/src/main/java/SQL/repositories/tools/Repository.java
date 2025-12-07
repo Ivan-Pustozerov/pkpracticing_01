@@ -4,67 +4,54 @@ import SQL.DTO.DTO;
 import SQL.SQLRepositoryException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Repository {
-///=================================СЛУЖЕБНЫЕ=СОСТОЯНИЯ===============================================
-    protected final String url;
-    protected final String username;
-    protected final String password;
-///===================================================================================================
 
     /// Универсальный конструктор таблиц
-    protected int initTable(String sql) throws SQLRepositoryException
+    protected int initTable(Connection connect, String sql) throws SQLRepositoryException
     {
-        try(Connection connect = DriverManager.getConnection(url,username,password)) {
-            Statement statement = connect.createStatement();
+        try(Statement statement = connect.createStatement()){
             return statement.executeUpdate(sql);
 
         } catch (SQLException e) {
-            //log
             throw new SQLRepositoryException("Init Table Error!");
         }
     }
 
     /// Универсальный запрос на обновление
-    protected int executeUpdate(String sql,
+    protected int executeUpdate(Connection connect, String sql,
                                 SQLConsumer<PreparedStatement> pstateTemplate) throws SQLRepositoryException
     {
-        try(Connection connect = DriverManager.getConnection(url,username,password);
-            PreparedStatement pstate = connect.prepareStatement(sql)) {
-
+        try(PreparedStatement pstate = connect.prepareStatement(sql)) {
 
             pstateTemplate.accept(pstate);//внутреннее состояние объекта pstate изменяется void методом
 
             return pstate.executeUpdate();
         }
         catch (SQLException e) {
-            //log
-            System.err.println(e.toString());
-            throw new SQLRepositoryException("Execute Update Error!");
+            System.err.println(e.getMessage());
+            throw new SQLRepositoryException("PreparedStatement Update Error!");
         }
     }
 
     /// Универсальный запрос на поиск
-    protected <T extends DTO> ArrayList<T> executeQuery(String sql,
+    protected <T extends DTO> ArrayList<T> executeQuery(Connection connect, String sql,
                                                         SQLConsumer<PreparedStatement> pstateTemplate,
                                                         SQLResultSetFunction<T> funcTemplate)
                                                             throws SQLRepositoryException
     {
-        try(Connection connect = DriverManager.getConnection(url,username,password);
-            PreparedStatement pstate = connect.prepareStatement(sql.trim());) {
-
-
-            ArrayList<T> result = new ArrayList<>();
-
+        ArrayList<T> result = new ArrayList<>();
+        try(PreparedStatement pstate = connect.prepareStatement(sql.trim());) {
 
             pstateTemplate.accept(pstate);
 
 
-            ///ОБЯЗАТЕЛЬНО! ResultSet и PreparedStatement, Array ЗАКРЫВАТЬ - ОБЕРТКИ НАД СИСТЕМНЫМИ ПОТОКАМИ!
-            try(ResultSet set = pstate.executeQuery()){
-                while(set.next()){
+            try(ResultSet set = pstate.executeQuery()){///ОБЯЗАТЕЛЬНО! ResultSet и PreparedStatement, Array, Statement
+                while(set.next()){                           ///ЗАКРЫВАТЬ - ОБЕРТКИ НАД доступом к БД!
                     result.add(funcTemplate.apply(set));
                 }
 
@@ -72,7 +59,6 @@ public class Repository {
             }
 
         } catch (SQLException e) {
-            //log
             e.printStackTrace();
             throw new SQLRepositoryException("Execute Query Error!");
         }
@@ -80,12 +66,30 @@ public class Repository {
 
 
 ///---------------------------------------ВСПОМОГАТЕЛЬНЫЙ-ФУНКЦИОНАЛ----------------------------------
-    protected Repository(String url, String username, String password){
-        this.url = url;            //   абстрактные классы могут иметь конструкторы
-        this.username = username; //более того компиль всегда добавляет пустой конструктор
-        this.password = password;//                 если не указаны другие
-    }
+    protected String readCommand(String resourcePath) {
+            // Удаляем начальные слеши, если есть
+            if (resourcePath.startsWith("/")) {
+                resourcePath = resourcePath.substring(1);
+            }
 
+            InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath);
+            if (is == null) {
+                // Попробуем другой способ
+                is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
+            }
+
+            if (is == null) {
+                throw new RuntimeException("Resource not found in classpath: " + resourcePath);
+            }
+
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                return reader.lines().collect(Collectors.joining("\n"));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read resource: " + resourcePath, e);
+            }
+        }
+
+    /*
     protected static String readCommand(String filepath){
         StringBuffer res = new StringBuffer();
         String line;
@@ -96,10 +100,11 @@ public class Repository {
             return res.toString();
 
         }catch (IOException e) {
-            //log
+            System.out.println(e.getMessage());
             throw new RuntimeException("Command Error");
         }
-    }
+    }*/
+
 
     protected static double[] toDoubleBaseArray(java.sql.Array array) throws SQLRepositoryException{
         double[] result = null;
@@ -109,7 +114,6 @@ public class Repository {
             for(int i = 0;i<arr.length;++i) result[i] = arr[i];
         }
         catch (SQLException e) {
-            //log
             throw new SQLRepositoryException("From SQLArray Cast Error");
         }
         finally{
@@ -117,7 +121,6 @@ public class Repository {
                 array.free();
             }
             catch (SQLException e) {
-                //log
                 throw new SQLRepositoryException("SQLArray Free Error");
             }
 
@@ -126,17 +129,36 @@ public class Repository {
         return result;
     }
 
-    protected java.sql.Array toDoubleSQLArray(double[] array) throws SQLRepositoryException{
+    protected SQLArray toDoubleSQLArray(Connection connect, double[] array) throws SQLRepositoryException{
+        if(array == null) return new SQLArray(null);
         Double[] arr = new Double[array.length];
         for(int i =0; i < array.length;++i){ arr[i] = Double.valueOf(array[i]); }
 
-        try(Connection connect = DriverManager.getConnection(url,username,password)){
-            return connect.createArrayOf("float8", arr);
-
+        try{
+            return new SQLArray(connect.createArrayOf("float8", arr));
         } catch (SQLException e) {
             throw new SQLRepositoryException("To SQL Array Cast Exception");
         }
     }
+    protected SQLArray toLongSQLArray(Connection connect, long[] array) throws SQLRepositoryException{
+        if(array == null) return new SQLArray(null);
 
+        Long[] arr = new Long[array.length];
+        for(int i =0; i < array.length;++i){ arr[i] = Long.valueOf(array[i]); }
+
+        try{
+            return new SQLArray(connect.createArrayOf("int8", arr));
+        } catch (SQLException e) {
+            throw new SQLRepositoryException("To SQL Array Cast Exception");
+        }
+    }
+    protected SQLArray toStringSQLArray(Connection connect, String[] array) throws SQLRepositoryException{
+        if(array == null) return new SQLArray(null);
+        try{
+            return new SQLArray(connect.createArrayOf("varchar", array));
+        } catch (SQLException e) {
+            throw new SQLRepositoryException("To SQL Array Cast Exception");
+        }
+    }
 }
 

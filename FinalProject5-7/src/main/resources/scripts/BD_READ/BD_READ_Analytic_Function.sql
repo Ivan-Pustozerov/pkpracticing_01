@@ -1,1 +1,1 @@
-SELECT * FROM AnalyticFunctions WHERE id = $1;
+SELECT * FROM AnalyticFunctions WHERE func_id = ANY(?::BIGINT[]);

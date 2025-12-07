@@ -1,4 +1,4 @@
 UPDATE MathFunctions
  SET
- name = COALESCE($2, name)
- WHERE id = $1;
+ name = COALESCE(?, name)
+ WHERE id = ? AND owner_id = ?;

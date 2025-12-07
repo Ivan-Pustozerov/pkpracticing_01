@@ -1,7 +1,7 @@
-UPDATE FROM Users
+UPDATE Users
  SET
- is_admin = COALESCE($2, is_admin),
- name = COALESCE($3, name),
- email = COALESCE($4, email),
- password = COALESCE($5, password)
- WHERE id = $1;
+ is_admin = COALESCE(?, is_admin),
+ name = COALESCE(?, name),
+ email = COALESCE(?, email),
+ password = COALESCE(?, password)
+ WHERE id = ? OR name = ?;

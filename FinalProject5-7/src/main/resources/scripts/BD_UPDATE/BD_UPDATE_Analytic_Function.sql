@@ -1,3 +1,3 @@
 UPDATE AnalyticFunctions
- SET function_expression = $2
- WHERE id = $1;
+ SET function_expression = COALESCE(?, function_expression)
+ WHERE func_id = ?;

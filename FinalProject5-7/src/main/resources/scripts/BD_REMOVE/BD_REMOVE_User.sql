@@ -1,1 +1,1 @@
-DELETE FROM Users WHERE id = ?;
+DELETE FROM Users WHERE id = ? OR name = ?;
