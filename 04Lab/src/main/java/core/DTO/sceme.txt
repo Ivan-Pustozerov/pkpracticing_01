@@ -1,0 +1,15 @@
+//USERS
+GET     /api/users                      #Всех
+GET     /api/users/{id}                 #Одного
+POST    /api/users/                     #Создание
+PUT     /api/users/{id}                 #Обновление
+DELETE  /api/users/{id}                 #Удаление
+//FUNCTION:
+GET    /api/functions                    # Все функции (можно фильтровать по type)
+GET    /api/functions/{id}               # Конкретная функция
+POST   /api/functions/analytic           # Создать аналитическую
+POST   /api/functions/tabulated          # Создать табулированную
+PUT    /api/functions/{id}               # Обновить базовые поля (name)
+PUT    /api/functions/analytic/{id}      # Обновить детали аналитической
+PUT    /api/functions/tabulated/{id}     # Обновить детали табулированной
+DELETE /api/functions/{id}               # Удалить функцию

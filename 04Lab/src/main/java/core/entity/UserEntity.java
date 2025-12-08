@@ -38,6 +38,8 @@ public class UserEntity {
     @BatchSize(size = 20)
     @ToString.Exclude
     private List<MathFunctionsEntity> functions = new ArrayList<>();
+    /** Для души:
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
