@@ -1,9 +1,10 @@
 package core.mapper;
-import core.DTO.*;
+
 import core.DTO.request.UserRequest;
 import core.DTO.response.UserResponse;
 import core.entity.UserEntity;
 import org.springframework.stereotype.Component;
+@Component
 public class UserMapper {
     public UserResponse toResponse(UserEntity entity) {
         if (entity == null) {
@@ -17,8 +18,11 @@ public class UserMapper {
         response.setIsAdmin(entity.getIsAdmin());
         return response;
     }
-
-    // Метод для обновления сущности (если понадобится)
+    /**
+     * Есть вещи ,которые не понимает вселенная
+     * Это одна из них
+     * Никто не знает зачем, а главное для какой цели
+     */
     public void updateEntity(UserEntity entity, UserRequest request) {
         if (request.getName() != null) {
             entity.setName(request.getName());

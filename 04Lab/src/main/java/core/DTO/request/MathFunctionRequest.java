@@ -1,7 +1,7 @@
 package core.DTO.request;
 import lombok.Data;
 @Data
- class MathFunctionRequest {
+ class MathFunctionRequest{
     private Long userId;
     private String type;
     private String name;

@@ -6,7 +6,9 @@ import core.DTO.response.TabulatedFunctionResponse;
 import core.entity.AnalyticFunctionsEntity;
 import core.entity.MathFunctionsEntity;
 import core.entity.TabulatedFunctionsEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FunctionMapper {
     public AnalyticFunctionResponse toResponse(AnalyticFunctionsEntity entity) {
         AnalyticFunctionResponse response = new AnalyticFunctionResponse();
@@ -35,7 +37,6 @@ public class FunctionMapper {
         return response;
     }
 
-    // Маппер для списка базовых функций
     public MathFunctionResponse toBaseResponse(MathFunctionsEntity entity) {
         MathFunctionResponse response = new MathFunctionResponse();
         response.setId(entity.getId());
