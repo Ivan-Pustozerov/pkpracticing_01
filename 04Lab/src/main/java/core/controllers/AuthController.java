@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse>  login(@Valid @RequestBody LoginRequest loginRequest) {
-        System.out.println("=== 🔐 LOGIN DEBUG ===");
+        System.out.println("===  LOGIN DEBUG ===");
         System.out.println("Request username: '" + loginRequest.getUsername() + "'");
 
         // Аутентифицируем
@@ -52,7 +52,7 @@ public class AuthController {
 
         // Проверяем совпадение
         if (!authenticatedUsername.equals(loginRequest.getUsername())) {
-            System.out.println("⚠️ WARNING: Username mismatch!");
+            System.out.println("WARNING: Username mismatch!");
             System.out.println("  Request: " + loginRequest.getUsername());
             System.out.println("  Auth: " + authenticatedUsername);
         }
