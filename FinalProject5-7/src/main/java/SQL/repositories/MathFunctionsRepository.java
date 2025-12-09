@@ -1,13 +1,14 @@
 package SQL.repositories;
 
-import SQL.DTO.DTO;
 import SQL.DTO.IdDTO;
-import SQL.DTO.MathFunctionDTO;
-import SQL.SQLRepositoryException;
+import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MathFunctionsRepository extends Repository {
@@ -17,16 +18,26 @@ public class MathFunctionsRepository extends Repository {
     private final String MFuncInsert;
     private final String MFuncReadInfoAsc;
     private final String MFuncReadInfoDesc;
+    private final String MFuncReadInfoByOwnerAsc;
+    private final String MFuncReadInfoByOwnerDesc;
+    private final String MFuncReadInfoAllAsc;
+    private final String MFuncReadInfoAllDesc;
     private final String MFuncRemove;
     private final String MFuncUpdate;
+    private final String MFuncBelongs;
 
     {
         MFuncInit = readCommand(dir + "BD_INIT/BD_INIT_MathFunctions_table.sql");
         MFuncInsert = readCommand(dir + "BD_INSERT/BD_INSERT_MathFunction.sql");
         MFuncReadInfoAsc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoASC.sql");
         MFuncReadInfoDesc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoDESC.sql");
+        MFuncReadInfoByOwnerAsc = readCommand(dir + "BD_READ/BD_READ_MathFunction_By_OwnerIDASC.sql");
+        MFuncReadInfoByOwnerDesc = readCommand(dir + "BD_READ/BD_READ_MathFunction_By_OwnerIDDESC.sql");
+        MFuncReadInfoAllAsc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoAllASC.sql");
+        MFuncReadInfoAllDesc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoAllDESC.sql");
         MFuncRemove = readCommand(dir + "BD_REMOVE/BD_REMOVE_MathFunction.sql");
         MFuncUpdate = readCommand(dir + "BD_UPDATE/BD_UPDATE_MathFunction.sql");
+        MFuncBelongs = readCommand(dir + "BD_CHECK/BD_CHECK_MathFunction_Belongs.sql");
     }
 ///=================================================================================================================
 
@@ -61,7 +72,7 @@ public class MathFunctionsRepository extends Repository {
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<MathFunctionDTO> readMFuncInfo(Connection connect, long[] id, String  sortField, String sortOrder)
+    public ArrayList<MathFunctionFromBdDTO> readMFuncInfo(Connection connect, long[] id, String  sortField, String sortOrder)
             throws SQLRepositoryException{
         try(SQLArray idArray = toLongSQLArray(connect, id)) {
 
@@ -71,11 +82,56 @@ public class MathFunctionsRepository extends Repository {
                                 ps.setString(2, sortField);
                     },
                     set -> {
-                        return new MathFunctionDTO(set.getLong("id"),
+                        return new MathFunctionFromBdDTO(
+                                set.getLong("id"),
                                 set.getString("type"),
                                 set.getString("name"),
                                 set.getLong("owner_id"));
                     });
+        }
+    }
+
+    public ArrayList<MathFunctionFromBdDTO> readMFuncInfoAll(Connection connect, String  sortField, String sortOrder)
+            throws SQLRepositoryException {
+        return executeQuery(connect,sortOrder.equals("desc")? MFuncReadInfoAllDesc : MFuncReadInfoAllAsc,
+                ps ->{ ps.setString(1, sortField);},
+                set -> {
+                    return new MathFunctionFromBdDTO(
+                            set.getLong("id"),
+                            set.getString("type"),
+                            set.getString("name"),
+                            set.getLong("owner_id"));
+                    });
+    }
+
+    public ArrayList<MathFunctionFromBdDTO> readMFuncInfoByOwnerId(Connection connect, long owner_id, String sortField, String sortOrder)
+            throws SQLRepositoryException {
+        return executeQuery(connect, sortOrder.equals("desc")? MFuncReadInfoByOwnerDesc : MFuncReadInfoByOwnerAsc,
+                ps ->{
+                                ps.setLong(1, owner_id);
+                                ps.setString(2, sortField);},
+                set -> {
+                    return new MathFunctionFromBdDTO(
+                            set.getLong("id"),
+                            set.getString("type"),
+                            set.getString("name"),
+                            set.getLong("owner_id"));
+                });
+    }
+
+///-------------------------------------------------CHECK----------------------------------------------------------
+    public boolean BelongsByOwnerId(Connection connect, Long id, Long owner_id )
+            throws SQLRepositoryException {
+        try(PreparedStatement ps = connect.prepareStatement(MFuncBelongs)) {
+            ps.setLong(1, id);
+            ps.setLong(2, owner_id);
+
+            try (ResultSet set = ps.executeQuery()) {
+                return set.next();
+            }
+
+        }catch (SQLException e){
+            throw new SQLRepositoryException("Belongs exist error");
         }
     }
 }

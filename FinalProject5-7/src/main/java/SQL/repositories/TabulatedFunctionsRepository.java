@@ -1,7 +1,6 @@
 package SQL.repositories;
 
-import SQL.DTO.TabulatedFunctionToServerDTO;
-import SQL.SQLRepositoryException;
+import SQL.DTO.FromBD.TabulatedFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 
@@ -32,7 +31,6 @@ public class TabulatedFunctionsRepository extends Repository {
         return initTable(connect, TabulatedInit);
     }
 
-    /// МОЖЕТ ОЧЕНЬ СИЛЬНО РАЗОЧАРОВАТЬ - ПРОБЛЕМЫ НЕ МОИ - СОЗДАТЕЛЯ java.sql.Array
     public int insertTabulatedFunction(Connection connect, long func_id, double[] xVals, double[] yVals)
             throws SQLRepositoryException {
 
@@ -56,7 +54,6 @@ public class TabulatedFunctionsRepository extends Repository {
         });
     }
 
-    /// МОЖЕТ ОЧЕНЬ СИЛЬНО РАЗОЧАРОВАТЬ - ПРОБЛЕМЫ НЕ МОИ - СОЗДАТЕЛЯ java.sql.Array
     public int updateTabulatedFunctionFull(Connection connect, long id, double[] xVals, double[] yVals)
             throws SQLRepositoryException {
 
@@ -73,14 +70,14 @@ public class TabulatedFunctionsRepository extends Repository {
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<TabulatedFunctionToServerDTO> readTabulatedFunctionInfo(Connection connect, long[] func_id)
+    public ArrayList<TabulatedFunctionFromBdDTO> readTabulatedFunctionInfo(Connection connect, long[] func_id)
             throws SQLRepositoryException{
         try( SQLArray func_idArray = toLongSQLArray(connect, func_id)) {
 
             return executeQuery(connect, TabulatedReadInfo,
                     ps -> ps.setArray(1, func_idArray.innerArray()),
                     set -> {
-                        return new TabulatedFunctionToServerDTO(
+                        return new TabulatedFunctionFromBdDTO(
                                 set.getLong("func_id"),
                                 toDoubleBaseArray(set.getArray("xVals")),
                                 toDoubleBaseArray(set.getArray("yVals")));

@@ -1,0 +1,1 @@
+SELECT 1 FROM MathFunctions WHERE id = ? AND owner_id = ?;

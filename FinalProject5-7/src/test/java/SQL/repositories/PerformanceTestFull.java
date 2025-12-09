@@ -1,6 +1,5 @@
 package SQL.repositories;
 
-import SQL.SQLRepositoryException;
 import org.junit.jupiter.api.*;
 import java.io.FileWriter;
 import java.io.IOException;

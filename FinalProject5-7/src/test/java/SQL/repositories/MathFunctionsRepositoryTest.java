@@ -1,11 +1,11 @@
 package SQL.repositories;
 
-import SQL.SQLRepositoryException;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,7 +63,13 @@ class MathFunctionsRepositoryTest {
 
     @Test
     @Order(4)
-    void readMFuncInfo() {
+    void readMFuncInfo() throws SQLRepositoryException {
+
+        /*var array =mf.readMFuncInfo(connection, fbuffer, "type_desc","desc");
+        for(var elem : array){
+            System.out.println(elem+"/n");
+        }*/
+
         assertDoesNotThrow(() -> mf.readMFuncInfo(connection, fbuffer, "name_asc","asc"));
         assertDoesNotThrow(() -> mf.readMFuncInfo(connection, fbuffer, "type_asc","asc"));
         assertDoesNotThrow(() -> mf.readMFuncInfo(connection, fbuffer, "-","asc"));
@@ -75,7 +81,49 @@ class MathFunctionsRepositoryTest {
 
     @Test
     @Order(5)
+    void readMFuncInfoByOwnerId() throws SQLRepositoryException {
+        /*var array =mf.readMFuncInfoByOwnerId(connection,testerId,"-","-");
+        for(var elem : array){
+            System.out.println(elem+"/n");
+        }*/
+        assertDoesNotThrow(()-> mf.readMFuncInfoByOwnerId(connection,testerId,"-","-"));
+    }
+
+    @Test
+    @Order(6)
+    void readMFuncInfoAll() throws SQLRepositoryException {
+        /*var array =mf.readMFuncInfoAll(connection,"-","-");
+        for(var elem : array){
+            System.out.println(elem+"/n");
+        }*/
+        assertDoesNotThrow(()-> mf.readMFuncInfoAll(connection,"-","-"));
+    }
+
+    @Test
+    @Order(7)
+    void CheckBelongs() throws SQLRepositoryException {
+        long badfuncid = COUNT+1;
+        long badUserId = testerId +1;
+
+        assertTrue(mf.BelongsByOwnerId(connection,fbuffer[0],testerId));
+        assertFalse(mf.BelongsByOwnerId(connection,badfuncid,testerId));
+        assertFalse(mf.BelongsByOwnerId(connection,fbuffer[0],badUserId));
+    }
+
+    @Test
+    @Order(8)
     void removeMFunc() {
-        assertDoesNotThrow(() -> users.removeUser(connection,null,"FuncTester"));
+        for(int i=0; i<COUNT;++i){
+            long owner_id = testerId;
+            long func_id = fbuffer[i];
+            assertDoesNotThrow(() -> mf.removeMFunc(connection,owner_id,func_id));
+        }
+    }
+
+    @AfterAll
+    static void cleanUp() throws SQLException {
+        String drop = "DROP TABLE Users CASCADE; DROP TABLE MathFunctions CASCADE; ";
+        Statement st = connection.createStatement();
+        st.execute(drop);
     }
 }

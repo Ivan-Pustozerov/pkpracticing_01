@@ -1,0 +1,1 @@
+SELECT 1 FROM Users WHERE (id = ? OR name = ?) AND is_admin = true;

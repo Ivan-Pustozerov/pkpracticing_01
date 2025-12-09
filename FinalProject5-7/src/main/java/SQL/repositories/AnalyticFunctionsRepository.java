@@ -1,7 +1,6 @@
 package SQL.repositories;
 
-import SQL.DTO.AnalyticFunctionDTO;
-import SQL.SQLRepositoryException;
+import SQL.DTO.FromBD.AnalyticFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 
@@ -44,13 +43,13 @@ public class AnalyticFunctionsRepository extends Repository {
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<AnalyticFunctionDTO> readAnalyticFunctionInfo(Connection connect, long[] func_id)
+    public ArrayList<AnalyticFunctionFromBdDTO> readAnalyticFunctionInfo(Connection connect, long[] func_id)
             throws SQLRepositoryException{
         try(SQLArray func_idArray = toLongSQLArray(connect, func_id)) {
             return executeQuery(connect, AnalyticFunctionReadInfo,
                     ps -> ps.setArray(1, func_idArray.innerArray()),
                     set -> {
-                        return new AnalyticFunctionDTO(
+                        return new AnalyticFunctionFromBdDTO(
                                 set.getLong("func_id"),
                                 set.getString("function_expression"));
                     });

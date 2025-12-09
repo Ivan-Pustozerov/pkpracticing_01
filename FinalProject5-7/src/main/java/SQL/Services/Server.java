@@ -1,9 +1,11 @@
 /*
-package SQL;
+package SQL.Services;
 import SQL.DTO.*;
+import SQL.DTO.ToServer.UserToServerDTO;
+import SQL.repositories.SQLRepositoryException;
 import SQL.repositories.*;
-import SQL.repositories.tools.ConnectPool;
-import SQL.repositories.tools.ConnectPoolException;
+import SQL.repositories.tools.SmartConnection;
+import SQL.repositories.tools.SmartConnectionException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -16,11 +18,7 @@ public class Server {
     private final String username;
     private final String password;
 
-    private ConnectPool connections;
-    private final int UPoolIndex = 0;
-    private final int MPoolIndex = 1;
-    private final int APoolIndex = 2;
-    private final int TPoolIndex = 3;
+    private SmartConnection connection;
 
     protected final UsersRepository Users = new UsersRepository();
     protected final MathFunctionsRepository MathFunctions = new MathFunctionsRepository();
@@ -32,27 +30,10 @@ public class Server {
     private static void logger(String log){
         System.out.println(log);
     }
-    private static byte[] passwordHash(String password){
-        //одностороннее хеширование
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] input = password.getBytes(StandardCharsets.UTF_8);
-            return md.digest(input);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
-    public Server(String url, String username, String password) throws ConnectPoolException {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        connections = new ConnectPool(url, username, password, 4);
-        logger("SERVER CREATED");
-    }
 ///==============================================================================
     public void initDataBase()
-            throws SQLRepositoryException, ConnectPoolException {
+            throws SQLRepositoryException, SmartConnectionException {
 
         Users.initTable(connections.getConnection(UPoolIndex));
         MathFunctions.initTable(connections.getConnection(MPoolIndex));
@@ -64,21 +45,11 @@ public class Server {
     }
 
 ///------------------------------------------------------------------------------
-    public int addUser(boolean isAdmin, String name, String email, String password)
-            throws SQLRepositoryException, ConnectPoolException {
-        byte[] pswd = passwordHash(password);
-        logger("USER ADDED");
-        try{
-            return Users.insertUser(connections.getConnection(UPoolIndex),isAdmin, name, email, pswd);
-        }
-        finally{
-            connections.free();
-        }
-    }
+
 
 
     public int addAnalyticMFunction(String function_expression, String name, long owner_id)
-            throws SQLRepositoryException, ConnectPoolException {
+            throws SQLRepositoryException, SmartConnectionException {
         try {
             long mfId = MathFunctions.insertMFunc(connections.getConnection(MPoolIndex), "analytic", name, owner_id).get(0).id();
             logger("ANALYTIC FUNCTION ADDED");
@@ -89,7 +60,7 @@ public class Server {
         }
     }
     public int addAnalyticMFunction(String function_expression, String name, String owner_name)
-            throws SQLRepositoryException, ConnectPoolException {
+            throws SQLRepositoryException, SmartConnectionException {
         try {
 
             long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
@@ -102,7 +73,7 @@ public class Server {
 
 
     public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, long owner_id)
-            throws SQLRepositoryException, ConnectPoolException {
+            throws SQLRepositoryException, SmartConnectionException {
         try {
             long mfId = MathFunctions.insertMFunc(connections.getConnection(MPoolIndex), "tabulated", name, owner_id).get(0).id();
             logger("TABULATED FUNCTION ADDED");
@@ -113,7 +84,7 @@ public class Server {
         }
     }
     public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, String owner_name)
-            throws SQLRepositoryException, ConnectPoolException {
+            throws SQLRepositoryException, SmartConnectionException {
         try {
             long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
             return addTabulatedMFunction(xVals, yVals, name, userId);
@@ -125,7 +96,7 @@ public class Server {
 
 ///------------------------------------------------------------------------------
     public int removeMFunction(long owner_id, long id)
-            throws ConnectPoolException, SQLRepositoryException {
+            throws SmartConnectionException, SQLRepositoryException {
         try {
             return MathFunctions.removeMFunc(connections.getConnection(MPoolIndex), owner_id, id);
         }
@@ -134,7 +105,7 @@ public class Server {
         }
     }
     public int removeMFunction(String owner_name, long id)
-            throws ConnectPoolException, SQLRepositoryException {
+            throws SmartConnectionException, SQLRepositoryException {
         try {
             long userId = Users.readUserId(connections.getConnection(UPoolIndex), new String[]{owner_name}).get(0).id();
             return removeMFunction(userId, id);
@@ -145,79 +116,10 @@ public class Server {
     }
 
 
-    public int removeUser(long id)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.removeUser(connections.getConnection(UPoolIndex), id, null);
-        }
-        finally{
-            connections.free();
-        }
-    }
-    public int removeUser(String name)
-            throws
-            ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.removeUser(connections.getConnection(UPoolIndex), -1, name);
-        }
-        finally{
-            connections.free();
-        }
-    }
-
 ///------------------------------------------------------------------------------
-    public ArrayList<UserToServerDTO> readUsersInfo(long[] id)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.readUserInfo(connections.getConnection(UPoolIndex), id, null);
-        }
-        finally{
-            connections.free();
-        }
-
-    }
-    public ArrayList<UserToServerDTO> readUsersInfo(String[] name)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.readUserInfo(connections.getConnection(UPoolIndex), new long[]{-1}, name);
-        }
-        finally{
-            connections.free();
-        }
-    }
 
 
-    public ArrayList<MathFunctionDTO> readUsersFunctions(long[] id)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.readUserFunctions(connections.getConnection(UPoolIndex), id, null);
-        }
-        finally{
-            connections.free();
-        }
 
-    }
-    public ArrayList<MathFunctionDTO> readUsersFunctions(String[] name)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.readUserFunctions(connections.getConnection(UPoolIndex), new long[]{-1}, name);
-        }
-        finally{
-            connections.free();
-        }
-
-    }
-
-
-    public ArrayList<IdDTO> readUsersID(String[] name)
-            throws ConnectPoolException, SQLRepositoryException {
-        try {
-            return Users.readUserId(connections.getConnection(UPoolIndex), name);
-        }
-        finally{
-            connections.free();
-        }
-    }
 
     public static void main(String[] args) {
         String url = "jdbc:postgresql://localhost:5432/lab";
@@ -241,7 +143,7 @@ public class Server {
         } catch (SQLRepositoryException e) {
             logger("ERROR: - " + e.getMessage());
             e.printStackTrace();
-        } catch (ConnectPoolException e) {
+        } catch (SmartConnectionException e) {
             System.out.println(e.getMessage());
         }
     }

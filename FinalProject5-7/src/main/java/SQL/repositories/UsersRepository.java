@@ -1,12 +1,14 @@
 package SQL.repositories;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import SQL.DTO.IdDTO;
-import SQL.DTO.UserToServerDTO;
-import SQL.DTO.MathFunctionDTO;
-import SQL.SQLRepositoryException;
+import SQL.DTO.FromBD.UserFromBdDTO;
+import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 
@@ -22,8 +24,14 @@ public class UsersRepository extends Repository {
     private final String UserReadIDAsc;
     private final String UserReadIDDesc;
     private final String UserReadByRole;
+    private final String UserReadIDByLike;
+    private final String UserReadAllASC;
+    private final String UserReadAllDESC;
     private final String UserRemove;
     private final String UserUpdate;
+    private final String UserExist;
+    private final String UserIsAdmin;
+
 
     {
         UserInit = readCommand(dir + "BD_INIT/BD_INIT_Users_table.sql");
@@ -34,8 +42,13 @@ public class UsersRepository extends Repository {
         UserReadIDAsc = readCommand(dir + "BD_READ/BD_READ_User_IDASC.sql");
         UserReadIDDesc = readCommand(dir + "BD_READ/BD_READ_User_IDDESC.sql");
         UserReadByRole = readCommand(dir + "BD_READ/BD_READ_User_By_Role.sql");
+        UserReadIDByLike = readCommand(dir + "BD_READ/BD_READ_User_Name_Like.sql");
+        UserReadAllASC = readCommand(dir + "BD_READ/BD_READ_User_AllASC.sql");
+        UserReadAllDESC = readCommand(dir + "BD_READ/BD_READ_User_AllDESC.sql");
         UserRemove = readCommand(dir + "BD_REMOVE/BD_REMOVE_User.sql");
         UserUpdate = readCommand(dir + "BD_UPDATE/BD_UPDATE_User.sql");
+        UserExist = readCommand(dir + "BD_CHECK/BD_CHECK_User_Exist.sql");
+        UserIsAdmin = readCommand(dir + "BD_CHECK/BD_CHECK_User_Is_Admin.sql");
     }
 ///================================================================================================================
 
@@ -73,12 +86,26 @@ public class UsersRepository extends Repository {
     }
 
 ///-------------------------------------------------READER---------------------------------------------------------
-    public ArrayList<UserToServerDTO> readUserInfo(Connection connect, long[] id, String[] names, String sortField, String sortOrder)
+    public ArrayList<UserFromBdDTO>readAllUsers(Connection connect, String sortField, String sortOrder)
+            throws SQLRepositoryException {
+        return executeQuery(connect, sortOrder.equals("desc")? UserReadAllDESC : UserReadAllASC,
+                ps -> {ps.setString(1,sortField);},
+                set -> {
+                    return new UserFromBdDTO(
+                            set.getLong("id"),
+                            set.getBoolean("is_admin"),
+                            set.getString("name"),
+                            set.getString("email"),
+                            set.getBytes("password"));
+                });
+    }
+
+    /// ID указываются, начиная с 1
+    public ArrayList<UserFromBdDTO> readUserInfo(Connection connect, long[] id, String[] names, String sortField, String sortOrder)
             throws SQLRepositoryException{
 
         try(SQLArray idArray = toLongSQLArray(connect, id);
             SQLArray nameArray = toStringSQLArray(connect, names)) {
-
             return executeQuery(connect, sortOrder.equals("desc")? UserReadInfoDesc : UserReadInfoAsc,
                     ps -> {
                         ps.setArray(1, idArray.innerArray());
@@ -86,7 +113,7 @@ public class UsersRepository extends Repository {
                         ps.setString(3, sortField);
                     },
                     set -> {
-                        return new UserToServerDTO(
+                        return new UserFromBdDTO(
                                 set.getLong("id"),
                                 set.getBoolean("is_admin"),
                                 set.getString("name"),
@@ -96,7 +123,7 @@ public class UsersRepository extends Repository {
         }
     }
 
-    public ArrayList<MathFunctionDTO> readUserFunctions(Connection connect, long[] id, String[] names)
+    public ArrayList<MathFunctionFromBdDTO> readUserFunctions(Connection connect, long[] id, String[] names)
             throws SQLRepositoryException{
 
         try(SQLArray idArray = toLongSQLArray(connect, id);
@@ -106,7 +133,7 @@ public class UsersRepository extends Repository {
                         ps.setArray(2, nameArray.innerArray());
                     },
                     set -> {
-                        return new MathFunctionDTO(
+                        return new MathFunctionFromBdDTO(
                                 set.getLong("id"),
                                 set.getString("type"),
                                 set.getString("name"),
@@ -115,11 +142,11 @@ public class UsersRepository extends Repository {
         }
     }
 
-    public ArrayList<UserToServerDTO> readUserByRole(Connection connect, boolean is_admin)
+    public ArrayList<UserFromBdDTO> readUserByRole(Connection connect, boolean is_admin)
             throws SQLRepositoryException {
         return executeQuery(connect, UserReadByRole, ps -> ps.setBoolean(1,is_admin),
                 set -> {
-                    return new UserToServerDTO(
+                    return new UserFromBdDTO(
                             set.getLong("id"),
                             set.getBoolean("is_admin"),
                             set.getString("name"),
@@ -142,5 +169,44 @@ public class UsersRepository extends Repository {
         }
     }
 
+    public ArrayList<IdDTO> readUserIdByLikeName(Connection connect, String patternname)
+            throws SQLRepositoryException {
+        return executeQuery(connect, UserReadIDByLike, ps ->{
+                                                        ps.setString(1,patternname);
+                                                        },
+                                                            set -> {
+                                                        return new IdDTO(set.getLong("id"));
+            }
+        );
+    }
+
+///-----------------------------------------------CHECK-----------------------------------------------------------
+    public boolean exists(Connection connect, Long id, String name)
+            throws SQLRepositoryException {
+        try(PreparedStatement ps = connect.prepareStatement(UserExist)) {
+            if(id == null) ps.setNull(1, -5); else{ps.setLong(1, id);}
+            ps.setString(2, name);
+
+            try (ResultSet set = ps.executeQuery()) {
+                return set.next();
+            }
+        }catch (SQLException e){
+            throw new SQLRepositoryException("Check exist error");
+        }
+    }
+
+    public boolean isAdmin(Connection connect, Long id, String name)
+            throws SQLRepositoryException {
+        try(PreparedStatement ps = connect.prepareStatement(UserIsAdmin)) {
+            if(id == null) ps.setNull(1, -5); else{ps.setLong(1, id);}
+            ps.setString(2, name);
+
+            try (ResultSet set = ps.executeQuery()) {
+                return set.next();
+            }
+        }catch (SQLException e){
+            throw new SQLRepositoryException("Check IsAdmin error");
+        }
+    }
 }
 
