@@ -1,0 +1,502 @@
+{
+	"info": {
+		"_postman_id": "8a3816e9-fe5f-44bf-88a4-832fe6fd12e0",
+		"name": "MathFunctions API Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "50662401",
+		"_collection_link": "https://the-real-dr-woid-2354769.postman.co/workspace/test~10c05077-9678-45d7-afcb-3efa59eeda57/collection/50662401-8a3816e9-fe5f-44bf-88a4-832fe6fd12e0?action=share&source=collection_link&creator=50662401"
+	},
+	"item": [
+		{
+			"name": "Registration",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Registration - Status is OK\", function() {\r",
+									"    pm.response.to.be.ok; // 200-299\r",
+									"});\r",
+									"\r",
+									"// Сохраняем данные из ответа\r",
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"user_id\", response.user.id);\r",
+									"pm.collectionVariables.set(\"jwt_token\", response.token);\r",
+									"\r",
+									"console.log(\"✅ User registered. ID:\", response.user.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{test_username}}\",\r\n    \"email\": \"{{test_email}}\",\r\n    \"password\": \"{{test_password}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/auth/register"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Functions",
+			"item": [
+				{
+					"name": "Create anal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Create Analytic - Status is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"analytic_func_id\", response.id);\r",
+									"console.log(\"✅ Analytic function created. ID:\", response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": {{user_id}},\r\n    \"name\": \"AN{{run_id}}\",\r\n    \"type\": \"analytic\",\r\n    \"functionExpression\": \"x^2 + 2*x + 1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/functions/analytic"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tabulated Function",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Create Tabulated - Status is 201\", function() {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"const response = pm.response.json();\r",
+									"pm.collectionVariables.set(\"tabulated_func_id\", response.id);\r",
+									"console.log(\"✅ Tabulated function created. ID:\", response.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": {{user_id}},\r\n    \"name\": \"TF{{run_id}}\",\r\n    \"type\": \"tabulated\",\r\n    \"xvals\": [1.0, 2.0, 3.0, 4.0],\r\n    \"yvals\": [1.0, 4.0, 9.0, 16.0]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://localhost:8080/api/functions/tabulated"
+					},
+					"response": []
+				},
+				{
+					"name": "GetFunc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Get All - Status 200\", () => pm.response.to.have.status(200));\r",
+									"const functions = pm.response.json();\r",
+									"console.log(\"✅ Total functions:\", functions.length);\r",
+									"pm.expect(functions).to.have.lengthOf(2);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/functions"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Function by ID(ANAL)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Get Tabulated - Status 200\", () => pm.response.to.have.status(200));\r",
+									"const func = pm.response.json();\r",
+									"console.log(\"✅ Tabulated function:\", func.name);\r",
+									"pm.expect(func.type).to.equal(\"tabulated\");\r",
+									"pm.expect(func).to.have.property(\"xvals\");\r",
+									"pm.expect(func).to.have.property(\"yvals\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/functions/{{tabulated_func_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Function by ID(TABS)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Get Tabulated - Status 200\", () => pm.response.to.have.status(200));\r",
+									"const func = pm.response.json();\r",
+									"console.log(\"✅ Tabulated function:\", func.name);\r",
+									"pm.expect(func.type).to.equal(\"tabulated\");\r",
+									"pm.expect(func).to.have.property(\"xvals\");\r",
+									"pm.expect(func).to.have.property(\"yvals\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/functions/{{tabulated_func_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Functions by Type(anal)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"var functions = pm.response.json();\r",
+									"console.log(`📋 Found ${functions.length} function(s)`);\r",
+									"\r",
+									"// Если есть функции, выводим информацию\r",
+									"if (functions.length > 0) {\r",
+									"    functions.forEach((func, index) => {\r",
+									"        console.log(`${index + 1}. ${func.name} (${func.type}) - ID: ${func.id}`);\r",
+									"    });\r",
+									"}\r",
+									"// Дополнительные проверки для фильтрации по типу\r",
+									"const url = pm.request.url.toString();\r",
+									"if (url.includes('type=')) {\r",
+									"    const expectedType = url.match(/type=(\\w+)/)[1];\r",
+									"    pm.test(`All functions are of type '${expectedType}'`, function () {\r",
+									"        functions.forEach(func => {\r",
+									"            pm.expect(func.type).to.equal(expectedType);\r",
+									"        });\r",
+									"    });\r",
+									"    console.log(`🔍 Filtered by type: ${expectedType}`);\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/functions?type=analytic",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"functions"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "analytic"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Delete - Status 204\", () => pm.response.to.have.status(204));\r",
+									"console.log(\"✅ Function deleted\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "http://localhost:8080/api/functions/{{analytic_func_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "GetFunc(PostDel)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Check remaining - Status 200\", () => pm.response.to.have.status(200));\r",
+									"const functions = pm.response.json();\r",
+									"console.log(\"✅ Remaining functions:\", functions.length);\r",
+									"pm.expect(functions).to.have.lengthOf(1);\r",
+									"pm.expect(functions[0].type).to.equal(\"tabulated\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{jwt_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8080/api/functions"
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": {
+					"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcl83MTJfMTc2NTI4OTY5MDMyNyIsImlhdCI6MTc2NTI4OTcxMywiZXhwIjoxNzY1Mzc2MTEzfQ.MZYhIS10b_U83U9RNo3S2H2pqND-fmnwqFSW1rc6dN0"
+				}
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const runId = Date.now() + \"_\" + Math.floor(Math.random() * 1000);",
+					"const username = `user_${runId}`;",
+					"const email = `test_${runId}@test.com`;",
+					"",
+					"// Сохраняем в переменные коллекции",
+					"pm.collectionVariables.set(\"run_id\", runId);",
+					"pm.collectionVariables.set(\"test_username\", username);",
+					"pm.collectionVariables.set(\"test_email\", email);",
+					"pm.collectionVariables.set(\"test_password\", \"password123\");",
+					"",
+					"console.log(\"🧪 Generated for this run:\");",
+					"console.log(\"Username:\", username);",
+					"console.log(\"Email:\", email);",
+					"console.log(\"Run ID:\", runId);",
+					"pm.collectionVariables.set(\"admin_username\", \"Test Admin\");",
+					"pm.collectionVariables.set(\"admin_email\", \"admin@test.com\");",
+					"pm.collectionVariables.set(\"admin_password\", \"admin123\");",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "\thttp://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "function_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "target_user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "test_run_id",
+			"value": ""
+		},
+		{
+			"key": "session_id",
+			"value": ""
+		},
+		{
+			"key": "test_username",
+			"value": ""
+		},
+		{
+			"key": "test_password",
+			"value": ""
+		},
+		{
+			"key": "test_email",
+			"value": ""
+		},
+		{
+			"key": "jwt_token",
+			"value": ""
+		},
+		{
+			"key": "run_id",
+			"value": ""
+		},
+		{
+			"key": "tabulated_func_id",
+			"value": ""
+		},
+		{
+			"key": "analytic_func_id",
+			"value": ""
+		},
+		{
+			"key": "admin_username",
+			"value": ""
+		},
+		{
+			"key": "admin_email",
+			"value": ""
+		},
+		{
+			"key": "admin_password",
+			"value": ""
+		}
+	]
+}
