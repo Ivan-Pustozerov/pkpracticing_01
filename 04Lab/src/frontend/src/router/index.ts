@@ -64,6 +64,16 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/functions/:id/visualize',
+    name: 'function-visualization',
+    component: () => import('@/views/functions/FunctionVisualization.vue'),
+    meta: {
+      title: 'Визуализация функции',
+      requiresAuth: true,
+      breadcrumb: 'График'
+    }
+  },
+  {
     path: '/users',
     name: 'Users',
     component: () => import('@/views/admin/UsersView.vue'),
@@ -82,6 +92,15 @@ const routes: RouteRecordRaw[] = [
       title: 'Мой профиль',
       requiresAuth: true,
       breadcrumb: 'Профиль'
+    }
+  },
+  {
+    path: '/chambers-of-secrets',
+    name: 'ChambersOfSecrets',
+    component: () => import('@/views/ChambersOfSecrets.vue'),
+    meta: {
+      title: 'Chambers of Secrets',
+      requiresAuth: true
     }
   },
   {

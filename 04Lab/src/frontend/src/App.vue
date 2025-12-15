@@ -28,8 +28,40 @@
           </div>
         </div>
 
-        <!-- Профиль и выход справа -->
+        <!-- Профиль, тема и выход справа -->
         <div class="nav-section nav-right">
+          <!-- Переключатель тем -->
+          <div class="theme-switcher" v-if="showNavigation">
+            <button
+              @click="toggleThemeDropdown"
+              class="theme-toggle-btn"
+              :title="`Тема: ${themeStore.currentThemeName}`"
+            >
+              <span v-html="themeStore.currentThemeIconHtml"></span>
+            </button>
+
+            <!-- Выпадающее меню с выбором темы -->
+            <div v-if="showThemeDropdown" class="theme-dropdown" ref="themeDropdown">
+              <div class="theme-dropdown-header">
+                <strong>Выбор темы</strong>
+              </div>
+              <div
+                v-for="theme in themes"
+                :key="theme.value"
+                class="theme-option"
+                :class="{ active: themeStore.currentTheme === theme.value }"
+                @click="selectTheme(theme.value)"
+              >
+                <span class="theme-icon" v-html="theme.iconHtml"></span>
+                <div class="theme-info">
+                  <div class="theme-name">{{ theme.name }}</div>
+                  <div class="theme-desc">{{ theme.description }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Профиль пользователя -->
           <div class="user-profile">
             <div class="user-avatar">
               <i class="fas fa-user"></i>
@@ -110,21 +142,60 @@
       </div>
     </footer>
 
-    <!-- Глобальные уведомления (можно добавить позже) -->
-    <!-- <notification-center /> -->
+    <!-- Оверлей для закрытия выпадающего меню темы -->
+    <div
+      v-if="showThemeDropdown"
+      class="dropdown-overlay"
+      @click="closeThemeDropdown"
+    ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme.store'
+import { ThemeName } from '@/stores/theme.store'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
-// Показать навигацию только для авторизованных пользователей и не на страницах auth
+// Состояние для выпадающего меню темы
+const showThemeDropdown = ref(false)
+const themeDropdown = ref<HTMLElement | null>(null)
+
+// Список тем для меню - ДОБАВЛЕНО поле iconHtml
+const themes = [
+  {
+    value: 'light',
+    name: 'Светлая',
+    iconHtml: '<i class="fas fa-sun"></i>',
+    description: 'BASED theme'
+  },
+  {
+    value: 'dark',
+    name: 'Темная',
+    iconHtml: '<i class="fas fa-moon"></i>',
+    description: 'Luna the Best'
+  },
+  {
+    value: 'ultra-dark',
+    name: 'Ультра-темная',
+    iconHtml: '<i class="fa-brands fa-squarespace"></i>', // ИСПРАВЛЕНО
+    description: 'Темная и мрачная пустота'
+  },
+  {
+    value: 'eco',
+    name: 'Эко',
+    iconHtml: '<i class="fas fa-leaf"></i>',
+    description: 'WEED'
+  }
+]
+
+// Показать навигацию только для авторизованных пользователей
 const showNavigation = computed(() => {
   return authStore.isAuthenticated && route.meta.layout !== 'auth'
 })
@@ -144,7 +215,7 @@ const pageTitle = computed(() => {
   return route.meta.title || 'MathFunctions'
 })
 
-// Подзаголовок страницы (опционально)
+// Подзаголовок страницы
 const pageSubtitle = computed(() => {
   return route.meta.subtitle || ''
 })
@@ -154,6 +225,58 @@ const showPageTitle = computed(() => {
   return route.meta.title && route.meta.layout !== 'auth'
 })
 
+
+
+// Название текущей темы для кнопки
+const currentThemeName = computed(() => {
+  const theme = themes.find(t => t.value === themeStore.currentTheme)
+  return theme?.name || 'Светлая'
+})
+
+// Иконка текущей темы для кнопки
+const currentThemeIcon = computed(() => {
+  const theme = themes.find(t => t.value === themeStore.currentTheme)
+  return theme?.icon || '☀️'
+})
+
+// Текущая тема для сравнения в меню
+const currentTheme = computed(() => themeStore.currentTheme || 'light')
+
+// ============================================
+
+// Переключение выпадающего меню
+const toggleThemeDropdown = () => {
+  console.log('🔄 toggleThemeDropdown вызван')
+  showThemeDropdown.value = !showThemeDropdown.value
+}
+
+// Закрытие выпадающего меню
+const closeThemeDropdown = () => {
+  showThemeDropdown.value = false
+}
+
+// ВЫБОР ТЕМЫ
+const selectTheme = (theme: string) => {
+  console.log('🎯 Выбираем тему:', theme)
+
+  // Удаляем все классы тем
+  const allThemes = ['light', 'dark', 'ultra-dark', 'eco']
+  const html = document.documentElement
+
+  allThemes.forEach(t => html.classList.remove(`theme-${t}`))
+  html.classList.add(`theme-${theme}`)
+  html.setAttribute('data-theme', theme)
+
+  // Сохраняем в localStorage
+  localStorage.setItem('app-theme', theme)
+
+  // Обновляем store
+  themeStore.currentTheme = theme as ThemeName
+
+  closeThemeDropdown()
+  console.log('✅ Тема применена:', theme)
+}
+
 // Выход из системы
 const logout = () => {
   if (confirm('Вы уверены, что хотите выйти?')) {
@@ -162,7 +285,7 @@ const logout = () => {
   }
 }
 
-// Следим за изменениями маршрута для обновления заголовка
+// Следим за изменениями маршрута
 watch(
   () => route.meta.title,
   (newTitle) => {
@@ -172,27 +295,84 @@ watch(
   },
   { immediate: true }
 )
+
+// При монтировании проверяем тему
+onMounted(() => {
+  // Проверяем, что тема применена
+  const savedTheme = localStorage.getItem('app-theme') || 'light'
+  const html = document.documentElement
+
+  // Принудительно применяем класс темы
+  const allThemes = ['light', 'dark', 'ultra-dark', 'eco']
+  allThemes.forEach(t => html.classList.remove(`theme-${t}`))
+  html.classList.add(`theme-${savedTheme}`)
+  html.setAttribute('data-theme', savedTheme)
+
+  console.log('🚀 App mounted, тема:', savedTheme)
+  console.log('themeStore.currentTheme:', themeStore.currentTheme)
+})
+
+// ИЛИ еще проще - использовать напрямую из store
+// В шаблоне можно так:
+// :title="`Тема: ${themeStore.currentThemeName || 'Светлая'}`"
+// {{ themeStore.currentThemeIcon || '☀️' }}
 </script>
 
 <style>
+
 /* Глобальные стили */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background-color var(--transition-speed, 0.3s) ease,
+              border-color var(--transition-speed, 0.3s) ease,
+              color var(--transition-speed, 0.3s) ease,
+              box-shadow var(--transition-speed, 0.3s) ease,
+              transform var(--transition-speed, 0.3s) ease;
 }
 
+/* Установка переменных для корневого элемента */
+html {
+  /* Базовые переменные по умолчанию (светлая тема) */
+  --color-bg-main: #f8f9fa;
+  --color-text-primary: #2c3e50;
+  --color-text-secondary: #7f8c8d;
+  --color-text-light: #ffffff;
+  --color-text-muted: #95a5a6;
+  --color-primary: #3498db;
+  --color-bg-card: #ffffff;
+  --color-bg-header: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  --color-bg-footer: #2c3e50;
+  --color-border: #e1e8ed;
+  --color-bg-hover: rgba(52, 152, 219, 0.1);
+  --color-bg-active: rgba(52, 152, 219, 0.2);
+  --gradient-primary: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --box-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.2);
+  --border-radius: 8px;
+  --transition-speed: 0.3s;
+}
+
+/* Применяем переменные к body */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  color: #333;
-  background-color: #f8f9fa;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-main);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease;
 }
 
 #app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
 }
 
 .container {
@@ -203,8 +383,8 @@ body {
 
 /* Шапка */
 .app-header {
-  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-  color: white;
+  background: var(--color-bg-header);
+  color: var(--color-text-light);
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -229,7 +409,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: white;
+  color: var(--color-text-light);
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: 700;
@@ -243,11 +423,11 @@ body {
 
 .nav-logo i {
   font-size: 1.8rem;
-  color: #3498db;
+  color: var(--color-primary);
 }
 
 .logo-text {
-  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -263,52 +443,192 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-text-light);
   text-decoration: none;
   padding: 10px 16px;
   border-radius: 8px;
   transition: all 0.3s;
   font-weight: 500;
+  opacity: 0.9;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--color-bg-hover);
+  color: var(--color-text-light);
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--color-bg-active);
+  color: var(--color-text-light);
 }
 
 .nav-link i {
   font-size: 1.1rem;
 }
 
-/* Профиль пользователя */
+/* Переключатель тем */
+.theme-switcher {
+  position: relative;
+  margin-right: 15px;
+}
+
+.theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-bg-hover);
+  color: var(--color-text-light);
+  border: 2px solid var(--color-border, rgba(255, 255, 255, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: all 0.3s;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--color-bg-active);
+  transform: scale(1.05);
+  border-color: var(--color-primary);
+}
+
+/* Выпадающее меню тем */
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  width: 280px;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius, 8px);
+  box-shadow: var(--box-shadow-lg);
+  border: 1px solid var(--color-border);
+  z-index: 1100;
+  overflow: hidden;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  width: 280px;
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius, 8px);
+  box-shadow: var(--box-shadow-lg);
+  border: 1px solid var(--color-border);
+  z-index: 1100;
+  overflow: hidden;
+}
+
+.theme-dropdown-header {
+  padding: 15px;
+  background: var(--color-bg-hover);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+.theme-dropdown-header:hover {
+  color: white;
+  background: var(--color-primary);
+}
+
+.theme-option {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-bottom: 1px solid var(--color-border-light, #f1f1f1);
+}
+
+.theme-option:last-child {
+  border-bottom: none;
+}
+
+.theme-option:hover {
+  background: var(--color-primary);
+}
+.theme-option:hover .theme-icon,
+.theme-option:hover .theme-name,
+.theme-option:hover .theme-desc {
+  color: var(--color-border-light);
+}
+
+.theme-option.active {
+  background: var(--color-bg-active);
+  position: relative; /* Добавляем для псевдоэлемента */
+}
+
+/* Граница на 80% высоты с помощью псевдоэлемента */
+.theme-option.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 5%; /* Отступ сверху 10% */
+  height: 90%; /* Высота 80% от родителя */
+  width: 3px;
+  background: var(--color-primary);
+  border-radius: 0 3px 3px 0;
+}
+
+.theme-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  transition: color 0.3s; /* Плавный переход для иконки */
+}
+
+.theme-info {
+  flex: 1;
+}
+
+.theme-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 3px;
+  transition: color 0.3s; /* Плавный переход для названия */
+}
+
+.theme-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  transition: color 0.3s;
+}
+
+
 .user-profile {
   display: flex;
   align-items: center;
   gap: 15px;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-bg-hover);
   border-radius: 12px;
   transition: background 0.3s;
 }
 
 .user-profile:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-bg-active);
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);
+  background: var(--gradient-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-text-light);
   font-size: 1.2rem;
 }
 
@@ -320,6 +640,7 @@ body {
 .user-name {
   font-weight: 600;
   font-size: 0.95rem;
+  color: var(--color-text-light);
 }
 
 .user-role {
@@ -338,13 +659,13 @@ body {
 }
 
 .role-badge.admin {
-  background: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  background: var(--color-bg-hover);
+  color: var(--color-error, #e74c3c);
 }
 
 .role-badge.user {
-  background: rgba(52, 152, 219, 0.2);
-  color: #3498db;
+  background: var(--color-bg-hover);
+  color: var(--color-text-light, #5dade2);
 }
 
 .user-actions {
@@ -367,23 +688,23 @@ body {
 }
 
 .profile-link {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--color-bg-hover);
+  color: var(--color-text-light);
   text-decoration: none;
 }
 
 .profile-link:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-bg-active);
   transform: scale(1.1);
 }
 
 .logout-btn {
-  background: rgba(231, 76, 60, 0.2);
-  color: #e74c3c;
+  background: var(--color-bg-hover);
+  color: var(--color-error, --color-text-light);
 }
 
 .logout-btn:hover {
-  background: rgba(231, 76, 60, 0.3);
+  background: var(--color-bg-active);
   transform: scale(1.1);
 }
 
@@ -391,6 +712,7 @@ body {
 .main-content {
   flex: 1;
   padding: 30px 0;
+  background-color: var(--color-bg-main);
 }
 
 .main-content.with-nav {
@@ -404,13 +726,13 @@ body {
   gap: 10px;
   margin-bottom: 25px;
   padding: 12px 20px;
-  background: white;
+  background: var(--color-bg-card);
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--box-shadow);
 }
 
 .breadcrumb-item {
-  color: #3498db;
+  color: var(--color-primary);
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -421,11 +743,11 @@ body {
 }
 
 .breadcrumb-separator {
-  color: #95a5a6;
+  color: var(--color-text-muted);
 }
 
 .breadcrumb-current {
-  color: #2c3e50;
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
@@ -436,20 +758,20 @@ body {
 
 .page-title {
   font-size: 2.2rem;
-  color: #2c3e50;
+  color: var(--color-text-primary);
   margin-bottom: 10px;
   font-weight: 700;
 }
 
 .page-subtitle {
-  color: #7f8c8d;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
 }
 
 /* Футер */
 .app-footer {
-  background: #2c3e50;
-  color: #ecf0f1;
+  background: var(--color-bg-footer);
+  color: var(--color-text-light);
   padding: 30px 0;
   margin-top: 50px;
 }
@@ -472,11 +794,11 @@ body {
   gap: 10px;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #3498db;
+  color: var(--color-primary);
 }
 
 .footer-description {
-  color: #bdc3c7;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   max-width: 400px;
 }
@@ -486,14 +808,25 @@ body {
 }
 
 .footer-version {
-  color: #95a5a6;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
   margin-bottom: 5px;
 }
 
 .footer-copyright {
-  color: #7f8c8d;
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
+}
+
+/* Оверлей для закрытия выпадающего меню */
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  background: transparent;
 }
 
 /* Анимации */
@@ -523,12 +856,36 @@ body {
     display: none; /* Скрываем ссылки на мобильных */
   }
 
+  .theme-switcher {
+    margin-right: 10px;
+  }
+
+  .theme-toggle-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  .theme-dropdown {
+    width: 250px;
+    right: -10px;
+  }
+
   .user-profile {
     padding: 6px 12px;
   }
 
   .user-info {
     display: none; /* Скрываем информацию о пользователе на мобильных */
+  }
+
+  .user-actions {
+    gap: 8px;
+  }
+
+  .profile-link, .logout-btn {
+    width: 32px;
+    height: 32px;
   }
 
   .footer-content {
@@ -541,4 +898,87 @@ body {
     text-align: center;
   }
 }
+
+/* === ВАЖНОЕ ДОПОЛНЕНИЕ: Применение классов тем === */
+/* Когда html получает класс темы, переопределяем переменные */
+
+html.theme-light {
+  --color-bg-main: #f8f9fa;
+  --color-text-primary: #2c3e50;
+  --color-text-secondary: #7f8c8d;
+  --color-text-light: #ffffff;
+  --color-text-muted: #95a5a6;
+  --color-primary: #3498db;
+  --color-bg-card: #ffffff;
+  --color-bg-header: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  --color-bg-footer: #2c3e50;
+  --color-border: #e1e8ed;
+  --color-bg-hover: rgba(52, 152, 219, 0.1);
+  --color-bg-active: rgba(52, 152, 219, 0.2);
+  --gradient-primary: linear-gradient(135deg, #3498db 0%, #7fbbe3 100%);
+}
+
+html.theme-dark {
+  --color-bg-main: #1a1a2e;
+  --color-bg-card: #16213e;
+  --color-bg-header: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+  --color-bg-footer: #0f3460;
+  --color-text-primary: #e6e6e6;
+  --color-text-secondary: #b0b0b0;
+  --color-text-light: #ffffff;
+  --color-text-muted: #888888;
+  --color-primary: #3498db;
+  --color-border: #2a2a3e;
+  --color-bg-hover: rgba(52, 152, 219, 0.15);
+  --color-bg-active: rgba(52, 152, 219, 0.25);
+  --gradient-primary: linear-gradient(120deg, #3498db 0%, #2ecc71 100%);
+}
+
+html.theme-ultra-dark {
+  --color-bg-main: #0d0d0d;
+  --color-bg-card: #1a1a1a;
+  --color-bg-header: linear-gradient(135deg, #2e0f7d 0%, #0d0d0d 100%);
+  --color-bg-footer: #2e0f7d;
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #cccccc;
+  --color-text-light: #ffffff;
+  --color-text-muted: #888888;
+  --color-primary: #9b59b6;
+  --color-border: #333333;
+  --color-bg-hover: rgba(155, 89, 182, 0.15);
+  --color-bg-active: rgba(155, 89, 182, 0.25);
+  --gradient-primary: linear-gradient(0deg, #9b59b6 0%, #2e0f7d 100%);
+}
+
+html.theme-eco {
+  --color-bg-main: #f0f8ff;
+  --color-bg-card: #ffffff;
+  --color-bg-header: linear-gradient(135deg, #27ae60 0%, #16a085 100%);
+  --color-bg-footer: #16a085;
+  --color-text-primary: #1a535c;
+  --color-text-secondary: #4a4a4a;
+  --color-text-light: #ffffff;
+  --color-text-muted: #1a535c;
+  --color-primary: #62d17e;
+  --color-border: #d1ecf1;
+  --color-bg-hover: rgba(39, 174, 96, 0.1);
+  --color-bg-active: rgba(39, 174, 96, 0.2);
+  --gradient-primary: linear-gradient(180deg, #4ea655  5%, #84d18a 50%);
+}
+
+/* Гарантируем, что body наследует фон от html */
+html[class*="theme-"] {
+  background-color: var(--color-bg-main);
+}
+
+html[class*="theme-"] body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+}
+
+html[class*="theme-"] #app {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+}
 </style>
+

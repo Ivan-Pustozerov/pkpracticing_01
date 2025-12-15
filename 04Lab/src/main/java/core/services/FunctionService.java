@@ -1,6 +1,8 @@
 package core.services;
 
 
+import core.DTO.FunctionRangeRequest;
+import core.DTO.PointDTO;
 import core.DTO.response.*;
 import core.DTO.request.*;
 import core.entity.MathFunctionsEntity;
@@ -16,6 +18,10 @@ import org.springframework.transaction.annotation.*;
 import core.entity.*;
 import org.springframework.stereotype.Component;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +33,8 @@ public class FunctionService {
     private final TabulatedFunctionsRepository tabulatedRepo;
     private final UserRepository userRepo;
     private final FunctionMapper functionMapper;
+
+    private final ExpressionEvaluator expressionEvaluator;
 
     @Transactional
     public AnalyticFunctionResponse createAnalytic(AnalyticFunctionRequest request, Long userId) {
@@ -134,4 +142,67 @@ public class FunctionService {
 
         return functionMapper.toBaseResponse(entity);
     }
+    @Transactional
+    public List<PointDTO> calculateAnalyticPoints(Long functionId, FunctionRangeRequest range) {
+        AnalyticFunctionsEntity function = analyticRepo.findById(functionId)
+                .orElseThrow(() -> new RuntimeException("Аналитическая функция не найдена"));
+
+        // Проверяем валидность выражения
+        if (!expressionEvaluator.isValidExpression(function.getFunctionExpression())) {
+            throw new RuntimeException("Некорректное выражение функции: " + function.getFunctionExpression());
+        }
+
+        // Вычисляем точки в диапазоне
+        return expressionEvaluator.evaluateRange(
+                function.getFunctionExpression(),
+                range.getFrom(),
+                range.getTo(),
+                range.getStep()
+        );
+    }
+    @Transactional
+    public List<PointDTO> calculateTabulatedPoints(Long functionId, FunctionRangeRequest range) {
+        TabulatedFunctionsEntity entity = tabulatedRepo.findById(functionId)
+                .orElseThrow(() -> new RuntimeException("Табличная функция не найдена"));
+
+        // Получаем массивы из entity
+        Double[] xArray = entity.getXVals();
+        Double[] yArray = entity.getYVals();
+
+        // Проверяем, что массивы одинаковой длины
+        if (xArray.length != yArray.length) {
+            throw new RuntimeException(
+                    String.format("Некорректные данные: xVals(%d) и yVals(%d) разной длины",
+                            xArray.length, yArray.length)
+            );
+        }
+
+        // Фильтруем точки по диапазону
+        List<PointDTO> filteredPoints = new ArrayList<>();
+
+        for (int i = 0; i < xArray.length; i++) {
+            double currentX = xArray[i];
+            double currentY = yArray[i];
+
+            // Проверяем, попадает ли точка в запрошенный диапазон
+            if (currentX >= range.getFrom() && currentX <= range.getTo()) {
+                filteredPoints.add(new PointDTO(currentX, currentY));
+            }
+        }
+
+        // Проверяем, что нашлись точки
+        if (filteredPoints.isEmpty()) {
+            throw new RuntimeException(
+                    String.format("В диапазоне [%.2f, %.2f] не найдено точек",
+                            range.getFrom(), range.getTo())
+            );
+        }
+
+        // Сортируем по X (на всякий случай)
+        filteredPoints.sort(Comparator.comparing(PointDTO::getX));
+
+        return filteredPoints;
+    }
+
+
 }

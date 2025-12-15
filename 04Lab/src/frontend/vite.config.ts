@@ -1,35 +1,35 @@
+// vite.config.ts
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { fileURLToPath, URL } from 'node:url'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-/**
- * Конфигурация Vite для разработки и сборки
- * Для разработки: проксирует API запросы к Spring (localhost:8080)
- * Для продакшена: собирает в папку static Spring проекта
- */
+// Для ES модулей
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+
+  // ⚠️ ДОБАВЬТЕ ЭТО ⚠️
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': path.resolve(__dirname, 'src')
     }
   },
+
   server: {
-    port: 3000,  // Порт разработки фронтенда
-    open: true,   // Автоматически открывать браузер
+    port: 3000,
+    host: 'localhost',
+    open: false,
+
+    // Прокси (оставьте если нужно)
     proxy: {
-      '/api': {
-        target: 'http://localhost:8080',  // Ваш Spring бэкенд
+      '^/api': {
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path // Проксируем как есть
+        secure: false
       }
     }
-  },
-  build: {
-    outDir: 'dist',  // По умолчанию для разработки
-    // Для продакшена раскомментируйте:
-    // outDir: '../src/main/resources/static',
-    // emptyOutDir: true
   }
 })

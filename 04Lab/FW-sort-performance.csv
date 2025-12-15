@@ -1,10 +1,10 @@
 Метод,Среднее_время_мс,Общее_время_мс
- SingleSearch: MathFunction by Name,36.22,3622.00
- Repository: existsByName,32.83,3283.00
- Repository: MathFunction existsByName,37.39,3739.00
- MultiSearch: All Admins,41.30,413.00
- SortSearch: Users Sorted by Name DESC,51.80,259.00
- SingleSearch: User by Name,33.01,3301.00
- SortSearch: Users Sorted by Name ASC,54.60,273.00
- MultiSearch: Functions by Owner ID,61.50,615.00
- MultiSearch: All Users,46.00,460.00
+ SingleSearch: MathFunction by Name,34.29,3429.00
+ Repository: existsByName,34.56,3456.00
+ Repository: MathFunction existsByName,35.09,3509.00
+ MultiSearch: All Admins,42.60,426.00
+ SortSearch: Users Sorted by Name DESC,52.40,262.00
+ SingleSearch: User by Name,34.37,3437.00
+ SortSearch: Users Sorted by Name ASC,51.40,257.00
+ MultiSearch: Functions by Owner ID,62.30,623.00
+ MultiSearch: All Users,47.30,473.00

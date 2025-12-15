@@ -1,4 +1,6 @@
 package core.controllers;
+import core.DTO.FunctionRangeRequest;
+import core.DTO.PointDTO;
 import core.DTO.request.AnalyticFunctionRequest;
 import core.DTO.request.TabulatedFunctionRequest;
 import core.DTO.response.AnalyticFunctionResponse;
@@ -7,11 +9,13 @@ import core.DTO.response.TabulatedFunctionResponse;
 import core.services.FunctionService;
 import core.util.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -105,6 +109,31 @@ public class FunctionController {
         Long userId = securityUtils.getCurrentUserId();
         functionService.deleteFunction(id, userId);
     }
+    @PostMapping("/{id}/calculate")
+    @PreAuthorize("isAuthenticated()")
+    public List<PointDTO> calculateFunction(
+            @PathVariable Long id,
+            @Valid @RequestBody FunctionRangeRequest range) {
 
+        // Валидация запроса
+        range.validate();
+
+        Long userId = securityUtils.getCurrentUserId();
+        MathFunctionResponse info = functionService.getFunctionInfo(id, userId);
+
+        // Проверяем, что функция принадлежит пользователю
+        if (!info.getOwnerId().equals(userId)) {
+            throw new RuntimeException("Доступ запрещен");
+        }
+
+        // Выбираем соответствующий метод в зависимости от типа функции
+        if ("analytic".equals(info.getType())) {
+            return functionService.calculateAnalyticPoints(id, range);
+        } else if ("tabulated".equals(info.getType())) {
+            return functionService.calculateTabulatedPoints(id, range);
+        } else {
+            throw new RuntimeException("Неизвестный тип функции: " + info.getType());
+        }
+    }
 
 }
