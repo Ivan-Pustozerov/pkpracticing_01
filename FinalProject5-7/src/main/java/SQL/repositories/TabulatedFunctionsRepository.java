@@ -3,6 +3,7 @@ package SQL.repositories;
 import SQL.DTO.FromBD.TabulatedFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
+import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class TabulatedFunctionsRepository extends Repository {
     }
 
     public int updateTabulatedFunctionIndex(Connection connect, long func_id, int index, double y_val)
-            throws SQLRepositoryException{
+            throws SQLRepositoryException {
         return executeUpdate(connect, TabulatedUpdateIndex, ps -> {
                                                                 ps.setInt(1, index);
                                                                 ps.setDouble(2, y_val);

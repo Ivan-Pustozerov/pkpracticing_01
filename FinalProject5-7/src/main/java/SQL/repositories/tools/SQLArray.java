@@ -1,7 +1,5 @@
 package SQL.repositories.tools;
 
-import SQL.repositories.SQLRepositoryException;
-
 import java.sql.Array;
 import java.sql.SQLException;
 

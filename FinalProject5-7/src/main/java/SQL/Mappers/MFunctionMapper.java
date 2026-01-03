@@ -4,7 +4,7 @@ import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.DTO.FunctionData;
 import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
 import SQL.repositories.AnalyticFunctionsRepository;
-import SQL.repositories.SQLRepositoryException;
+import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MathFunctionMapperDTO {
+public class MFunctionMapper {
     public static ArrayList<MathFunctionToClientAdminDTO> translateToClientDTO(ArrayList<MathFunctionFromBdDTO> BDdto,
                                                                                SmartConnection connection,
                                                                                AnalyticFunctionsRepository Analytic,
@@ -49,29 +49,6 @@ public class MathFunctionMapperDTO {
             }
         }
         return result;
-    }
-
-    public static ArrayList<MathFunctionToClientAdminDTO> whoIsMissing(long[] idRequest,
-                                                                       ArrayList<MathFunctionToClientAdminDTO> serverResponse){
-
-        int missing_size = idRequest.length - serverResponse.size();
-        if(missing_size == 0) return serverResponse;
-
-        Long[] found = new Long[serverResponse.size()];
-
-        int i=0;
-        for(var elem : serverResponse){
-            found[i++] = elem.owner_id();
-        }
-        Set<Long> foundId = new HashSet<>(Arrays.asList(found));
-
-
-        for(Long id : idRequest){
-            if(!foundId.contains(id)){
-                serverResponse.add(new MathFunctionToClientAdminDTO(null,null,null,null,id));
-            }
-        }
-        return serverResponse;
     }
 
 }

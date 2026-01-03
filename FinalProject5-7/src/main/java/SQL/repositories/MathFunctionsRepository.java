@@ -4,6 +4,7 @@ import SQL.DTO.IdDTO;
 import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
+import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,7 +64,7 @@ public class MathFunctionsRepository extends Repository {
     }
 
     public int updateMFunc(Connection connect,long owner_id, long id, String new_name)
-            throws SQLRepositoryException{
+            throws SQLRepositoryException {
         return executeUpdate(connect, MFuncUpdate, ps ->{
                                                                     ps.setString(1, new_name);
                                                                     ps.setLong(2, id);

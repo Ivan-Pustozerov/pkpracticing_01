@@ -3,6 +3,7 @@ package SQL.repositories;
 import SQL.DTO.FromBD.AnalyticFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
+import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
 import java.util.ArrayList;

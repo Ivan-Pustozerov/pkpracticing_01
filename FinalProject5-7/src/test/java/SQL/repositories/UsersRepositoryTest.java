@@ -2,6 +2,7 @@ package SQL.repositories;
 
 import SQL.DTO.IdDTO;
 import SQL.DTO.FromBD.MathFunctionFromBdDTO;
+import SQL.repositories.tools.SQLRepositoryException;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;

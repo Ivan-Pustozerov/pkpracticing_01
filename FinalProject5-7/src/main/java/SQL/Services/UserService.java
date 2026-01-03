@@ -3,19 +3,24 @@ package SQL.Services;
 import SQL.DTO.IdDTO;
 import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
 import SQL.DTO.ToClient.UserToClientAdminDTO;
-import SQL.DTO.FromBD.UserFromBdDTO;
-import SQL.Mappers.MathFunctionMapperDTO;
+import SQL.Mappers.MFunctionMapper;
+
+import SQL.Mappers.UserMapper;
 import SQL.repositories.AnalyticFunctionsRepository;
-import SQL.repositories.SQLRepositoryException;
+import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.UsersRepository;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
 
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.util.ArrayList;
+
+import static SQL.Mappers.UserMapper.translateToClientDTO;
 
 public class UserService {
 
@@ -30,16 +35,7 @@ public class UserService {
         connection = new SmartConnection(url, username, password);
     }
 
-    public static ArrayList<UserToClientAdminDTO> translateToClientDTO(ArrayList<UserFromBdDTO> BDdto){
-        ArrayList<UserToClientAdminDTO> result = new ArrayList<>();
-        for (UserFromBdDTO userDTO : BDdto) {
-            boolean is_admin = userDTO.is_admin();
-            String name = userDTO.name();
-            String email = userDTO.email();
-            //result.add(new UserToClientAdminDTO(is_admin, name, email));
-        }
-        return result;
-    }
+
     private static byte[] passwordHash(String password){
         //одностороннее хеширование
         try {
@@ -99,18 +95,34 @@ public class UserService {
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(long[] id)
             throws SmartConnectionException, SQLRepositoryException {
 
-        var BDdto = Users.readUserFunctions(connection.getConnection(), id, null);
-        var result = MathFunctionMapperDTO.translateToClientDTO(BDdto,connection, AnalyticRepo, TabulatedRepo);
-        return MathFunctionMapperDTO.whoIsMissing(id, result);
+        if(!checkUsersExist(id)) throw new ServiceArgumentsException("Not Every User Is Available");
+        var BDdto = Users.readUserFunctions(connection.getConnection(), id, null) ;
+
+        return MFunctionMapper.translateToClientDTO(BDdto,connection, AnalyticRepo, TabulatedRepo);
     }
-/*
+
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(String[] name)
             throws SmartConnectionException, SQLRepositoryException {
 
+        if(!checkUsersExist(name)) throw new ServiceArgumentsException("Not Every User Is Available");
         var BDdto = Users.readUserFunctions(connection.getConnection(), null, name);
-        //return FunctionService.translateToClientDTO(BDdto,connection,
-                new AnalyticFunctionsRepository(),new TabulatedFunctionsRepository());
-    }*/
+
+        return MFunctionMapper.translateToClientDTO(BDdto,connection,AnalyticRepo, TabulatedRepo);
+    }
+
+    public ArrayList<UserToClientAdminDTO> getAllUsers(String sortField, String sortOrder)
+            throws SmartConnectionException, SQLRepositoryException {
+
+        var BDdto = Users.readAllUsers(connection.getConnection(), sortField, sortOrder);
+        return UserMapper.translateToClientDTO(BDdto);
+    }
+
+    public ArrayList<UserToClientAdminDTO> getAllUsersByRole(boolean is_admin)
+            throws SmartConnectionException, SQLRepositoryException {
+
+       var BDdto = Users.readUserByRole(connection.getConnection(), is_admin);
+       return UserMapper.translateToClientDTO(BDdto);
+    }
 
 ///=======================================UPDATE=========================================
 

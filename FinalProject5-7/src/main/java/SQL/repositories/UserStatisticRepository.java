@@ -2,6 +2,7 @@ package SQL.repositories;
 
 import SQL.DTO.ToClient.StatisticToClientDTO;
 import SQL.repositories.tools.Repository;
+import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
 import java.sql.Time;

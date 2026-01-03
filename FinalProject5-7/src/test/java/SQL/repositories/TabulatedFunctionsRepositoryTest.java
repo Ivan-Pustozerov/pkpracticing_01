@@ -1,5 +1,6 @@
 package SQL.repositories;
 
+import SQL.repositories.tools.SQLRepositoryException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;

@@ -11,6 +11,7 @@ import SQL.DTO.FromBD.UserFromBdDTO;
 import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
+import SQL.repositories.tools.SQLRepositoryException;
 
 
 public class UsersRepository extends Repository {
@@ -102,7 +103,7 @@ public class UsersRepository extends Repository {
 
     /// ID указываются, начиная с 1
     public ArrayList<UserFromBdDTO> readUserInfo(Connection connect, long[] id, String[] names, String sortField, String sortOrder)
-            throws SQLRepositoryException{
+            throws SQLRepositoryException {
 
         try(SQLArray idArray = toLongSQLArray(connect, id);
             SQLArray nameArray = toStringSQLArray(connect, names)) {
