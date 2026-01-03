@@ -89,21 +89,7 @@ public class Repository {
             }
         }
 
-    /*
-    protected static String readCommand(String filepath){
-        StringBuffer res = new StringBuffer();
-        String line;
-        try(BufferedReader reader = new BufferedReader(new FileReader(filepath))){
-            while((line = reader.readLine()) != null){
-                res.append(line);
-            }
-            return res.toString();
 
-        }catch (IOException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException("Command Error");
-        }
-    }*/
 
 
     protected static double[] toDoubleBaseArray(java.sql.Array array) throws SQLRepositoryException{

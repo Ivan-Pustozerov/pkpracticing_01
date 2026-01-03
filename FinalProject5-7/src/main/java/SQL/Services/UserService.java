@@ -36,7 +36,7 @@ public class UserService {
             boolean is_admin = userDTO.is_admin();
             String name = userDTO.name();
             String email = userDTO.email();
-            result.add(new UserToClientAdminDTO(is_admin, name, email));
+            //result.add(new UserToClientAdminDTO(is_admin, name, email));
         }
         return result;
     }
@@ -103,14 +103,14 @@ public class UserService {
         var result = MathFunctionMapperDTO.translateToClientDTO(BDdto,connection, AnalyticRepo, TabulatedRepo);
         return MathFunctionMapperDTO.whoIsMissing(id, result);
     }
-
+/*
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(String[] name)
             throws SmartConnectionException, SQLRepositoryException {
 
         var BDdto = Users.readUserFunctions(connection.getConnection(), null, name);
-        return FunctionService.translateToClientDTO(BDdto,connection,
+        //return FunctionService.translateToClientDTO(BDdto,connection,
                 new AnalyticFunctionsRepository(),new TabulatedFunctionsRepository());
-    }
+    }*/
 
 ///=======================================UPDATE=========================================
 

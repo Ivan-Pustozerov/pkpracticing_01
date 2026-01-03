@@ -1,0 +1,1 @@
+INSERT INTO UserStatistic (id) SELECT id FROM Users WHERE name = ?;

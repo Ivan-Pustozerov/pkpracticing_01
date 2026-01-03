@@ -1,0 +1,1 @@
+SELECT * FROM Errors WHERE code = ?;

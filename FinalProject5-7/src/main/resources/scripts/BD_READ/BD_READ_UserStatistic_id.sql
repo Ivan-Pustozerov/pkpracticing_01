@@ -1,0 +1,1 @@
+SELECT * FROM UserStatistic WHERE id = ?;
