@@ -1,0 +1,1 @@
+INSERT INTO Errors (code, type) VALUES (?, ?);
