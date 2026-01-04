@@ -21,6 +21,7 @@ public class UserStatisticRepository extends Repository {
     private final String StatUpdateAllTimeName;
     private final String StatUpdateAllTimeID;
     private final String StatUpdateFuncs;
+    private final String StatUpdateFuncsID;
 
     {
         StatInit = readCommand(dir + "BD_INIT/BD_INIT_UserStatistic.sql");
@@ -32,6 +33,7 @@ public class UserStatisticRepository extends Repository {
         StatUpdateAllTimeID = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_all_time_ID.sql");
         StatUpdateAllTimeName = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_all_time_Name.sql");
         StatUpdateFuncs = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_func_count.sql");
+        StatUpdateFuncsID = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_func_count_ID.sql");
     }
 
     public int initTable(Connection connect)
@@ -101,6 +103,14 @@ public class UserStatisticRepository extends Repository {
         return executeUpdate(connect, StatUpdateFuncs, ps -> {
             ps.setString(1, name);
             ps.setString(2, name);
+        });
+    }
+
+    public int updateStatFuncID(Connection connect, long id)
+            throws SQLRepositoryException {
+        return executeUpdate(connect, StatUpdateFuncsID, ps -> {
+            ps.setLong(1, id);
+            ps.setLong(2, id);
         });
     }
 }

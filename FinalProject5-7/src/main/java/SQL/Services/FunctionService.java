@@ -2,10 +2,7 @@ package SQL.Services;
 
 import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
 import SQL.Mappers.MFunctionMapper;
-import SQL.repositories.AnalyticFunctionsRepository;
-import SQL.repositories.MathFunctionsRepository;
-import SQL.repositories.TabulatedFunctionsRepository;
-import SQL.repositories.UsersRepository;
+import SQL.repositories.*;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
@@ -24,6 +21,7 @@ public class FunctionService {
     private final MathFunctionsRepository MathRepo = new MathFunctionsRepository();
     private final AnalyticFunctionsRepository AnalyticRepo = new AnalyticFunctionsRepository();
     private final TabulatedFunctionsRepository TabulatedRepo = new TabulatedFunctionsRepository();
+    private final UserStatisticRepository StatRepo = new UserStatisticRepository();
     private final UsersRepository UserRepo = new UsersRepository();
 
     private TabulatedFunctionFactory factory;
@@ -58,6 +56,8 @@ public class FunctionService {
             throw new ServiceArgumentsException("Owner with id " + owner_id + " does not exist");
 
         long mfId = MathRepo.insertMFunc(connection.getConnection(), "analytic", name, owner_id).get(0).id();
+
+        StatRepo.updateStatFuncID(connection.getConnection(),owner_id);
         return AnalyticRepo.insertAnalyticFunction(connection.getConnection(), mfId, function_expression);
     }
 
@@ -68,6 +68,8 @@ public class FunctionService {
             throw new ServiceArgumentsException("Owner with name " + owner_name + " does not exist");
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name},"-").get(0).id();
+
+        StatRepo.updateStatFunc(connection.getConnection(),owner_name);
         return addAnalyticMFunction(function_expression, name, userId);
     }
 
@@ -86,6 +88,8 @@ public class FunctionService {
         }
 
         long mfId = MathRepo.insertMFunc(connection.getConnection(), "tabulated", name, owner_id).get(0).id();
+
+        StatRepo.updateStatFuncID(connection.getConnection(),owner_id);
         return TabulatedRepo.insertTabulatedFunction(connection.getConnection(), mfId, xVals, yVals);
     }
 
@@ -103,6 +107,8 @@ public class FunctionService {
         }
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name}, "-").get(0).id();
+
+        StatRepo.updateStatFunc(connection.getConnection(),owner_name);
         return addTabulatedMFunction(xVals, yVals, name, userId);
     }
 
@@ -288,7 +294,10 @@ public class FunctionService {
         if(!checkMFunctionBelongs(owner_id, id))
             throw new ServiceArgumentsException("Function with id " + id + " does not belong to user with id " + owner_id);
 
-        return MathRepo.removeMFunc(connection.getConnection(), owner_id, id);
+
+        int res = MathRepo.removeMFunc(connection.getConnection(), owner_id, id);
+        StatRepo.updateStatFuncID(connection.getConnection(),owner_id);
+        return res;
     }
 
     public int removeMFunction(String owner_name, long id)
@@ -302,7 +311,9 @@ public class FunctionService {
         if(!checkMFunctionBelongs(userId, id))
             throw new ServiceArgumentsException("Function with id " + id + " does not belong to user with name " + owner_name);
 
-        return removeMFunction(userId, id);
+        int res = removeMFunction(userId, id);
+        StatRepo.updateStatFunc(connection.getConnection(),owner_name);
+        return res;
     }
 
     /// ========================================CHECK============================================

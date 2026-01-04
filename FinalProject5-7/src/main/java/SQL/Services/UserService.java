@@ -7,6 +7,7 @@ import SQL.Mappers.MFunctionMapper;
 
 import SQL.Mappers.UserMapper;
 import SQL.repositories.AnalyticFunctionsRepository;
+import SQL.repositories.UserStatisticRepository;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.UsersRepository;
@@ -20,7 +21,11 @@ import functions.factory.TabulatedFunctionFactory;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static SQL.Mappers.UserMapper.translateToClientDTO;
 
@@ -30,8 +35,9 @@ public class UserService {
     private final UsersRepository Users = new UsersRepository();
     private final AnalyticFunctionsRepository AnalyticRepo = new AnalyticFunctionsRepository();
     private final TabulatedFunctionsRepository TabulatedRepo = new TabulatedFunctionsRepository();
+    private final UserStatisticRepository StatRepo = new UserStatisticRepository();
     private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
-
+    private HashMap<Long, LocalDateTime> UsersOnline;
 
     public UserService(String url, String username, String password)
             throws SmartConnectionException {
@@ -68,6 +74,8 @@ public class UserService {
         if(checkUsersExist(new String[]{name})) throw new ServiceArgumentsException("User: " + name + " already exists");
 
         byte[] pswd = passwordHash(password);
+
+        StatRepo.insertStat(connection.getConnection(), name);
         return Users.insertUser(connection.getConnection(), isAdmin, name, email, pswd);
 
     }
@@ -213,6 +221,8 @@ public class UserService {
 
         if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd))
             throw new ServiceArgumentsException("Incorrect Auth");
+
+        UsersOnline.put(id, LocalDateTime.now());
     }
     public void UserAuth(String name, String password)
             throws SmartConnectionException, SQLRepositoryException {
@@ -225,5 +235,18 @@ public class UserService {
 
         if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd))
             throw new ServiceArgumentsException("Incorrect Auth");
+
+        var id = Users.readUserId(connection.getConnection(), new String[]{name},"-").get(0).id();
+        UsersOnline.put(id, LocalDateTime.now());
+    }
+
+    public void userUnlog(long id)
+            throws SmartConnectionException, SQLRepositoryException {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime userIn = UsersOnline.remove(id);
+
+        Duration durationOnline = Duration.between(userIn,now);
+        StatRepo.updateStatAllTimeById(connection.getConnection(),id,durationOnline);
     }
 }
