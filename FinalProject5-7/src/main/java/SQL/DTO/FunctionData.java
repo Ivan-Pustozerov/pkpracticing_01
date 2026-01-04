@@ -1,3 +1,8 @@
 package SQL.DTO;
 
-public record FunctionData(String function_expression, double[] xVals, double[] yVals){}
+import functions.classes.AnalyticFunction;
+import functions.interfaces.TabulatedFunction;
+
+public record FunctionData
+        (TabulatedFunction tabData, AnalyticFunction analyticData)
+        implements  DTO{}

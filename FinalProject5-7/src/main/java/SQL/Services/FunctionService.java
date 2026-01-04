@@ -9,6 +9,11 @@ import SQL.repositories.UsersRepository;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
+import exceptions.ArrayIsNotSortedException;
+import exceptions.DifferentLengthOfArraysException;
+import functions.factory.ArrayTabulatedFunctionFactory;
+import functions.factory.LinkedListTabulatedFunctionFactory;
+import functions.factory.TabulatedFunctionFactory;
 
 import java.util.ArrayList;
 
@@ -21,10 +26,20 @@ public class FunctionService {
     private final TabulatedFunctionsRepository TabulatedRepo = new TabulatedFunctionsRepository();
     private final UsersRepository UserRepo = new UsersRepository();
 
+    private TabulatedFunctionFactory factory;
+
 
     public FunctionService(String url, String username, String password)
             throws SmartConnectionException {
         connection = new SmartConnection(url,username,password);
+        factory = new ArrayTabulatedFunctionFactory();
+    }
+
+    public void setArrayFactory(){
+        factory = new ArrayTabulatedFunctionFactory();
+    }
+    public void setLinkedFactory(){
+        factory = new LinkedListTabulatedFunctionFactory();
     }
 
     /// ========================================CREATE=============================================
@@ -63,11 +78,12 @@ public class FunctionService {
         if(!UserRepo.exists(connection.getConnection(), owner_id, null))
             throw new ServiceArgumentsException("Owner with id " + owner_id + " does not exist");
 
-        if(xVals == null || yVals == null)
-            throw new ServiceArgumentsException("xVals and yVals cannot be null");
-
-        if(xVals.length != yVals.length)
-            throw new ServiceArgumentsException("xVals and yVals must have the same length");
+        try{
+            factory.create(xVals,yVals);
+        }
+        catch(ArrayIsNotSortedException | DifferentLengthOfArraysException Err){
+            throw new ServiceArgumentsException(Err.getMessage());
+        }
 
         long mfId = MathRepo.insertMFunc(connection.getConnection(), "tabulated", name, owner_id).get(0).id();
         return TabulatedRepo.insertTabulatedFunction(connection.getConnection(), mfId, xVals, yVals);
@@ -79,11 +95,12 @@ public class FunctionService {
         if(!UserRepo.exists(connection.getConnection(), null, owner_name))
             throw new ServiceArgumentsException("Owner with name " + owner_name + " does not exist");
 
-        if(xVals == null || yVals == null)
-            throw new ServiceArgumentsException("xVals and yVals cannot be null");
-
-        if(xVals.length != yVals.length)
-            throw new ServiceArgumentsException("xVals and yVals must have the same length");
+        try{
+            factory.create(xVals,yVals);
+        }
+        catch(ArrayIsNotSortedException | DifferentLengthOfArraysException Err){
+            throw new ServiceArgumentsException(Err.getMessage());
+        }
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name}, "-").get(0).id();
         return addTabulatedMFunction(xVals, yVals, name, userId);
@@ -98,7 +115,7 @@ public class FunctionService {
             throw new ServiceArgumentsException("Not Every Function Is Available");
 
         var BDdto = MathRepo.readMFuncInfo(connection.getConnection(), id, sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
     }
 
     public ArrayList<MathFunctionToClientAdminDTO> readMFunctionInfoByOwnerId(long owner_id, String sortField, String sortOrder)
@@ -108,7 +125,7 @@ public class FunctionService {
             throw new ServiceArgumentsException("Owner with id " + owner_id + " does not exist");
 
         var BDdto = MathRepo.readMFuncInfoByOwnerId(connection.getConnection(), owner_id, sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
     }
 
     public ArrayList<MathFunctionToClientAdminDTO> readMFunctionInfoByOwnerName(String owner_name, String sortField, String sortOrder)
@@ -119,13 +136,13 @@ public class FunctionService {
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name}, "-").get(0).id();
         var BDdto = MathRepo.readMFuncInfoByOwnerId(connection.getConnection(), userId, sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
     }
 
     public ArrayList<MathFunctionToClientAdminDTO> readInfoAll(String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
         var BDdto = MathRepo.readMFuncInfoAll(connection.getConnection(), sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
     }
 
     /// ========================================UPDATE=============================================
@@ -163,6 +180,8 @@ public class FunctionService {
         if(!funcType.equals("analytic"))
             throw new ServiceArgumentsException("Function with id " + id + " is not an analytic function");
 
+        /// чеккер на корректность парсера
+
         return AnalyticRepo.updateAnalyticFunction(connection.getConnection(), id, function_expression);
     }
 
@@ -180,6 +199,8 @@ public class FunctionService {
         String funcType = getFunctionType(id);
         if(!funcType.equals("analytic"))
             throw new ServiceArgumentsException("Function with id " + id + " is not an analytic function");
+
+        /// чеккер на корректность парсера
 
         return AnalyticRepo.updateAnalyticFunction(connection.getConnection(), id, function_expression);
     }
@@ -207,11 +228,12 @@ public class FunctionService {
         if(!funcType.equals("tabulated"))
             throw new ServiceArgumentsException("Function with id " + id + " is not a tabulated function");
 
-        if(xVals == null || yVals == null)
-            throw new ServiceArgumentsException("xVals and yVals cannot be null");
-
-        if(xVals.length != yVals.length)
-            throw new ServiceArgumentsException("xVals and yVals must have the same length");
+        try{
+            factory.create(xVals,yVals);
+        }
+        catch(ArrayIsNotSortedException | DifferentLengthOfArraysException Err){
+            throw new ServiceArgumentsException(Err.getMessage());
+        }
 
         return TabulatedRepo.updateTabulatedFunctionFull(connection.getConnection(), id, xVals, yVals);
     }
@@ -249,11 +271,12 @@ public class FunctionService {
         if(!funcType.equals("tabulated"))
             throw new ServiceArgumentsException("Function with id " + id + " is not a tabulated function");
 
-        if(xVals == null || yVals == null)
-            throw new ServiceArgumentsException("xVals and yVals cannot be null");
-
-        if(xVals.length != yVals.length)
-            throw new ServiceArgumentsException("xVals and yVals must have the same length");
+        try{
+            factory.create(xVals,yVals);
+        }
+        catch(ArrayIsNotSortedException | DifferentLengthOfArraysException Err){
+            throw new ServiceArgumentsException(Err.getMessage());
+        }
 
         return TabulatedRepo.updateTabulatedFunctionFull(connection.getConnection(), id, xVals, yVals);
     }

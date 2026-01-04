@@ -12,12 +12,14 @@ import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.UsersRepository;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
+import functions.factory.ArrayTabulatedFunctionFactory;
+import functions.factory.LinkedListTabulatedFunctionFactory;
+import functions.factory.TabulatedFunctionFactory;
 
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.util.ArrayList;
 
 import static SQL.Mappers.UserMapper.translateToClientDTO;
@@ -28,6 +30,7 @@ public class UserService {
     private final UsersRepository Users = new UsersRepository();
     private final AnalyticFunctionsRepository AnalyticRepo = new AnalyticFunctionsRepository();
     private final TabulatedFunctionsRepository TabulatedRepo = new TabulatedFunctionsRepository();
+    private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
 
 
     public UserService(String url, String username, String password)
@@ -35,6 +38,12 @@ public class UserService {
         connection = new SmartConnection(url, username, password);
     }
 
+    public void setArrayFactory(){
+        factory = new ArrayTabulatedFunctionFactory();
+    }
+    public void setLinkedFactory(){
+        factory = new LinkedListTabulatedFunctionFactory();
+    }
 
     private static byte[] passwordHash(String password){
         //одностороннее хеширование
@@ -98,7 +107,7 @@ public class UserService {
         if(!checkUsersExist(id)) throw new ServiceArgumentsException("Not Every User Is Available");
         var BDdto = Users.readUserFunctions(connection.getConnection(), id, null) ;
 
-        return MFunctionMapper.translateToClientDTO(BDdto,connection, AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto,connection, AnalyticRepo, TabulatedRepo, factory);
     }
 
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(String[] name)
@@ -107,7 +116,7 @@ public class UserService {
         if(!checkUsersExist(name)) throw new ServiceArgumentsException("Not Every User Is Available");
         var BDdto = Users.readUserFunctions(connection.getConnection(), null, name);
 
-        return MFunctionMapper.translateToClientDTO(BDdto,connection,AnalyticRepo, TabulatedRepo);
+        return MFunctionMapper.translateToClientDTO(BDdto,connection,AnalyticRepo, TabulatedRepo,  factory);
     }
 
     public ArrayList<UserToClientAdminDTO> getAllUsers(String sortField, String sortOrder)

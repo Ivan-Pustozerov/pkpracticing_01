@@ -8,17 +8,19 @@ import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
+import functions.classes.AnalyticFunction;
+import functions.factory.TabulatedFunctionFactory;
+import functions.interfaces.TabulatedFunction;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Objects;
 
 public class MFunctionMapper {
     public static ArrayList<MathFunctionToClientAdminDTO> translateToClientDTO(ArrayList<MathFunctionFromBdDTO> BDdto,
                                                                                SmartConnection connection,
                                                                                AnalyticFunctionsRepository Analytic,
-                                                                               TabulatedFunctionsRepository Tabulated)
+                                                                               TabulatedFunctionsRepository Tabulated,
+                                                                               TabulatedFunctionFactory factory)
             throws SmartConnectionException, SQLRepositoryException {
 
         ArrayList<MathFunctionToClientAdminDTO> result = new ArrayList<>();
@@ -29,18 +31,24 @@ public class MFunctionMapper {
             String type = serverDTO.type();
             String name = serverDTO.name();
 
-            if (type == "analytic") {
+            if (Objects.equals(type, "analytic")) {
                 var analytic_functions = Analytic.readAnalyticFunctionInfo(connection.getConnection(), new long[]{id});
+
                 String func_expression = analytic_functions.get(0).function_expression();
-                FunctionData data = new FunctionData(func_expression, null, null);
+                AnalyticFunction func = new AnalyticFunction(func_expression);
+
+                FunctionData data = new FunctionData(null, func);
 
                 result.add(new MathFunctionToClientAdminDTO(id, type, name, data, owner_id));
             }
-            else if (type == "tabulated") {
+            else if (Objects.equals(type, "tabulated")) {
                 var tabulated_functions = Tabulated.readTabulatedFunctionInfo(connection.getConnection(), new long[]{id});
+
                 double[] xVals = tabulated_functions.get(0).xVals();
                 double[] yVals = tabulated_functions.get(0).yVals();
-                FunctionData data = new FunctionData(null, xVals, yVals);
+                TabulatedFunction func = factory.create(xVals, yVals);
+
+                FunctionData data = new FunctionData(func, null);
 
                 result.add(new MathFunctionToClientAdminDTO(id, type, name, data, owner_id));
             }

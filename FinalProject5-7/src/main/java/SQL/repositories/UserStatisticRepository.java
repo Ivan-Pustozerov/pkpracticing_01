@@ -6,6 +6,7 @@ import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -17,6 +18,8 @@ public class UserStatisticRepository extends Repository {
     private final String StatReadName;
     private final String StatUpdateTimeID;
     private final String StatUpdateTimeName;
+    private final String StatUpdateAllTimeName;
+    private final String StatUpdateAllTimeID;
     private final String StatUpdateFuncs;
 
     {
@@ -26,6 +29,8 @@ public class UserStatisticRepository extends Repository {
         StatReadName = readCommand(dir + "BD_READ/BD_READ_UserStatistic_name.sql");
         StatUpdateTimeID = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_avrg_time_day_ID.sql");
         StatUpdateTimeName = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_avrg_time_day_Name.sql");
+        StatUpdateAllTimeID = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_all_time_ID.sql");
+        StatUpdateAllTimeName = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_all_time_Name.sql");
         StatUpdateFuncs = readCommand(dir + "BD_UPDATE/BD_UPDATE_UserStatistic_func_count.sql");
     }
 
@@ -63,18 +68,32 @@ public class UserStatisticRepository extends Repository {
                 });
     }
 
-    public int updateStatTimeById(Connection connect, long id, LocalTime avrg_time_day)
+    public int updateStatAvrgTimeById(Connection connect, long id, LocalTime avrg_time_day)
             throws SQLRepositoryException {
         return executeUpdate(connect, StatUpdateTimeID, ps -> {
             ps.setTime(1, Time.valueOf(avrg_time_day));
             ps.setLong(2,id);});
     }
 
-    public int updateStatTimeByName(Connection connect, String username, LocalTime avrg_time_day)
+    public int updateStatAvrgTimeByName(Connection connect, String username, LocalTime avrg_time_day)
             throws SQLRepositoryException {
         return executeUpdate(connect, StatUpdateTimeName, ps -> {
             ps.setTime(1, Time.valueOf(avrg_time_day));
             ps.setString(2,username);});
+    }
+
+    public int updateStatAllTimeById(Connection connect, long id, Duration add_time)
+            throws SQLRepositoryException {
+        return executeUpdate(connect, StatUpdateAllTimeID, ps -> {
+            ps.setString(1, add_time.toString());
+            ps.setLong(2,id);});
+    }
+
+    public int updateStatAllTimeByName(Connection connect, String name, Duration add_time)
+            throws SQLRepositoryException {
+        return executeUpdate(connect, StatUpdateAllTimeName, ps -> {
+            ps.setString(1, add_time.toString());
+            ps.setString(2,name);});
     }
 
     public int updateStatFunc(Connection connect, String name)
