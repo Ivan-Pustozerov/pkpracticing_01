@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/functions/*")
+@WebServlet("/functions/*")
 public class FunctionServlet extends HttpServlet {
     private UserService userService;
     private FunctionService functionService;

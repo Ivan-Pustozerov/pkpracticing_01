@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/users/*")
+@WebServlet("/users/*")
 public class UserServlet extends HttpServlet {
     private UserService userService;
     private ObjectMapper objectMapper;

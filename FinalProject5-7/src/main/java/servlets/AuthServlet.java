@@ -6,14 +6,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import SQL.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet("/api/auth/*")
+@WebServlet("/auth/*")
 public class AuthServlet extends HttpServlet {
     private UserService userService;
     private ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(UserServlet.class);
 
     @Override
     public void init() {
@@ -46,6 +49,9 @@ public class AuthServlet extends HttpServlet {
 
     private void handleRegister(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
+
+        logger.info("UserServlet accessed with URI");
+
         // TODO: Implementation for user registration
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
@@ -55,6 +61,9 @@ public class AuthServlet extends HttpServlet {
 
     private void handleLogin(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
+
+        logger.info("UserServlet accessed with URI");
+
         // TODO: Implementation for user login
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
