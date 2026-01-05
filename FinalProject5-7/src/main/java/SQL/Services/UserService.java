@@ -25,6 +25,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
+import utils.JwtTokenProvider;
 import java.util.HashMap;
 
 import static SQL.Mappers.UserMapper.translateToClientDTO;
@@ -38,6 +40,7 @@ public class UserService {
     private final UserStatisticRepository StatRepo = new UserStatisticRepository();
     private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
     private HashMap<Long, LocalDateTime> UsersOnline;
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
 
     public UserService(String url, String username, String password)
             throws SmartConnectionException {
@@ -248,5 +251,61 @@ public class UserService {
 
         Duration durationOnline = Duration.between(userIn,now);
         StatRepo.updateStatAllTimeById(connection.getConnection(),id,durationOnline);
+    }
+    
+    // JWT Authentication Methods
+    public String authenticateUser(String name, String password) 
+            throws SmartConnectionException, SQLRepositoryException {
+        if(!checkUsersExist(new String[]{name})) {
+            throw new ServiceException("Incorrect Auth");
+        }
+
+        byte[] pswrd = passwordHash(password);
+        var UserDto = Users.readUserInfo(connection.getConnection(), null, new String[]{name},"-","-").get(0);
+
+        if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd)) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        var id = Users.readUserId(connection.getConnection(), new String[]{name},"-").get(0).id();
+        UsersOnline.put(id, LocalDateTime.now());
+        
+        return jwtTokenProvider.generateToken(id);
+    }
+    
+    public String authenticateUser(long id, String password) 
+            throws SmartConnectionException, SQLRepositoryException {
+        if(!checkUsersExist(new long[]{id})) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        byte[] pswrd = passwordHash(password);
+        var UserDto = Users.readUserInfo(connection.getConnection(), new long[]{id},null,"-","-").get(0);
+
+        if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd)) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        UsersOnline.put(id, LocalDateTime.now());
+        
+        return jwtTokenProvider.generateToken(id);
+    }
+    
+    public boolean registerUser(String name, String email, String password) 
+            throws SmartConnectionException, SQLRepositoryException {
+        if(checkUsersExist(new String[]{name})) {
+            return false; // User already exists
+        }
+        
+        addUser(false, name, email, password); // Add regular user (not admin)
+        return true;
+    }
+    
+    public boolean validateToken(String token) {
+        return jwtTokenProvider.validateToken(token);
+    }
+    
+    public Long getUserIdFromToken(String token) {
+        return jwtTokenProvider.getUserIdFromToken(token);
     }
 }
