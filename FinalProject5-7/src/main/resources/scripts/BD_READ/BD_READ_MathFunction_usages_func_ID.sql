@@ -1,0 +1,1 @@
+SELECT usages FROM MathFunctions WHERE id = ? AND owner_id = ?

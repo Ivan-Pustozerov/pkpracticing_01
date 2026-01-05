@@ -2,6 +2,7 @@ package SQL.repositories;
 
 import SQL.DTO.IdDTO;
 import SQL.DTO.FromBD.MathFunctionFromBdDTO;
+import SQL.DTO.ToClient.MathFunctionUsagesToClientAdminDTO;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 import SQL.repositories.tools.SQLRepositoryException;
@@ -23,8 +24,11 @@ public class MathFunctionsRepository extends Repository {
     private final String MFuncReadInfoByOwnerDesc;
     private final String MFuncReadInfoAllAsc;
     private final String MFuncReadInfoAllDesc;
+    private final String MFuncReadUsagesAll;
+    private final String MFuncReadUsagesID;
     private final String MFuncRemove;
     private final String MFuncUpdate;
+    private final String MFuncUpdateUsages;
     private final String MFuncBelongs;
 
     {
@@ -36,8 +40,11 @@ public class MathFunctionsRepository extends Repository {
         MFuncReadInfoByOwnerDesc = readCommand(dir + "BD_READ/BD_READ_MathFunction_By_OwnerIDDESC.sql");
         MFuncReadInfoAllAsc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoAllASC.sql");
         MFuncReadInfoAllDesc = readCommand(dir + "BD_READ/BD_READ_MathFunction_infoAllDESC.sql");
+        MFuncReadUsagesAll = readCommand(dir + "BD_READ/BD_READ_MathFunction_usages_All_ID.sql");
+        MFuncReadUsagesID = readCommand(dir + "BD_READ/BD_READ_MathFunction_usages_func_ID.sql");
         MFuncRemove = readCommand(dir + "BD_REMOVE/BD_REMOVE_MathFunction.sql");
         MFuncUpdate = readCommand(dir + "BD_UPDATE/BD_UPDATE_MathFunction.sql");
+        MFuncUpdateUsages = readCommand(dir + "BD_UPDATE/BD_UPDATE_MathFunction_usages.sql");
         MFuncBelongs = readCommand(dir + "BD_CHECK/BD_CHECK_MathFunction_Belongs.sql");
     }
 ///=================================================================================================================
@@ -71,6 +78,15 @@ public class MathFunctionsRepository extends Repository {
                                                                     ps.setLong(3, owner_id);
         });
     }
+
+    public int updateMFuncUsages(Connection connect, long owner_id, long id)
+            throws SQLRepositoryException {
+        return executeUpdate(connect, MFuncUpdateUsages, ps ->{
+            ps.setLong(1, id);
+            ps.setLong(2, owner_id);
+        });
+    }
+
 
 ///-------------------------------------------------READER---------------------------------------------------------
     public ArrayList<MathFunctionFromBdDTO> readMFuncInfo(Connection connect, long[] id, String  sortField, String sortOrder)
@@ -119,6 +135,36 @@ public class MathFunctionsRepository extends Repository {
                             set.getLong("owner_id"));
                 });
     }
+
+    public ArrayList<MathFunctionUsagesToClientAdminDTO> readMFuncUsagesAllByOwnerId(Connection connect, long owner_id)
+            throws SQLRepositoryException {
+        return executeQuery(connect, MFuncReadUsagesAll,
+                ps ->{
+                    ps.setLong(1, owner_id);},
+                set -> {
+                    return new MathFunctionUsagesToClientAdminDTO(
+                            owner_id,
+                            set.getLong("id"),
+                            set.getInt("usages"));
+                });
+
+    }
+
+    public ArrayList<MathFunctionUsagesToClientAdminDTO> readMFuncUsagesByOwnerId(Connection connect, long owner_id, long func_id)
+            throws SQLRepositoryException {
+        return executeQuery(connect, MFuncReadUsagesID,
+                ps ->{
+                    ps.setLong(1, func_id);
+                    ps.setLong(2, owner_id);},
+                set -> {
+                    return new MathFunctionUsagesToClientAdminDTO(
+                            owner_id,
+                            set.getLong("id"),
+                            set.getInt("usages"));
+                });
+
+    }
+
 
 ///-------------------------------------------------CHECK----------------------------------------------------------
     public boolean BelongsByOwnerId(Connection connect, Long id, Long owner_id )

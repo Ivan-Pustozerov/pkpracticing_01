@@ -121,6 +121,11 @@ public class FunctionService {
             throw new ServiceArgumentsException("Not Every Function Is Available");
 
         var BDdto = MathRepo.readMFuncInfo(connection.getConnection(), id, sortField, sortOrder);
+        for(var DTO : BDdto){
+            long owner_id = DTO.owner_id();
+            long func_id = DTO.id();
+            MathRepo.updateMFuncUsages(connection.getConnection(), owner_id, func_id);
+        }
         return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
     }
 

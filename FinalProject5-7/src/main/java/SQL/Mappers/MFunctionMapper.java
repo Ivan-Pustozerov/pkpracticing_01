@@ -4,6 +4,7 @@ import SQL.DTO.FromBD.MathFunctionFromBdDTO;
 import SQL.DTO.FunctionData;
 import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
 import SQL.repositories.AnalyticFunctionsRepository;
+import SQL.repositories.MathFunctionsRepository;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.TabulatedFunctionsRepository;
 import SQL.repositories.tools.SmartConnection;
@@ -30,6 +31,7 @@ public class MFunctionMapper {
             long owner_id = serverDTO.owner_id();
             String type = serverDTO.type();
             String name = serverDTO.name();
+
 
             if (Objects.equals(type, "analytic")) {
                 var analytic_functions = Analytic.readAnalyticFunctionInfo(connection.getConnection(), new long[]{id});
