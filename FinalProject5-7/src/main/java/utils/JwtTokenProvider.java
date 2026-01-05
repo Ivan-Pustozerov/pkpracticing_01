@@ -24,29 +24,29 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(System.currentTimeMillis() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .subject(userId.toString())
-                .issuedAt(new Date())
-                .expiration(expiryDate)
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
                 .signWith(jwtSecret)
                 .compact();
     }
 
     public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(jwtSecret)
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(jwtSecret)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
 
         return Long.parseLong(claims.getSubject());
     }
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser()
-                .verifyWith(jwtSecret)
-                .build()
-                .parseSignedClaims(authToken);
+            Jwts.parserBuilder()
+                    .setSigningKey(jwtSecret)
+                    .build()
+                    .parseClaimsJws(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
             // Invalid JWT token
