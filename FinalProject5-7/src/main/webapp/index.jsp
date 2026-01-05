@@ -45,8 +45,9 @@
 
         <h2>Available Servlets:</h2>
         <ul>
-            <li><a href="hello">Hello World Servlet</a></li>
-            <li><a href="functions">Functions Servlet</a></li>
+            <li><a href="api/auth">Authentication Servlet</a> (Register/Login)</li>
+            <li><a href="api/functions">Functions Servlet</a></li>
+            <li><a href="api/users">Users Servlet</a></li>
         </ul>
 
         <p>Server time: <%= new java.util.Date() %></p>
