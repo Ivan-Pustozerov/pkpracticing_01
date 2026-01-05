@@ -25,6 +25,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
+import utils.JwtTokenProvider;
 import java.util.HashMap;
 
 import static SQL.Mappers.UserMapper.translateToClientDTO;
@@ -38,6 +40,7 @@ public class UserService {
     private final UserStatisticRepository StatRepo = new UserStatisticRepository();
     private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
     private HashMap<Long, LocalDateTime> UsersOnline;
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
 
     public UserService(String url, String username, String password)
             throws SmartConnectionException {
@@ -62,7 +65,7 @@ public class UserService {
         }
     }
 
-///=========================================CREATE======================================
+    ///=========================================CREATE======================================
     public void initDataBase()
             throws SQLRepositoryException, SmartConnectionException {
         Users.initTable(connection.getConnection());
@@ -80,7 +83,7 @@ public class UserService {
 
     }
 
-///===========================================READ=======================================
+    ///===========================================READ=======================================
 
     public ArrayList<UserToClientAdminDTO> readUserInfo(long[] id, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
@@ -137,11 +140,11 @@ public class UserService {
     public ArrayList<UserToClientAdminDTO> getAllUsersByRole(boolean is_admin)
             throws SmartConnectionException, SQLRepositoryException {
 
-       var BDdto = Users.readUserByRole(connection.getConnection(), is_admin);
-       return UserMapper.translateToClientDTO(BDdto);
+        var BDdto = Users.readUserByRole(connection.getConnection(), is_admin);
+        return UserMapper.translateToClientDTO(BDdto);
     }
 
-///=======================================UPDATE=========================================
+    ///=======================================UPDATE=========================================
 
     public int updateUserInfo(long id, String new_name, String new_email, String new_password)
             throws SmartConnectionException, SQLRepositoryException {
@@ -163,7 +166,7 @@ public class UserService {
         return Users.updateUser(connection.getConnection(),id,null,new_role,null,null,null);
     }
 
-///=======================================DELETE==========================================
+    ///=======================================DELETE==========================================
     public int removeUser(long id)
             throws SmartConnectionException, SQLRepositoryException {
         return Users.removeUser(connection.getConnection(), id, null);
@@ -174,7 +177,7 @@ public class UserService {
         return Users.removeUser(connection.getConnection(), null, name);
     }
 
-/// ======================================CHECK============================================
+    /// ======================================CHECK============================================
 
     public boolean checkUsersExist(long[] id)
             throws SmartConnectionException, SQLRepositoryException {
@@ -248,5 +251,61 @@ public class UserService {
 
         Duration durationOnline = Duration.between(userIn,now);
         StatRepo.updateStatAllTimeById(connection.getConnection(),id,durationOnline);
+    }
+
+    // JWT Authentication Methods
+    public String authenticateUser(String name, String password)
+            throws SmartConnectionException, SQLRepositoryException {
+        if(!checkUsersExist(new String[]{name})) {
+            throw new ServiceException("Incorrect Auth");
+        }
+
+        byte[] pswrd = passwordHash(password);
+        var UserDto = Users.readUserInfo(connection.getConnection(), null, new String[]{name},"-","-").get(0);
+
+        if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd)) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        var id = Users.readUserId(connection.getConnection(), new String[]{name},"-").get(0).id();
+        UsersOnline.put(id, LocalDateTime.now());
+
+        return jwtTokenProvider.generateToken(id);
+    }
+
+    public String authenticateUser(long id, String password)
+            throws SmartConnectionException, SQLRepositoryException {
+        if(!checkUsersExist(new long[]{id})) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        byte[] pswrd = passwordHash(password);
+        var UserDto = Users.readUserInfo(connection.getConnection(), new long[]{id},null,"-","-").get(0);
+
+        if(!MessageDigest.isEqual(UserDto.passwordHash(),pswrd)) {
+            throw new ServiceArgumentsException("Incorrect Auth");
+        }
+
+        UsersOnline.put(id, LocalDateTime.now());
+
+        return jwtTokenProvider.generateToken(id);
+    }
+
+    public boolean registerUser(String name, String email, String password)
+            throws SmartConnectionException, SQLRepositoryException {
+        if(checkUsersExist(new String[]{name})) {
+            return false; // User already exists
+        }
+
+        addUser(false, name, email, password); // Add regular user (not admin)
+        return true;
+    }
+
+    public boolean validateToken(String token) {
+        return jwtTokenProvider.validateToken(token);
+    }
+
+    public Long getUserIdFromToken(String token) {
+        return jwtTokenProvider.getUserIdFromToken(token);
     }
 }
