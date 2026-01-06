@@ -9,8 +9,8 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <tomcat.version>10.1.16</tomcat.version> <!-- Добавлено: версия Tomcat -->
     </properties>
 
@@ -103,6 +103,15 @@
 
     <build>
         <plugins>
+            <!-- Плагин для сборки WAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
             <!-- Плагин для Tomcat -->
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
