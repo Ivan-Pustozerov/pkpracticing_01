@@ -19,7 +19,6 @@ public class UserServlet extends HttpServlet {
     public void init() {
         // Initialize the UserService with database connection details
         try {
-            Thread.sleep(5000);
             userService = new UserService("jdbc:postgresql://localhost:5432/Final",
                                          "postgres", "lkroot");
             objectMapper = new ObjectMapper();
