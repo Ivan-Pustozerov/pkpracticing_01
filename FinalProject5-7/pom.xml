@@ -103,6 +103,8 @@
 
     <build>
         <plugins>
+            <!-- Плагин для сборки WAR -->
+
             <!-- Плагин для Tomcat -->
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
