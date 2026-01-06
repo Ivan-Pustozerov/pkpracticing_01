@@ -9,9 +9,10 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <tomcat.version>10.1.16</tomcat.version> <!-- Добавлено: версия Tomcat -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     </properties>
 
     <dependencies>
@@ -79,7 +80,7 @@
             <version>5.0.0</version>
             <scope>provided</scope> <!-- Зависимость доступна только при компиляции -->
         </dependency>
-        
+
         <!-- JWT Library -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -104,6 +105,14 @@
     <build>
         <plugins>
             <!-- Плагин для сборки WAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
 
             <!-- Плагин для Tomcat -->
             <plugin>
