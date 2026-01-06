@@ -28,9 +28,10 @@ public class FunctionService {
 
 
     public FunctionService(String url, String username, String password)
-            throws SmartConnectionException {
+            throws SmartConnectionException, SQLRepositoryException {
         connection = new SmartConnection(url,username,password);
         factory = new ArrayTabulatedFunctionFactory();
+        initDataBase();
     }
 
     public void setArrayFactory(){
@@ -47,6 +48,8 @@ public class FunctionService {
         MathRepo.initTable(connection.getConnection());
         AnalyticRepo.initTable(connection.getConnection());
         TabulatedRepo.initTable(connection.getConnection());
+        StatRepo.initTable(connection.getConnection());
+        UserRepo.initTable(connection.getConnection());
     }
 
     public int addAnalyticMFunction(String function_expression, String name, long owner_id)

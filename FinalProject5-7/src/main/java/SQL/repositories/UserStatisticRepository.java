@@ -52,7 +52,8 @@ public class UserStatisticRepository extends Repository {
                 set -> {return new StatisticToClientDTO(
                         set.getLong("id"),
                         set.getTimestamp("reg_time").toLocalDateTime(),
-                        set.getTime("avrg_time_day").toLocalTime(),
+                        Duration.parse(set.getString("all_time")),
+                        Duration.parse(set.getString("avrg_time_day")),
                         set.getInt("func_count"));
         });
     }
@@ -65,22 +66,23 @@ public class UserStatisticRepository extends Repository {
                     return new StatisticToClientDTO(
                             set.getLong("id"),
                             set.getTimestamp("reg_time").toLocalDateTime(),
-                            set.getTime("avrg_time_day").toLocalTime(),
+                            Duration.parse(set.getString("all_time")),
+                            Duration.parse(set.getString("avrg_time_day")),
                             set.getInt("func_count"));
                 });
     }
 
-    public int updateStatAvrgTimeById(Connection connect, long id, LocalTime avrg_time_day)
+    public int updateStatAvrgTimeById(Connection connect, long id, Duration avrg_time_day)
             throws SQLRepositoryException {
         return executeUpdate(connect, StatUpdateTimeID, ps -> {
-            ps.setTime(1, Time.valueOf(avrg_time_day));
+            ps.setString(1, avrg_time_day.toString());
             ps.setLong(2,id);});
     }
 
-    public int updateStatAvrgTimeByName(Connection connect, String username, LocalTime avrg_time_day)
+    public int updateStatAvrgTimeByName(Connection connect, String username, Duration avrg_time_day)
             throws SQLRepositoryException {
         return executeUpdate(connect, StatUpdateTimeName, ps -> {
-            ps.setTime(1, Time.valueOf(avrg_time_day));
+            ps.setString(1, avrg_time_day.toString());
             ps.setString(2,username);});
     }
 

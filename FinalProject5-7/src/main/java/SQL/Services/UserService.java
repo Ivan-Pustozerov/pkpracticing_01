@@ -6,11 +6,8 @@ import SQL.DTO.ToClient.UserToClientAdminDTO;
 import SQL.Mappers.MFunctionMapper;
 
 import SQL.Mappers.UserMapper;
-import SQL.repositories.AnalyticFunctionsRepository;
-import SQL.repositories.UserStatisticRepository;
+import SQL.repositories.*;
 import SQL.repositories.tools.SQLRepositoryException;
-import SQL.repositories.TabulatedFunctionsRepository;
-import SQL.repositories.UsersRepository;
 import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
 import functions.factory.ArrayTabulatedFunctionFactory;
@@ -35,16 +32,19 @@ public class UserService {
 
     private final SmartConnection connection;
     private final UsersRepository Users = new UsersRepository();
+    private final MathFunctionsRepository MathRepo = new MathFunctionsRepository();
     private final AnalyticFunctionsRepository AnalyticRepo = new AnalyticFunctionsRepository();
     private final TabulatedFunctionsRepository TabulatedRepo = new TabulatedFunctionsRepository();
     private final UserStatisticRepository StatRepo = new UserStatisticRepository();
+
     private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
     private HashMap<Long, LocalDateTime> UsersOnline;
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
 
     public UserService(String url, String username, String password)
-            throws SmartConnectionException {
+            throws SmartConnectionException, SQLRepositoryException {
         connection = new SmartConnection(url, username, password);
+        initDataBase();
     }
 
     public void setArrayFactory(){
@@ -69,6 +69,10 @@ public class UserService {
     public void initDataBase()
             throws SQLRepositoryException, SmartConnectionException {
         Users.initTable(connection.getConnection());
+        MathRepo.initTable(connection.getConnection());
+        AnalyticRepo.initTable(connection.getConnection());
+        TabulatedRepo.initTable(connection.getConnection());
+        StatRepo.initTable(connection.getConnection());
     }
 
     public int addUser(boolean isAdmin, String name, String email, String password)

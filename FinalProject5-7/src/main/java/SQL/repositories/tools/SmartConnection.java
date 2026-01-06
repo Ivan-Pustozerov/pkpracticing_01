@@ -20,12 +20,13 @@ public class SmartConnection {
             connection.setAutoCommit(true);
 
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             try {
                 connection.close();
             } catch (SQLException ex) {
-                System.out.println("Connection Close Error");
+                System.out.println(e.getMessage()+ "Connection Close Error");
             }
-            throw new SmartConnectionException("Connection Error");
+            throw new SmartConnectionException(e.getMessage() + "Connection Error");
         }
     }
 

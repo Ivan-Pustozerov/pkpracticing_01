@@ -22,8 +22,8 @@ public class AuthServlet extends HttpServlet {
     public void init() {
         // Initialize the UserService with database connection details
         try {
-            userService = new UserService("jdbc:postgresql://localhost:5432/math_functions_db", 
-                                         "postgres", "password");
+            userService = new UserService("jdbc:postgresql://localhost:5432/Final",
+                                         "postgres", "lkroot");
             objectMapper = new ObjectMapper();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize AuthServlet", e);

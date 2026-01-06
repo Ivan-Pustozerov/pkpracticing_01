@@ -17,7 +17,7 @@ public class Repository {
             return statement.executeUpdate(sql);
 
         } catch (SQLException e) {
-            throw new SQLRepositoryException("Init Table Error!");
+            throw new SQLRepositoryException(e.getMessage() + "Init Table Error!");
         }
     }
 

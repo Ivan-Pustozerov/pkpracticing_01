@@ -21,10 +21,10 @@ public class FunctionServlet extends HttpServlet {
     public void init() {
         // Initialize the services with database connection details
         try {
-            userService = new UserService("jdbc:postgresql://localhost:5432/math_functions_db", 
-                                         "postgres", "password");
-            functionService = new FunctionService("jdbc:postgresql://localhost:5432/math_functions_db", 
-                                                "postgres", "password");
+            userService = new UserService("jdbc:postgresql://localhost:5432/Final",
+                                         "postgres", "lkroot");
+            functionService = new FunctionService("jdbc:postgresql://localhost:5432/Final",
+                                                "postgres", "lkroot");
             objectMapper = new ObjectMapper();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize FunctionServlet", e);
