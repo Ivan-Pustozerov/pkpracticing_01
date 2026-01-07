@@ -32,9 +32,7 @@ public class UserServlet extends HttpServlet {
             throws IOException {
         // TODO: Implementation for GET /api/users and /api/users/{id}
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"GET users endpoint called\"}");
-        out.flush();
+
     }
 
     @Override
@@ -42,18 +40,16 @@ public class UserServlet extends HttpServlet {
             throws IOException {
         String pathInfo = request.getPathInfo();
         
-        if (pathInfo != null && pathInfo.equals("/admin")) {
+        if (pathInfo != null && pathInfo.equals("/admin")) /// new ADMIN
+        {
             // TODO: Implementation for POST /api/users/admin
             response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter out = response.getWriter();
-            out.print("{\"message\":\"Create admin user endpoint called\"}");
-            out.flush();
-        } else {
+        }
+        else /// new USER
+        {
             // TODO: Implementation for POST /api/users
             response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter out = response.getWriter();
-            out.print("{\"message\":\"Create user endpoint called\"}");
-            out.flush();
+
         }
     }
 
@@ -64,13 +60,14 @@ public class UserServlet extends HttpServlet {
         
         if (pathInfo != null) {
             String[] pathParts = pathInfo.split("/");
-            if (pathParts.length >= 3 && "role".equals(pathParts[2])) {
+
+            if (pathParts.length >= 3 && "role".equals(pathParts[2])) /// change ROLE
+            {
                 // TODO: Implementation for PUT /api/users/{id}/role
                 response.setStatus(HttpServletResponse.SC_OK);
-                PrintWriter out = response.getWriter();
-                out.print("{\"message\":\"Change user role endpoint called\"}");
-                out.flush();
-            } else {
+            }
+            else /// change USER
+            {
                 // TODO: Implementation for PUT /api/users/{id}
                 response.setStatus(HttpServletResponse.SC_OK);
                 PrintWriter out = response.getWriter();
@@ -85,8 +82,5 @@ public class UserServlet extends HttpServlet {
             throws IOException {
         // TODO: Implementation for DELETE /api/users/{id}
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"Delete user endpoint called\"}");
-        out.flush();
     }
 }

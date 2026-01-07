@@ -3,5 +3,5 @@ package SQL.DTO.responseDTO;
 import SQL.DTO.FromBD.DTO;
 
 public record MathFunctionUsagesResponse
-        (long owner_id, long func_id, int usages)
+        (Long owner_id, Long func_id, Integer usages)
         implements DTO {}

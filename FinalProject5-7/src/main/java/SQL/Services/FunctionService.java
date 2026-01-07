@@ -20,6 +20,8 @@ import SQL.DTO.responseDTO.MathFunctionInfoResponse;
 
 import java.util.ArrayList;
 
+import static SQL.Mappers.Converter.todoubleArray;
+
 
 public class FunctionService {
 
@@ -396,7 +398,10 @@ public class FunctionService {
         }
         else if (func_data.get(0) instanceof TabulatedFunctionResponse) {
             var tabulated = (TabulatedFunctionResponse)func_data.get(0);
-            ArrayTabulatedFunction function = new ArrayTabulatedFunction(tabulated.xvals(), tabulated.yvals());
+            double[] xvals = todoubleArray(tabulated.xvals());
+            double[] yvals = todoubleArray(tabulated.yvals());
+
+            ArrayTabulatedFunction function = new ArrayTabulatedFunction(xvals,yvals);
 
             int count = (int)((from-to)/step);
             double max_count = (from-to)/step;

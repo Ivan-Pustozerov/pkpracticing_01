@@ -38,20 +38,7 @@ public class FunctionServlet extends HttpServlet {
             throws IOException {
         // TODO: Implementation for GET /api/functions and /api/functions/{id}
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
 
-        String name;
-        try {
-            var result = userService.readUserInfo(new long[]{1},"-","-");
-            name = result.get(0).name();
-        } catch (SmartConnectionException e) {
-            throw new RuntimeException(e);
-        } catch (SQLRepositoryException e) {
-            throw new RuntimeException(e);
-        }
-
-        out.print("{\"message\":\"GET functions endpoint called\"} " + name);
-        out.flush();
     }
 
     @Override
@@ -59,42 +46,36 @@ public class FunctionServlet extends HttpServlet {
             throws IOException {
         String pathInfo = request.getPathInfo();
         
-        if ("/analytic".equals(pathInfo)) {
+        if ("/analytic".equals(pathInfo)) /// ANALYTIC
+        {
             // TODO: Implementation for POST /api/functions/analytic
             response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter out = response.getWriter();
-            out.print("{\"message\":\"Create analytic function endpoint called\"}");
-            out.flush();
-        } else if ("/tabulated".equals(pathInfo)) {
+
+        }
+        else if ("/tabulated".equals(pathInfo)) /// TABULATED
+        {
             // TODO: Implementation for POST /api/functions/tabulated
             response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter out = response.getWriter();
-            out.print("{\"message\":\"Create tabulated function endpoint called\"}");
-            out.flush();
-        } else if (pathInfo != null) {
+        }
+        else if (pathInfo != null) /// CALCULATE
+        {
             String[] pathParts = pathInfo.split("/");
             if (pathParts.length >= 3 && "calculate".equals(pathParts[2])) {
-                // TODO: Implementation for POST /api/functions/{id}/calculate
+                // TODO: Implementation for POST /api/functions/{id}/calculate + ID!
                 response.setStatus(HttpServletResponse.SC_OK);
-                PrintWriter out = response.getWriter();
-                out.print("{\"message\":\"Calculate function endpoint called\"}");
-                out.flush();
+
             }
-        } else {
+        }
+        else /// ERROR
+        {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            PrintWriter out = response.getWriter();
-            out.print("{\"error\":\"Invalid path\"}");
-            out.flush();
         }
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) 
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         // TODO: Implementation for DELETE /api/functions/{id}
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"Delete function endpoint called\"}");
-        out.flush();
     }
 }

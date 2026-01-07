@@ -1,7 +1,7 @@
 package SQL.Services;
 
 import SQL.DTO.IdDTO;
-import SQL.DTO.responseDTO.UserInfoResponseDTO;
+import SQL.DTO.responseDTO.UserResponse;
 
 import SQL.Mappers.UserMapper;
 import SQL.repositories.*;
@@ -85,7 +85,7 @@ public class UserService {
 
     ///===========================================READ=======================================
 
-    public ArrayList<UserInfoResponseDTO> readUserInfo(long[] id, String sortField, String sortOrder)
+    public ArrayList<UserResponse> readUserInfo(long[] id, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!checkUsersExist(id)) throw new ServiceArgumentsException("Not Every User Is Available");
@@ -93,7 +93,7 @@ public class UserService {
         var BDdto = Users.readUserInfo(connection.getConnection(), id, null, sortField, sortOrder);
         return translateToClientDTO(BDdto);
     }
-    public ArrayList<UserInfoResponseDTO> readUserInfo(String[] name, String sortField, String sortOrder)
+    public ArrayList<UserResponse> readUserInfo(String[] name, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!checkUsersExist(name)) throw new ServiceArgumentsException("Not Every User Is Available");
@@ -130,14 +130,14 @@ public class UserService {
         return MFunctionMapper.translateToClientDTO(BDdto,connection,AnalyticRepo, TabulatedRepo,  factory);
     }
     */
-    public ArrayList<UserInfoResponseDTO> getAllUsers(String sortField, String sortOrder)
+    public ArrayList<UserResponse> getAllUsers(String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         var BDdto = Users.readAllUsers(connection.getConnection(), sortField, sortOrder);
         return UserMapper.translateToClientDTO(BDdto);
     }
 
-    public ArrayList<UserInfoResponseDTO> getAllUsersByRole(boolean is_admin)
+    public ArrayList<UserResponse> getAllUsersByRole(boolean is_admin)
             throws SmartConnectionException, SQLRepositoryException {
 
         var BDdto = Users.readUserByRole(connection.getConnection(), is_admin);

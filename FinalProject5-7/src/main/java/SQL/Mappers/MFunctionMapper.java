@@ -14,6 +14,8 @@ import SQL.DTO.responseDTO.TabulatedFunctionResponse;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static SQL.Mappers.Converter.toDoubleArray;
+
 public class MFunctionMapper {
     public static ArrayList<MathFunctionDetailsResponse> translateDetailsResponseDTO(ArrayList<MathFunctionFromBdDTO> BDdto,
                                                                                      SmartConnection connection,
@@ -39,8 +41,8 @@ public class MFunctionMapper {
             else if (Objects.equals(type, "tabulated")) {
                 var tabulated_functions = Tabulated.readTabulatedFunctionInfo(connection.getConnection(), new long[]{id});
 
-                double[] xVals = tabulated_functions.get(0).xVals();
-                double[] yVals = tabulated_functions.get(0).yVals();
+                Double[] xVals = toDoubleArray(tabulated_functions.get(0).xVals());
+                Double[] yVals = toDoubleArray(tabulated_functions.get(0).yVals());
 
                 result.add(new TabulatedFunctionResponse(id, type, name, owner_id, xVals, yVals));
             }

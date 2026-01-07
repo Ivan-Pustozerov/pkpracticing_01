@@ -1,3 +1,4 @@
 package SQL.DTO;
 
-public record PointDTO(double x, double y) {}
+public record PointDTO
+        (double x, double y) {}

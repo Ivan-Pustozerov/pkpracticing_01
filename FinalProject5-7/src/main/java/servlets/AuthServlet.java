@@ -35,18 +35,24 @@ public class AuthServlet extends HttpServlet {
             throws IOException {
         String pathInfo = request.getPathInfo();
 
-        if ("/register".equals(pathInfo)) {
+        if ("/register".equals(pathInfo))  /// REGISTER
+        {
             handleRegister(request, response);
-        } else if ("/login".equals(pathInfo)) {
+        }
+        else if ("/login".equals(pathInfo)) /// LOGIN
+        {
             handleLogin(request, response);
-        } else {
+        }
+        else /// ERROR
+        {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            PrintWriter out = response.getWriter();
-            out.print("{\"error\":\"Endpoint not found\"}");
-            out.flush();
         }
     }
 
+
+
+
+    /// =============================================HANDLERS==========================================
     private void handleRegister(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
 
@@ -54,9 +60,7 @@ public class AuthServlet extends HttpServlet {
 
         // TODO: Implementation for user registration
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"Register endpoint called\"}");
-        out.flush();
+
     }
 
     private void handleLogin(HttpServletRequest request, HttpServletResponse response) 
@@ -66,8 +70,6 @@ public class AuthServlet extends HttpServlet {
 
         // TODO: Implementation for user login
         response.setStatus(HttpServletResponse.SC_OK);
-        PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"Login endpoint called\"}");
-        out.flush();
+
     }
 }
