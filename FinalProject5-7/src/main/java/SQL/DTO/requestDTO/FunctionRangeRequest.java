@@ -1,4 +1,4 @@
-package requestDTO;
+package SQL.DTO.requestDTO;
 
 public record FunctionRangeRequest(double from, double to, double step) {
     public FunctionRangeRequest {

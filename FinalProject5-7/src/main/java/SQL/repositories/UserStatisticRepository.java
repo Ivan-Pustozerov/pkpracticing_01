@@ -1,13 +1,11 @@
 package SQL.repositories;
 
-import SQL.DTO.ToClient.StatisticToClientDTO;
+import SQL.DTO.responseDTO.StatisticResponse;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLRepositoryException;
 
 import java.sql.Connection;
-import java.sql.Time;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class UserStatisticRepository extends Repository {
@@ -46,10 +44,10 @@ public class UserStatisticRepository extends Repository {
         return executeUpdate(connect, StatInsert, ps -> ps.setString(1,username));
     }
 
-    public ArrayList<StatisticToClientDTO> readStatById(Connection connect, long id)
+    public ArrayList<StatisticResponse> readStatById(Connection connect, long id)
             throws SQLRepositoryException {
         return executeQuery(connect, StatReadId, ps -> {ps.setLong(1,id);},
-                set -> {return new StatisticToClientDTO(
+                set -> {return new StatisticResponse(
                         set.getLong("id"),
                         set.getTimestamp("reg_time").toLocalDateTime(),
                         Duration.parse(set.getString("all_time")),
@@ -57,13 +55,13 @@ public class UserStatisticRepository extends Repository {
                         set.getInt("func_count"));
         });
     }
-    public ArrayList<StatisticToClientDTO> readStatByName(Connection connect, String name)
+    public ArrayList<StatisticResponse> readStatByName(Connection connect, String name)
             throws SQLRepositoryException {
         return executeQuery(connect, StatReadName, ps -> {
                     ps.setString(1, name);
                 },
                 set -> {
-                    return new StatisticToClientDTO(
+                    return new StatisticResponse(
                             set.getLong("id"),
                             set.getTimestamp("reg_time").toLocalDateTime(),
                             Duration.parse(set.getString("all_time")),

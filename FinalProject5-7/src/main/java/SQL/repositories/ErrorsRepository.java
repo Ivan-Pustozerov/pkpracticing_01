@@ -1,6 +1,6 @@
 package SQL.repositories;
 
-import SQL.DTO.ToClient.ErrorsDTO;
+import SQL.DTO.responseDTO.ErrorsResponse;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLRepositoryException;
 
@@ -32,26 +32,26 @@ public class ErrorsRepository extends Repository {
         });
     }
 
-    public ArrayList<ErrorsDTO> readErrorByTime(Connection connect, java.time.LocalDateTime time)
+    public ArrayList<ErrorsResponse> readErrorByTime(Connection connect, java.time.LocalDateTime time)
             throws SQLRepositoryException {
         return executeQuery(connect, ErrorsReadTime, ps -> {
                     ps.setTimestamp(1, java.sql.Timestamp.valueOf(time));
                 },
                 set -> {
-                    return new ErrorsDTO(
+                    return new ErrorsResponse(
                             set.getTimestamp("time").toLocalDateTime(),
                             set.getInt("code"),
                             set.getString("type"));
                 });
     }
 
-    public ArrayList<ErrorsDTO> readErrorByCode(Connection connect, int code)
+    public ArrayList<ErrorsResponse> readErrorByCode(Connection connect, int code)
             throws SQLRepositoryException {
         return executeQuery(connect, ErrorsReadTime, ps -> {
                     ps.setInt(1, code);
                 },
                 set -> {
-                    return new ErrorsDTO(
+                    return new ErrorsResponse(
                             set.getTimestamp("time").toLocalDateTime(),
                             set.getInt("code"),
                             set.getString("type"));

@@ -1,6 +1,6 @@
 package SQL.repositories.tools;
 
-import SQL.DTO.DTO;
+import SQL.DTO.FromBD.DTO;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

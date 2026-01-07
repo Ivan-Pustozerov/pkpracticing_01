@@ -1,5 +1,7 @@
 package servlets;
 
+import SQL.repositories.tools.SQLRepositoryException;
+import SQL.repositories.tools.SmartConnectionException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +39,18 @@ public class FunctionServlet extends HttpServlet {
         // TODO: Implementation for GET /api/functions and /api/functions/{id}
         response.setStatus(HttpServletResponse.SC_OK);
         PrintWriter out = response.getWriter();
-        out.print("{\"message\":\"GET functions endpoint called\"}");
+
+        String name;
+        try {
+            var result = userService.readUserInfo(new long[]{1},"-","-");
+            name = result.get(0).name();
+        } catch (SmartConnectionException e) {
+            throw new RuntimeException(e);
+        } catch (SQLRepositoryException e) {
+            throw new RuntimeException(e);
+        }
+
+        out.print("{\"message\":\"GET functions endpoint called\"} " + name);
         out.flush();
     }
 

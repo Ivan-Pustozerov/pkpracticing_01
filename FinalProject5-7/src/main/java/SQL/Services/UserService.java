@@ -1,9 +1,7 @@
 package SQL.Services;
 
 import SQL.DTO.IdDTO;
-import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
-import SQL.DTO.ToClient.UserToClientAdminDTO;
-import SQL.Mappers.MFunctionMapper;
+import SQL.DTO.responseDTO.UserInfoResponseDTO;
 
 import SQL.Mappers.UserMapper;
 import SQL.repositories.*;
@@ -19,10 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Base64;
 import utils.JwtTokenProvider;
 import java.util.HashMap;
 
@@ -44,7 +40,7 @@ public class UserService {
     public UserService(String url, String username, String password)
             throws SmartConnectionException, SQLRepositoryException {
         connection = new SmartConnection(url, username, password);
-        initDataBase();
+
     }
 
     public void setArrayFactory(){
@@ -89,7 +85,7 @@ public class UserService {
 
     ///===========================================READ=======================================
 
-    public ArrayList<UserToClientAdminDTO> readUserInfo(long[] id, String sortField, String sortOrder)
+    public ArrayList<UserInfoResponseDTO> readUserInfo(long[] id, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!checkUsersExist(id)) throw new ServiceArgumentsException("Not Every User Is Available");
@@ -97,7 +93,7 @@ public class UserService {
         var BDdto = Users.readUserInfo(connection.getConnection(), id, null, sortField, sortOrder);
         return translateToClientDTO(BDdto);
     }
-    public ArrayList<UserToClientAdminDTO> readUserInfo(String[] name, String sortField, String sortOrder)
+    public ArrayList<UserInfoResponseDTO> readUserInfo(String[] name, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!checkUsersExist(name)) throw new ServiceArgumentsException("Not Every User Is Available");
@@ -115,7 +111,7 @@ public class UserService {
         return Users.readUserId(connection.getConnection(), name, sortOrder);
     }
 
-
+    /*
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(long[] id)
             throws SmartConnectionException, SQLRepositoryException {
 
@@ -133,15 +129,15 @@ public class UserService {
 
         return MFunctionMapper.translateToClientDTO(BDdto,connection,AnalyticRepo, TabulatedRepo,  factory);
     }
-
-    public ArrayList<UserToClientAdminDTO> getAllUsers(String sortField, String sortOrder)
+    */
+    public ArrayList<UserInfoResponseDTO> getAllUsers(String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         var BDdto = Users.readAllUsers(connection.getConnection(), sortField, sortOrder);
         return UserMapper.translateToClientDTO(BDdto);
     }
 
-    public ArrayList<UserToClientAdminDTO> getAllUsersByRole(boolean is_admin)
+    public ArrayList<UserInfoResponseDTO> getAllUsersByRole(boolean is_admin)
             throws SmartConnectionException, SQLRepositoryException {
 
         var BDdto = Users.readUserByRole(connection.getConnection(), is_admin);
@@ -216,7 +212,7 @@ public class UserService {
         return Users.isAdmin(connection.getConnection(), null, name);
     }
 
-
+    /*
     public void UserAuth(long id, String password)
             throws SmartConnectionException, SQLRepositoryException {
 
@@ -246,7 +242,7 @@ public class UserService {
         var id = Users.readUserId(connection.getConnection(), new String[]{name},"-").get(0).id();
         UsersOnline.put(id, LocalDateTime.now());
     }
-
+    */
     public void userUnlog(long id)
             throws SmartConnectionException, SQLRepositoryException {
 
@@ -276,7 +272,6 @@ public class UserService {
 
         return jwtTokenProvider.generateToken(id);
     }
-
     public String authenticateUser(long id, String password)
             throws SmartConnectionException, SQLRepositoryException {
         if(!checkUsersExist(new long[]{id})) {

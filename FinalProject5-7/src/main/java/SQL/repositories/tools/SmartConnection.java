@@ -16,17 +16,13 @@ public class SmartConnection {
         this.username = username;
         this.password = password;
         try {
-            connection = DriverManager.getConnection(url, username, password);
+            //connection = DriverManager.getConnection(url, username, password);
+            connection = DatabaseConnection.getConnection();
             connection.setAutoCommit(true);
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            try {
-                connection.close();
-            } catch (SQLException ex) {
-                System.out.println(e.getMessage()+ "Connection Close Error");
-            }
-            throw new SmartConnectionException(e.getMessage() + "Connection Error");
+            throw new SmartConnectionException(e.getMessage() + " Connection Error");
         }
     }
 

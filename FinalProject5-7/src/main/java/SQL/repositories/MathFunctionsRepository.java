@@ -2,7 +2,7 @@ package SQL.repositories;
 
 import SQL.DTO.IdDTO;
 import SQL.DTO.FromBD.MathFunctionFromBdDTO;
-import SQL.DTO.ToClient.MathFunctionUsagesToClientAdminDTO;
+import SQL.DTO.responseDTO.MathFunctionUsagesResponse;
 import SQL.repositories.tools.Repository;
 import SQL.repositories.tools.SQLArray;
 import SQL.repositories.tools.SQLRepositoryException;
@@ -136,13 +136,13 @@ public class MathFunctionsRepository extends Repository {
                 });
     }
 
-    public ArrayList<MathFunctionUsagesToClientAdminDTO> readMFuncUsagesAllByOwnerId(Connection connect, long owner_id)
+    public ArrayList<MathFunctionUsagesResponse> readMFuncUsagesAllByOwnerId(Connection connect, long owner_id)
             throws SQLRepositoryException {
         return executeQuery(connect, MFuncReadUsagesAll,
                 ps ->{
                     ps.setLong(1, owner_id);},
                 set -> {
-                    return new MathFunctionUsagesToClientAdminDTO(
+                    return new MathFunctionUsagesResponse(
                             owner_id,
                             set.getLong("id"),
                             set.getInt("usages"));
@@ -150,14 +150,14 @@ public class MathFunctionsRepository extends Repository {
 
     }
 
-    public ArrayList<MathFunctionUsagesToClientAdminDTO> readMFuncUsagesByOwnerId(Connection connect, long owner_id, long func_id)
+    public ArrayList<MathFunctionUsagesResponse> readMFuncUsagesByOwnerId(Connection connect, long owner_id, long func_id)
             throws SQLRepositoryException {
         return executeQuery(connect, MFuncReadUsagesID,
                 ps ->{
                     ps.setLong(1, func_id);
                     ps.setLong(2, owner_id);},
                 set -> {
-                    return new MathFunctionUsagesToClientAdminDTO(
+                    return new MathFunctionUsagesResponse(
                             owner_id,
                             set.getLong("id"),
                             set.getInt("usages"));

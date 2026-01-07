@@ -1,6 +1,8 @@
 package SQL.Services;
 
-import SQL.DTO.ToClient.MathFunctionToClientAdminDTO;
+import SQL.DTO.PointDTO;
+import SQL.DTO.responseDTO.AnalyticFunctionResponse;
+import SQL.DTO.responseDTO.TabulatedFunctionResponse;
 import SQL.Mappers.MFunctionMapper;
 import SQL.repositories.*;
 import SQL.repositories.tools.SQLRepositoryException;
@@ -8,9 +10,13 @@ import SQL.repositories.tools.SmartConnection;
 import SQL.repositories.tools.SmartConnectionException;
 import exceptions.ArrayIsNotSortedException;
 import exceptions.DifferentLengthOfArraysException;
+import functions.classes.AnalyticFunction;
+import functions.classes.ArrayTabulatedFunction;
 import functions.factory.ArrayTabulatedFunctionFactory;
 import functions.factory.LinkedListTabulatedFunctionFactory;
 import functions.factory.TabulatedFunctionFactory;
+import SQL.DTO.responseDTO.MathFunctionDetailsResponse;
+import SQL.DTO.responseDTO.MathFunctionInfoResponse;
 
 import java.util.ArrayList;
 
@@ -31,7 +37,7 @@ public class FunctionService {
             throws SmartConnectionException, SQLRepositoryException {
         connection = new SmartConnection(url,username,password);
         factory = new ArrayTabulatedFunctionFactory();
-        initDataBase();
+
     }
 
     public void setArrayFactory(){
@@ -117,7 +123,7 @@ public class FunctionService {
 
     /// ========================================READ=============================================
 
-    public ArrayList<MathFunctionToClientAdminDTO> readMFunctionInfo(long[] id, String sortField, String sortOrder)
+    public ArrayList<MathFunctionDetailsResponse> readMFunctionDetails(long[] id, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!checkMFunctionsExist(id))
@@ -129,20 +135,20 @@ public class FunctionService {
             long func_id = DTO.id();
             MathRepo.updateMFuncUsages(connection.getConnection(), owner_id, func_id);
         }
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
+        return MFunctionMapper.translateDetailsResponseDTO(BDdto, connection, AnalyticRepo, TabulatedRepo);
     }
 
-    public ArrayList<MathFunctionToClientAdminDTO> readMFunctionInfoByOwnerId(long owner_id, String sortField, String sortOrder)
+    public ArrayList<MathFunctionInfoResponse> readMFunctionInfoByOwnerId(long owner_id, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!UserRepo.exists(connection.getConnection(), owner_id, null))
             throw new ServiceArgumentsException("Owner with id " + owner_id + " does not exist");
 
         var BDdto = MathRepo.readMFuncInfoByOwnerId(connection.getConnection(), owner_id, sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
+        return MFunctionMapper.translateInfoResponseDTO(BDdto);
     }
 
-    public ArrayList<MathFunctionToClientAdminDTO> readMFunctionInfoByOwnerName(String owner_name, String sortField, String sortOrder)
+    public ArrayList<MathFunctionInfoResponse> readMFunctionInfoByOwnerName(String owner_name, String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
         if(!UserRepo.exists(connection.getConnection(), null, owner_name))
@@ -150,13 +156,14 @@ public class FunctionService {
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name}, "-").get(0).id();
         var BDdto = MathRepo.readMFuncInfoByOwnerId(connection.getConnection(), userId, sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
+        return MFunctionMapper.translateInfoResponseDTO(BDdto);
     }
 
-    public ArrayList<MathFunctionToClientAdminDTO> readInfoAll(String sortField, String sortOrder)
+    public ArrayList<MathFunctionInfoResponse> readInfoAll(String sortField, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
+
         var BDdto = MathRepo.readMFuncInfoAll(connection.getConnection(), sortField, sortOrder);
-        return MFunctionMapper.translateToClientDTO(BDdto, connection, AnalyticRepo, TabulatedRepo, factory);
+        return MFunctionMapper.translateInfoResponseDTO(BDdto);
     }
 
     /// ========================================UPDATE=============================================
@@ -362,6 +369,48 @@ public class FunctionService {
             throw new ServiceArgumentsException("Function with id " + id + " does not exist");
         }
         return result.get(0).type();
+    }
+
+    /// ========================================CALCULATION========================================
+
+    public ArrayList<PointDTO> calcPoints(long id, double from, double to, double step)
+            throws SmartConnectionException, SQLRepositoryException {
+
+        ArrayList<PointDTO> result = new ArrayList<>();
+        ArrayList<MathFunctionDetailsResponse> func_data = readMFunctionDetails(new long[]{id},"-","-");
+
+        if(func_data.get(0) instanceof AnalyticFunctionResponse){
+            var analytic = (AnalyticFunctionResponse)func_data.get(0);
+            AnalyticFunction function = new AnalyticFunction(analytic.functionExpression());
+
+            int count = (int)((from-to)/step);
+            double max_count = (from-to)/step;
+
+            for(int i = 0; i<count; ++i){
+                result.add(new PointDTO(from,function.apply(from)));
+                from += step;
+            }
+            if((max_count - count)>0){
+                result.add(new PointDTO(to,function.apply(to)));
+            }
+        }
+        else if (func_data.get(0) instanceof TabulatedFunctionResponse) {
+            var tabulated = (TabulatedFunctionResponse)func_data.get(0);
+            ArrayTabulatedFunction function = new ArrayTabulatedFunction(tabulated.xvals(), tabulated.yvals());
+
+            int count = (int)((from-to)/step);
+            double max_count = (from-to)/step;
+
+            for(int i = 0; i<count; ++i){
+                result.add(new PointDTO(from,function.apply(from)));
+                from += step;
+            }
+            if((max_count - count)>0){
+                result.add(new PointDTO(to,function.apply(to)));
+            }
+        }
+
+        return  result;
     }
 
 }

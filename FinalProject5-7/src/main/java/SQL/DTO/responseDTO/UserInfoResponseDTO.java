@@ -1,7 +1,7 @@
-package SQL.DTO.ToClient;
+package SQL.DTO.responseDTO;
 
-import SQL.DTO.DTO;
+import SQL.DTO.FromBD.DTO;
 
-public record UserToClientAdminDTO
+public record UserInfoResponseDTO
         (long id, boolean is_admin, String name, String email)
         implements DTO {}
