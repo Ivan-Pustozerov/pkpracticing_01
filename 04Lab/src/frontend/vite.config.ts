@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [vue()],
 
-  // ⚠️ ДОБАВЬТЕ ЭТО ⚠️
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src')
@@ -23,7 +23,7 @@ export default defineConfig({
     host: 'localhost',
     open: false,
 
-    // Прокси (оставьте если нужно)
+    //
     proxy: {
       '^/api': {
         target: 'http://localhost:8080',

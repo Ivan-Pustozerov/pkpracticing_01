@@ -75,7 +75,7 @@
           <p>Нет аккаунта? <router-link to="/register" class="link">Зарегистрируйтесь</router-link></p>
           <p class="demo-hint">
             <i class="fas fa-info-circle"></i>
-            Для теста: admin / admin123
+            Все пока находится на этапе тестирования
           </p>
         </div>
       </form>
@@ -171,11 +171,12 @@ onMounted(() => {
     successMessage.value = 'Регистрация успешна! Теперь вы можете войти в систему.'
   }
 
-  // Автозаполнение для тестирования (можно удалить в production)
+   /*
   if (import.meta.env.DEV) {
     form.name = 'admin'
     form.password = 'admin123'
   }
+  */
 })
 </script>
 

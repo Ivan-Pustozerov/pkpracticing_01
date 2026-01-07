@@ -250,7 +250,7 @@ const setExample = (expression: string) => {
 
 // Управление точками для табличной функции
 const addPoint = () => {
-  tabulatedForm.points.push({ x: 0, y: 0 })
+  tabulatedForm.points.push({ x: 1, y: 0 })
 }
 
 const removePoint = (index: number) => {
@@ -258,7 +258,7 @@ const removePoint = (index: number) => {
 }
 
 const clearPoints = () => {
-  tabulatedForm.points = [{ x: 0, y: 0 }]
+  tabulatedForm.points = [{ x: 0, y: 0 },{ x: 1, y: 0 }]
 }
 
 // Быстрый импорт данных

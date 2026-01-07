@@ -75,7 +75,7 @@ public class SecurityConfig {
                             "Bad credentials"));
                 }
 
-                System.out.println("✅ Password matches!");
+                System.out.println(" Password matches!");
             }
         };
 

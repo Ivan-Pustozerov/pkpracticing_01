@@ -80,7 +80,7 @@ class FunctionService {
   }
 
   /**
-   * Получить только аналитические функции (с деталями)
+   * Получить только аналитические функции
    */
   async getAnalyticFunctions(): Promise<AnalyticFunctionResponse[]> {
     try {
@@ -98,7 +98,7 @@ class FunctionService {
   }
 
   /**
-   * Получить только табличные функции (с деталями)
+   * Получить только табличные функции
    */
   async getTabulatedFunctions(): Promise<TabulatedFunctionResponse[]> {
     try {

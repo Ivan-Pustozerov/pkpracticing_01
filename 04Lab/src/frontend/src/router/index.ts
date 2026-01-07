@@ -95,12 +95,14 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/chambers-of-secrets',
-    name: 'ChambersOfSecrets',
-    component: () => import('@/views/ChambersOfSecrets.vue'),
+    path: '/statistics',
+    name: 'Statistics',
+    component: () => import('@/views/StatisticsView.vue'),
     meta: {
-      title: 'Chambers of Secrets',
-      requiresAuth: true
+      title: 'Статистика системы',
+      requiresAuth: true,
+      requiresAdmin: true, // Только для администраторов
+      breadcrumb: 'Статистика'
     }
   },
   {

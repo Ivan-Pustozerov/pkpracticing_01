@@ -120,7 +120,7 @@
                 alt="Новый год"
                 class="holiday-picture"
               >
-              <p class="image-caption">До релиза: скоро:3</p>
+              <p class="image-caption">До релиза: скоро :3</p>
             </div>
 
             <div class="fun-message">

@@ -926,7 +926,7 @@ onMounted(() => {
 
 /* Модальное окно: Помощь */
 .help-center-modal .modal-header {
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  background: var(--color-primary);
 }
 
 .help-center-message {
@@ -939,7 +939,7 @@ onMounted(() => {
 .help-center-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  background:var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -951,7 +951,7 @@ onMounted(() => {
 
 .help-center-message h4 {
   margin: 0;
-  color: var(--color-text-primary);
+  color: var(--color-primary);
   font-size: 1.5rem;
   text-align: center;
 }
@@ -979,12 +979,12 @@ onMounted(() => {
   padding: 15px;
   background: rgba(155, 89, 182, 0.1);
   border-radius: 10px;
-  border-left: 4px solid #9b59b6;
+  border-left: 4px solid var(--color-primary);
   text-align: left;
 }
 
 .support-icon {
-  color: #9b59b6;
+  color:var(--color-primary);
   font-size: 1.5rem;
   margin-top: 2px;
 }
@@ -1011,7 +1011,7 @@ onMounted(() => {
   padding: 15px;
   background: rgba(155, 89, 182, 0.1);
   border-radius: 10px;
-  border: 2px dashed #9b59b6;
+  border: 2px dashed var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1019,14 +1019,14 @@ onMounted(() => {
 }
 
 .thank-you-message i {
-  color: #f1c40f;
+  color: var(--color-primary);
   font-size: 1.2rem;
 }
 
 .thank-you-message p {
   margin: 0;
   font-weight: bold;
-  color: #9b59b6 !important;
+  color:var(--color-primary) !important;
   font-size: 1rem;
 }
 

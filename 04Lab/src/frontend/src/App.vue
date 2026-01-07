@@ -25,6 +25,12 @@
               <i class="fas fa-users-cog"></i>
               <span>Пользователи</span>
             </router-link>
+
+            <!-- НОВАЯ ССЫЛКА НА СТАТИСТИКУ -->
+            <router-link v-if="authStore.isAdmin" to="/statistics" class="nav-link" active-class="active">
+              <i class="fas fa-chart-line"></i>
+              <span>Статистика</span>
+            </router-link>
           </div>
         </div>
 
