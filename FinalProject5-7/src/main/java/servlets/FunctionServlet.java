@@ -4,6 +4,7 @@ import SQL.Server.Server;
 import SQL.Server.ServerSingleton;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnectionException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import SQL.Services.UserService;
 import SQL.Services.FunctionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -19,12 +21,26 @@ import java.io.PrintWriter;
 public class FunctionServlet extends HttpServlet {
     private Server server;
     private ObjectMapper objectMapper;
+    private StringBuilder readRequest(HttpServletRequest request){
+        StringBuilder jsonBody = new StringBuilder();
+        try(BufferedReader reader = request.getReader()){
+            String line;
+            while((line = reader.readLine()) != null){
+                jsonBody.append(line);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return jsonBody;
+    }
 
     @Override
     public void init() {
         try {
             server = ServerSingleton.getINSTANCE();
             objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES, false);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize FunctionServlet", e);
         }

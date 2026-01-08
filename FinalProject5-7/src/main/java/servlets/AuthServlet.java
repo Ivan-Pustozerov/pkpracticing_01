@@ -26,11 +26,11 @@ public class AuthServlet extends HttpServlet {
     private ObjectMapper objectMapper;
     private static final Logger logger = LoggerFactory.getLogger(UserServlet.class);
 
-    private StringBuilder readRequest(HttpServletRequest request){
+    private StringBuilder readRequest(HttpServletRequest request) {
         StringBuilder jsonBody = new StringBuilder();
-        try(BufferedReader reader = request.getReader()){
+        try (BufferedReader reader = request.getReader()) {
             String line;
-            while((line = reader.readLine()) != null){
+            while ((line = reader.readLine()) != null) {
                 jsonBody.append(line);
             }
         } catch (IOException e) {
