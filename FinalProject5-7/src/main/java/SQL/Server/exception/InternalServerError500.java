@@ -10,7 +10,7 @@ public class InternalServerError500 extends ServerError{
     public InternalServerError500() {
         super("Ошибка сервера");
     }
-
+    @Override
     public ErrorResponse getErrorResponse(String path) {
         return new ErrorResponse(LocalDateTime.now(),500,"Ошибка сервера",path);
     }

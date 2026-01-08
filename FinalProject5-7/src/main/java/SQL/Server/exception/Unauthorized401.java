@@ -10,6 +10,7 @@ public class Unauthorized401 extends ServerError{
     public Unauthorized401() {
         super("Пользователь не авторизован");
     }
+    @Override
     public ErrorResponse getErrorResponse(String path) {
         return new ErrorResponse(LocalDateTime.now(),404,"Пользователь не авторизован",path);
     }
