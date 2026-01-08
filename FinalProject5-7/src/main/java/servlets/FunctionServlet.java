@@ -1,5 +1,7 @@
 package servlets;
 
+import SQL.Server.Server;
+import SQL.Server.ServerSingleton;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnectionException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,18 +17,13 @@ import java.io.PrintWriter;
 
 @WebServlet("/functions/*")
 public class FunctionServlet extends HttpServlet {
-    private UserService userService;
-    private FunctionService functionService;
+    private Server server;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        // Initialize the services with database connection details
         try {
-            userService = new UserService("jdbc:postgresql://localhost:5432/Final",
-                                         "postgres", "lkroot");
-            functionService = new FunctionService("jdbc:postgresql://localhost:5432/Final",
-                                                "postgres", "lkroot");
+            server = ServerSingleton.getINSTANCE();
             objectMapper = new ObjectMapper();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize FunctionServlet", e);

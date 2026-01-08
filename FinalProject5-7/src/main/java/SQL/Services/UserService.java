@@ -101,8 +101,6 @@ public class UserService {
         var BDdto = Users.readUserInfo(connection.getConnection(), null, name, sortField, sortOrder);
         return translateToClientDTO(BDdto);
     }
-
-
     public ArrayList<IdDTO> readUsersID(String[] name, String sortOrder)
             throws SmartConnectionException, SQLRepositoryException {
 
@@ -110,7 +108,6 @@ public class UserService {
 
         return Users.readUserId(connection.getConnection(), name, sortOrder);
     }
-
     /*
     public ArrayList<MathFunctionToClientAdminDTO> readUsersFunctions(long[] id)
             throws SmartConnectionException, SQLRepositoryException {
@@ -136,7 +133,6 @@ public class UserService {
         var BDdto = Users.readAllUsers(connection.getConnection(), sortField, sortOrder);
         return UserMapper.translateToClientDTO(BDdto);
     }
-
     public ArrayList<UserResponse> getAllUsersByRole(boolean is_admin)
             throws SmartConnectionException, SQLRepositoryException {
 
@@ -144,36 +140,47 @@ public class UserService {
         return UserMapper.translateToClientDTO(BDdto);
     }
 
+
     ///=======================================UPDATE=========================================
 
     public int updateUserInfo(long id, String new_name, String new_email, String new_password)
             throws SmartConnectionException, SQLRepositoryException {
 
+        if(!checkUsersExist(new long[]{id})) throw new ServiceArgumentsException("Not Every User Is Available");
+
         byte[] pswrd = passwordHash(new_password);
         return Users.updateUser(connection.getConnection(),id,null,null,new_name,new_email,pswrd);
     }
-
     public int updateUserInfo(String old_name, String new_name, String new_email, String new_password)
             throws SmartConnectionException, SQLRepositoryException {
+
+        if(!checkUsersExist(new String[]{old_name})) throw new ServiceArgumentsException("Not Every User Is Available");
 
         byte[] pswrd = passwordHash(new_password);
         return Users.updateUser(connection.getConnection(),null,old_name,null,new_name,new_email,pswrd);
     }
-
-
     public int updateUserRole(long id, boolean new_role)
             throws SmartConnectionException, SQLRepositoryException {
+
+        if(!checkUsersExist(new long[]{id})) throw new ServiceArgumentsException("Not Every User Is Available");
+
         return Users.updateUser(connection.getConnection(),id,null,new_role,null,null,null);
     }
 
     ///=======================================DELETE==========================================
     public int removeUser(long id)
             throws SmartConnectionException, SQLRepositoryException {
+
+        if(!checkUsersExist(new long[]{id})) throw new ServiceArgumentsException("Not Every User Is Available");
+
         return Users.removeUser(connection.getConnection(), id, null);
 
     }
     public int removeUser(String name)
             throws SmartConnectionException, SQLRepositoryException {
+
+        if(!checkUsersExist(new String[]{name})) throw new ServiceArgumentsException("Not Every User Is Available");
+
         return Users.removeUser(connection.getConnection(), null, name);
     }
 
@@ -257,7 +264,7 @@ public class UserService {
     public String authenticateUser(String name, String password)
             throws SmartConnectionException, SQLRepositoryException {
         if(!checkUsersExist(new String[]{name})) {
-            throw new ServiceException("Incorrect Auth");
+            throw new ServiceArgumentsException("Incorrect Auth");
         }
 
         byte[] pswrd = passwordHash(password);

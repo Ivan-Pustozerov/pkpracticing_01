@@ -60,7 +60,7 @@ public class FunctionService {
         UserRepo.initTable(connection.getConnection());
     }
 
-    public int addAnalyticMFunction(String function_expression, String name, long owner_id)
+    public long addAnalyticMFunction(String function_expression, String name, long owner_id)
             throws SQLRepositoryException, SmartConnectionException {
 
         if(!UserRepo.exists(connection.getConnection(), owner_id, null))
@@ -69,10 +69,11 @@ public class FunctionService {
         long mfId = MathRepo.insertMFunc(connection.getConnection(), "analytic", name, owner_id).get(0).id();
 
         StatRepo.updateStatFuncID(connection.getConnection(),owner_id);
-        return AnalyticRepo.insertAnalyticFunction(connection.getConnection(), mfId, function_expression);
+        AnalyticRepo.insertAnalyticFunction(connection.getConnection(), mfId, function_expression);
+        return mfId;
     }
 
-    public int addAnalyticMFunction(String function_expression, String name, String owner_name)
+    public long addAnalyticMFunction(String function_expression, String name, String owner_name)
             throws SQLRepositoryException, SmartConnectionException {
 
         if(!UserRepo.exists(connection.getConnection(), null, owner_name))
@@ -80,12 +81,11 @@ public class FunctionService {
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name},"-").get(0).id();
 
-        StatRepo.updateStatFunc(connection.getConnection(),owner_name);
         return addAnalyticMFunction(function_expression, name, userId);
     }
 
 
-    public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, long owner_id)
+    public long addTabulatedMFunction(double[] xVals, double[] yVals, String name, long owner_id)
             throws SQLRepositoryException, SmartConnectionException {
 
         if(!UserRepo.exists(connection.getConnection(), owner_id, null))
@@ -101,10 +101,11 @@ public class FunctionService {
         long mfId = MathRepo.insertMFunc(connection.getConnection(), "tabulated", name, owner_id).get(0).id();
 
         StatRepo.updateStatFuncID(connection.getConnection(),owner_id);
-        return TabulatedRepo.insertTabulatedFunction(connection.getConnection(), mfId, xVals, yVals);
+        TabulatedRepo.insertTabulatedFunction(connection.getConnection(), mfId, xVals, yVals);
+        return mfId;
     }
 
-    public int addTabulatedMFunction(double[] xVals, double[] yVals, String name, String owner_name)
+    public long addTabulatedMFunction(double[] xVals, double[] yVals, String name, String owner_name)
             throws SQLRepositoryException, SmartConnectionException {
 
         if(!UserRepo.exists(connection.getConnection(), null, owner_name))
@@ -119,7 +120,6 @@ public class FunctionService {
 
         long userId = UserRepo.readUserId(connection.getConnection(), new String[]{owner_name}, "-").get(0).id();
 
-        StatRepo.updateStatFunc(connection.getConnection(),owner_name);
         return addTabulatedMFunction(xVals, yVals, name, userId);
     }
 

@@ -1,9 +1,16 @@
 package SQL.Server.exception;
 
-import java.io.IOException;
+import SQL.DTO.responseDTO.ErrorResponse;
 
-public class NotFound404 extends IOException {
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+public class NotFound404 extends ServerError{
+    protected int code = 404;
     public NotFound404() {
         super("Запрашиваемый ресурс не найден");
+    }
+    public ErrorResponse getErrorResponse(String path) {
+        return new ErrorResponse(LocalDateTime.now(),404,"Запрашиваемый ресурс не найден",path);
     }
 }

@@ -30,10 +30,9 @@ public class ErrorService {
      * Logs an error to both the database and the application logs
      * @param code Error code (e.g., HTTP status code or custom error code)
      * @param type Error type (e.g., exception class name or custom error category)
-     * @param message Error message
      */
-    public void logError(int code, String type, String message) {
-        logger.error("Error [{}]: {} - {}", code, type, message);
+    public void logError(int code, String type) {
+        //logger.error("Error [{}]: {} - {}", code, type, message);
 
         try {
             errorsRepository.insertError(connection.getConnection(), code, type);

@@ -1,5 +1,7 @@
 package servlets;
 
+import SQL.Server.Server;
+import SQL.Server.ServerSingleton;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,15 +14,13 @@ import java.io.PrintWriter;
 
 @WebServlet("/users/*")
 public class UserServlet extends HttpServlet {
-    private UserService userService;
+    private Server server;
     private ObjectMapper objectMapper;
 
     @Override
     public void init() {
-        // Initialize the UserService with database connection details
         try {
-            userService = new UserService("jdbc:postgresql://localhost:5432/Final",
-                                         "postgres", "lkroot");
+            server = ServerSingleton.getINSTANCE();
             objectMapper = new ObjectMapper();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize UserServlet", e);
