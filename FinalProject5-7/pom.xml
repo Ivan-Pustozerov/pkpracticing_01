@@ -15,7 +15,17 @@
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     </properties>
 
+
     <dependencies>
+
+        <!-- Блокируем checkerQual -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <version>3.49.5</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -101,9 +111,11 @@
             <scope>runtime</scope>
         </dependency>
 
+
     </dependencies>
 
     <build>
+        <finalName>Project</finalName>
         <plugins>
             <!-- Плагин для сборки WAR -->
             <plugin>
@@ -124,46 +136,6 @@
                     <port>8080</port>
                     <path>/FinalProject5-7</path>
                 </configuration>
-            </plugin>
-
-            <!-- Плагин для frontend-->
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.12.1</version>
-                <configuration>
-                    <workingDirectory>src/frontend</workingDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>v18.17.0</nodeVersion>
-                            <npmVersion>9.6.7</npmVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm install</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>npm run build</id>
-                        <goals>
-                            <goal>npm</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>run build:prod</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>

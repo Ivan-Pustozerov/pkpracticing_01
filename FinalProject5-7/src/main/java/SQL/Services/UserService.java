@@ -34,7 +34,7 @@ public class UserService {
     private final UserStatisticRepository StatRepo = new UserStatisticRepository();
 
     private TabulatedFunctionFactory factory = new ArrayTabulatedFunctionFactory();
-    private HashMap<Long, LocalDateTime> UsersOnline;
+    private HashMap<Long, LocalDateTime> UsersOnline = new HashMap<>();
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
 
     public UserService(String url, String username, String password)

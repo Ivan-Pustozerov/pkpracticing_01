@@ -1,7 +1,12 @@
 package servlets;
 
+import SQL.DTO.requestDTO.AnalyticFunctionRequest;
+import SQL.DTO.requestDTO.FunctionRangeRequest;
+import SQL.DTO.requestDTO.RegisterRequest;
+import SQL.DTO.requestDTO.TabulatedFunctionRequest;
 import SQL.Server.Server;
 import SQL.Server.ServerSingleton;
+import SQL.Server.exception.ServerError;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnectionException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -33,6 +38,13 @@ public class FunctionServlet extends HttpServlet {
         }
         return jsonBody;
     }
+    private String extractTokenFromRequest(HttpServletRequest request){
+        String bearerToken = request.getHeader("Authorization");
+        if(bearerToken != null && bearerToken.startsWith("Bearer")){
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 
     @Override
     public void init() {
@@ -49,8 +61,19 @@ public class FunctionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
-        // TODO: Implementation for GET /api/functions and /api/functions/{id}
-        response.setStatus(HttpServletResponse.SC_OK);
+        String pathInfo = request.getPathInfo();
+        response.setContentType("application/json; charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        if(pathInfo == null){
+            handleGetAllFunctions(request,response);
+        }else{
+            String[] pathParts = pathInfo.split("/");
+            if(pathParts.length >= 2){
+                Long funcId = Long.parseLong(pathParts[1]);
+                handleGetFunction(request,response,funcId);
+            }
+        }
 
     }
 
@@ -61,22 +84,19 @@ public class FunctionServlet extends HttpServlet {
         
         if ("/analytic".equals(pathInfo)) /// ANALYTIC
         {
-            // TODO: Implementation for POST /api/functions/analytic
-            response.setStatus(HttpServletResponse.SC_OK);
+            handlePostAnalytic(request,response);
 
         }
         else if ("/tabulated".equals(pathInfo)) /// TABULATED
         {
-            // TODO: Implementation for POST /api/functions/tabulated
-            response.setStatus(HttpServletResponse.SC_OK);
+            handlePostTabulated(request,response);
         }
         else if (pathInfo != null) /// CALCULATE
         {
             String[] pathParts = pathInfo.split("/");
             if (pathParts.length >= 3 && "calculate".equals(pathParts[2])) {
-                // TODO: Implementation for POST /api/functions/{id}/calculate + ID!
-                response.setStatus(HttpServletResponse.SC_OK);
-
+                Long funcId = Long.parseLong(pathParts[1]);
+                handlePostCalculate(request,response,funcId);
             }
         }
         else /// ERROR
@@ -88,7 +108,121 @@ public class FunctionServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        // TODO: Implementation for DELETE /api/functions/{id}
-        response.setStatus(HttpServletResponse.SC_OK);
+
+        String pathInfo = request.getPathInfo();
+
+        String[] pathParts = pathInfo.split("/");
+        if (pathParts.length >= 2) {
+            Long funcId = Long.parseLong(pathParts[1]);
+            handleDelete(request,response,funcId);
+        }
     }
+
+    /// =======================================HANDLERS=====================================
+
+    private void handleGetAllFunctions(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+
+        String token = extractTokenFromRequest(request);
+
+        try{
+            var functionResponseArray = server.getAllFunctions(token,null);
+            response.setStatus(HttpServletResponse.SC_OK);
+            objectMapper.writeValue(response.getWriter(), functionResponseArray);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+    private void handleGetFunction(HttpServletRequest request, HttpServletResponse response, long funcId)
+            throws IOException {
+
+        String token = extractTokenFromRequest(request);
+
+        try{
+            var functionResponse = server.getSpecificFunction(token,funcId);
+            response.setStatus(HttpServletResponse.SC_OK);
+            objectMapper.writeValue(response.getWriter(), functionResponse);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+
+
+    private void handlePostAnalytic(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+
+        String token = extractTokenFromRequest(request);
+
+        AnalyticFunctionRequest analyticRequest = objectMapper.readValue(readRequest(request).toString(),
+                                                                            AnalyticFunctionRequest.class);
+
+        try{
+            var functionResponse = server.postAnalyticFunction(token,analyticRequest);
+            response.setStatus(HttpServletResponse.SC_OK);
+            objectMapper.writeValue(response.getWriter(), functionResponse);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+    private void handlePostTabulated(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+
+        String token = extractTokenFromRequest(request);
+
+        TabulatedFunctionRequest tabulatedRequest = objectMapper.readValue(readRequest(request).toString(),
+                TabulatedFunctionRequest.class);
+
+        try{
+            var functionResponse = server.postTabulatedFunction(token,tabulatedRequest);
+            response.setStatus(HttpServletResponse.SC_OK);
+            objectMapper.writeValue(response.getWriter(), functionResponse);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+    private void handlePostCalculate(HttpServletRequest request, HttpServletResponse response, long funcId)
+            throws IOException {
+
+        String token = extractTokenFromRequest(request);
+
+        var rangeRequest = objectMapper.readValue(readRequest(request).toString(),
+                FunctionRangeRequest.class);
+
+        try{
+            var PointResponseArray = server.calculateFunction(token,funcId,rangeRequest);
+            response.setStatus(HttpServletResponse.SC_OK);
+            objectMapper.writeValue(response.getWriter(), PointResponseArray);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+
+    private void handleDelete(HttpServletRequest request, HttpServletResponse response, long funcId)
+            throws IOException {
+
+        String token = extractTokenFromRequest(request);
+
+        try{
+            server.deleteFunction(token,funcId);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (ServerError e) {
+            var errorResponse = e.getErrorResponse("-");
+            response.setStatus(errorResponse.status());
+        }
+
+    }
+
 }

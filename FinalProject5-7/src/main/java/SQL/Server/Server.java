@@ -12,6 +12,7 @@ import SQL.repositories.UserStatisticRepository;
 import SQL.repositories.tools.SQLRepositoryException;
 import SQL.repositories.tools.SmartConnectionException;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 import static SQL.Mappers.Converter.todoubleArray;
@@ -71,6 +72,19 @@ public class Server {
             throw errorHandler(new InternalServerError500());
         }
     }
+
+
+    /// УБРАТЬ ПОТОМ!
+    public UserResponse registerUserTest()
+            throws ServerError, SmartConnectionException, SQLRepositoryException {
+        if(!userService.checkUsersExist(new String[]{"test"})){
+            RegisterRequest reg = new RegisterRequest("test", "test@gmail.com", "qwerty");
+            return registerUserAdmin(reg).user();
+        }
+        return null;
+
+    }
+
 
     private ServerError errorHandler(ServerError Throw){
         errorService.logError(Throw.code(),Throw.getMessage());
@@ -383,5 +397,10 @@ public class Server {
             throw errorHandler(new InternalServerError500());
         }
 
+    }
+
+
+    public Long getUserIdFromToken(String token) {
+        return userService.getUserIdFromToken(token);
     }
 }

@@ -47,6 +47,8 @@ public class AuthServlet extends HttpServlet {
             objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES, false);
             objectMapper.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
 
+            server.registerUserTest();
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize AuthServlet", e);
         }
